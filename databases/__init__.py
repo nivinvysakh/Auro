@@ -1,15 +1,8 @@
-from .noprefix import NoprefixDatabase
-from .Bot_Prefix import PrefixDatabase
 from .badges import BadgesDatabase
 
 
-
-noprefix = NoprefixDatabase()
-prefix = PrefixDatabase()
 badges = BadgesDatabase()
 init_db_list = [
-    ("noprefixDB", noprefix),
-    ("prefixDB", prefix),
     ("badgesDB", badges),
 ]
 

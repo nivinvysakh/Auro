@@ -2,10 +2,17 @@ import asyncio
 import os
 from dotenv import load_dotenv
 from core.auro import Auro
-
+from databases import init_dbs
 load_dotenv()
 
 async def run_auro():
+    try:
+        await init_dbs()
+        print("INFO     | All databases initialized successfully.")
+        print()
+    except Exception as e:
+        print(f"ERROR    | Database Initialization Failure: {e}")
+        return
     
     bot = Auro()
     

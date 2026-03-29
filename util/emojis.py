@@ -1,0 +1,40 @@
+
+
+
+class Emojis:
+    color = 2829616
+    error = "<:error:1486697352109756636>"
+    success = "<:ok:1486697734663831572>"
+    warning = "<:warning:1486697644003819540>"
+    cooldown = "<:cooldown:1486697805438521394>"
+    dot = "<:dot:1486701778413158533>"
+    spotify = "<:spotify:1486728325392109800>"
+    music = "<:music:1486728511082463353>"
+    activity = "<:activity:1486728744918978600>"
+    boost = "<:boost:1486729401059115081>"
+    time = "<:clock:1486748544273748100>"
+    join = "<:civillian:1486748879381860526>"
+    mutual = "<:home:1486749154246922473>"
+    id = "<:information:1486749308853424169>"
+    roles ="<:role:1486749772504236134>"
+    heart = "<a:heart:1486750445102956765>"
+    nickname_emoji = "<:earth:1486751475647516983>"
+    devicesicon = "<:devices:1486716548856025148>"
+    musicplaying = "<a:musicplaying:1487723633114878082>"
+class BadgesIcon:
+    developer = "<:developer:1486698723852681317>"
+    beta_tester = "<:beta:1486699084751568896>"
+    staff = "<:staff:1486700189510275184>"
+    friend = "<:lumawave:1486700462739554396>"
+    contributor = "<:contributor:1486700869658611903>"
+
+class ButtonEmojis:
+    account = "<:user:1486714338050969811>"
+    status = "<:status:1486714792734359662>"
+    badges = "<:badges:1486715024624976014>"
+ 
+class UserStautsEmo:
+    online = "<:onlinegray:1486715930103779439>"
+    idle = "<:idlegray:1486715928124325970>"
+    dnd = "<:dnd:1486716223847796836>"
+    offline = "<:offline:1486715926219985126>"
