@@ -2,7 +2,7 @@ import aiosqlite
 import json
 
 class BadgesDatabase:
-    def __init__(self, db_path=r"./database\DB\badge.db"):
+    def __init__(self, db_path=r"./databases\DB\badge.db"):
         self.db_path = db_path
 
     async def init_db(self):
