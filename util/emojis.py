@@ -21,6 +21,11 @@ class Emojis:
     nickname_emoji = "<:earth:1486751475647516983>"
     devicesicon = "<:devices:1486716548856025148>"
     musicplaying = "<a:musicplaying:1487723633114878082>"
+    green = "<:green:1487796148226752674>"
+    red = "<:red:1487796132393259039>"
+    die = "<a:dice:1488215769790546092>"
+    code = "<a:chihirotyping:1489269442167967864>"
+    bug = "<:caterpillar:1489269438023729342>"
 class BadgesIcon:
     developer = "<:developer:1486698723852681317>"
     beta_tester = "<:beta:1486699084751568896>"

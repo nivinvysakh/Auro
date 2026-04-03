@@ -60,6 +60,13 @@ class ProfileButtons(discord.ui.View):
         clicked_button.disabled = True
         return True
 
+    async def on_timeout(self):
+        for child in self.children:
+            if isinstance(child, discord.ui.Button):
+                child.disabled = True
+        if self.message:
+            await self.message.edit(view=self)
+
     def memberstatemoji(self, member):
         stats = {
             discord.Status.online: f"{UserStautsEmo.online} | **Online**",
@@ -86,7 +93,8 @@ class ProfileButtons(discord.ui.View):
         
         if member and member.activity:
             if isinstance(member.activity, discord.Spotify):
-                embed.add_field(name=f"{emojis.spotify} Spotify", value=f"> 🎵 *{member.activity.title}*", inline=False)
+                embed.add_field(name=f"{emojis.spotify} Spotify", value=f"> {emojis.musicplaying} \u2001 *{member.activity.title}*", inline=False)
+                embed.set_thumbnail(url=member.activity.album_cover_url)
             else:
                 embed.add_field(name=f"{emojis.activity} Activity", value=f"> *{member.activity.name}*", inline=False)
 

@@ -28,6 +28,8 @@ class ErrorHandler(commands.Cog):
                 color=discord.Color.red()
             ).set_thumbnail(url=self.bot.user.display_avatar.url)
             await ctx.reply(embed=embed, delete_after=5)
+        elif isinstance(error,commands.CommandNotFound):
+            return
         else:
             embed = discord.Embed(
                 title=f"{Emojis.error} An Error Occurred",
