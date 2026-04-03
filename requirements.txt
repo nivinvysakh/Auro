@@ -1,0 +1,5 @@
+discord.py
+pomice
+syncedlyrics
+python-dotenv
+flake8
