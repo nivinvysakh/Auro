@@ -1,4 +1,4 @@
-name: Auro Testing.
+Name: Auro Testing
 
 on:
   push:
@@ -26,15 +26,19 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install pytest pytest-asyncio
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Run with Flake8
+    - name: Run Linting
       run: |
         pip install flake8
-        
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Run Tests
+      run: |
+        pytest --maxfail=1 --disable-warnings -v
 
     - name: Deployment Check
       run: echo "Ready for Deployment"
+
