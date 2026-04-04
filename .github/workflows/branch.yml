@@ -1,4 +1,4 @@
-Name: Auro Testing
+name: Auro Testing
 
 on:
   push:
@@ -41,4 +41,3 @@ jobs:
 
     - name: Deployment Check
       run: echo "Ready for Deployment"
-
