@@ -22,7 +22,7 @@ class Auro(commands.AutoShardedBot):
     async def setup_hook(self):
         print(f"{self.get_time()} | INFO      | Auro Infrastructure: Initializing Shards...")
         
-       
+        await asyncio.sleep(5)
         async def pomice_setup():
             try:
                 await pomice.NodePool.create_node(
@@ -31,8 +31,9 @@ class Auro(commands.AutoShardedBot):
                     host="127.0.0.1",
                     port=2333,
                     password="youshallnotpass",
-                    secure=False
-                )
+                    secure=False,
+                    
+                )                
                 print(f"{self.get_time()} | INFO      | Pomice: Node connection initiated.")
             except Exception as e:
                 print(f"{self.get_time()} | ERROR     | Pomice: Setup failed: {e}")
@@ -65,6 +66,15 @@ class Auro(commands.AutoShardedBot):
     @commands.Cog.listener()
     async def on_pomice_node_ready(self, node: pomice.Node):
         print(f"{self.get_time()} | SUCCESS   | Pomice: Node {node.identifier} is fully CONNECTED.")
+    
+    @commands.Cog.listener()
+    async def on_pomice_node_disconnect(self,node:pomice.Node):
+        await asyncio.sleep(5)
+        try:
+            await node.connect()
+            print(f"✅ Auro Engine [Node: {node.identifier}] is back online!")
+        except Exception as e :
+            print(f"Connection Error : {e}")
 
     async def on_ready(self):
         await self.change_presence(

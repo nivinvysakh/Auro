@@ -40,9 +40,11 @@ class Stats(commands.Cog):
             if node and node.is_connected:
                 stats = node.stats
                 cpu = stats.cpu_process_load * 100
+                latency = round(node.latency)
                 lava_embed.description = f"**Node:** `Auro` {emojis.success}"
                 lava_embed.add_field(name="🎸 Players", value=f"`{stats.players_active}` Playing\n`{stats.players_total}` Total", inline=True)
                 lava_embed.add_field(name="⚡ Load", value=f"**Node:** `{cpu:.2f}%` \n**System:** `{stats.cpu_cores}%`", inline=True)
+                lava_embed.add_field(name="📶 Server Latency",value=f"`{latency}` Ms",inline=True)
                 lava_embed.add_field(name="📦 Version", value=f"`Pomice {pomice.__version__}`", inline=True)
                 lava_embed.set_thumbnail(url=self.bot.user.display_avatar.url)
                 

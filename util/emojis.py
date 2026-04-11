@@ -3,6 +3,7 @@
 
 class Emojis:
     color = 2829616
+    auro = "<:botico:1489908738323120260>"
     error = "<:error:1486697352109756636>"
     success = "<:ok:1486697734663831572>"
     warning = "<:warning:1486697644003819540>"
@@ -26,6 +27,9 @@ class Emojis:
     die = "<a:dice:1488215769790546092>"
     code = "<a:chihirotyping:1489269442167967864>"
     bug = "<:caterpillar:1489269438023729342>"
+    bonk = "<a:bonk:1489649612779163709>"
+    left_arrow = "<a:leftarrow:1489882175229923399>"
+    right_arrow = "<a:rightarrow:1489882169756352512>"
 class BadgesIcon:
     developer = "<:developer:1486698723852681317>"
     beta_tester = "<:beta:1486699084751568896>"
@@ -37,6 +41,8 @@ class ButtonEmojis:
     account = "<:user:1486714338050969811>"
     status = "<:status:1486714792734359662>"
     badges = "<:badges:1486715024624976014>"
+    github = "<:github:1492213289424392223>"
+    server = "<:server:1492213286286917682>"
  
 class UserStautsEmo:
     online = "<:onlinegray:1486715930103779439>"

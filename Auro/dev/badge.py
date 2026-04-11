@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from databases import BadgesDatabase
 from util.emojis import Emojis as _Emojis
+from util.emojis import BadgesIcon
 
 class Badges(commands.Cog):
     def __init__(self, bot:commands.AutoShardedBot):
@@ -55,14 +56,14 @@ class Badges(commands.Cog):
         if not badges:
             no_badges_embed = discord.Embed(
                 title=f"{User.name} has no badges",
-                description=f"{_Emojis.cross} This user does not have any badges.",
+                description=f"{_Emojis.error} This user does not have any badges.",
                 color=discord.Color.red()
             ).set_thumbnail(url=User.avatar.url if User.avatar else None)
             await ctx.reply(embed=no_badges_embed,delete_after=30)
             return True
         badges_str = "\n".join(f"{_Emojis.dot} {badge}" for badge in badges)
         badges_embed = discord.Embed(
-            title=f"{User.name}'s Badges [{_Emojis.dev_badge_emoji}]",
+            title=f"{User.name}'s Badges [{BadgesIcon.developer}]",
             description=badges_str,
             color=discord.Color.green()
         ).set_thumbnail(url=User.avatar.url if User.avatar else None).set_footer(text=f"Total Badges: {len(badges)}")

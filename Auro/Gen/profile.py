@@ -36,11 +36,28 @@ class ProfileButtons(discord.ui.View):
                 "badges": "https://i.pinimg.com/originals/33/ed/e3/33ede3813b49035b5dc3e1044b8d47fa.gif"
             }
             embed.set_image(url=gifs.get(page_type, gifs["overview"]))
-        elif "Admin" in badges:
+        elif "Staff" in badges:
+            embed.title = f"{self.target.name}'s {page_type.title()} [{BadgesIcon.staff}]"
             embed.color = discord.Color.blue()
             embed.set_image(url="https://giffiles.alphacoders.com/132/13241.gif")
+        elif "Friend" in badges:
+            embed.color = discord.Color.from_str("#FF69B4")
+            embed.title = f"{self.target.name}'s {page_type.title()} [{BadgesIcon.friend}]"
+            embed.set_image(url="https://i.pinimg.com/originals/0f/1b/a3/0f1ba3323de4711a314119a80205c0bf.gif")
+        elif "Beta_Tester" in badges:
+            embed.color = discord.Color.green()
+            embed.title = f"{self.target.name}'s {page_type.title()} [{BadgesIcon.beta_tester}]"
+            embed.set_image(url="https://i.pinimg.com/originals/71/5c/58/715c585f6a62f0869de90fa244aa80d8.gif")
+        elif "Contributor" in badges:
+            embed.color = discord.Color.from_str("#FF8C00")
+            embed.title = f"{self.target.name}'s {page_type.title()} [{BadgesIcon.contributor}]"
+            embed.set_image(url="https://i.pinimg.com/originals/00/a2/0a/00a20a67bc0bdbdb698ed0ee7a1cd5db.gif")
+
         else:
-            embed.color = emojis.color 
+            embed.color = emojis.color
+            bot_user = await self.bot.fetch_user(self.bot.user.id)
+            embed.set_image(url=bot_user.banner.url) 
+            embed.color = discord.Color.blurple()
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.command_owner.id:
@@ -65,7 +82,10 @@ class ProfileButtons(discord.ui.View):
             if isinstance(child, discord.ui.Button):
                 child.disabled = True
         if self.message:
-            await self.message.edit(view=self)
+            try:
+                await self.message.edit(view=self)
+            except Exception :
+                pass
 
     def memberstatemoji(self, member):
         stats = {
