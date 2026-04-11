@@ -1,4 +1,6 @@
 import aiosqlite
+
+
 class PrefixDatabase:
     def __init__(self, db_path="./database/DB/prefix.db"):
         self.db_path = db_path
@@ -29,12 +31,11 @@ class PrefixDatabase:
                 "SELECT prefix FROM guild_prefixes WHERE guild_id = ?", (guild_id,)
             ) as cursor:
                 row = await cursor.fetchone()
-                return row[0] if row else '!'
-            
-    async def reset_prefix(self,guild_id:int):
+                return row[0] if row else "!"
+
+    async def reset_prefix(self, guild_id: int):
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(
-                "DELETE FROM guild_prefixes WHERE guild_id = ?",
-                (guild_id,)
+                "DELETE FROM guild_prefixes WHERE guild_id = ?", (guild_id,)
             )
             await db.commit()

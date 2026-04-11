@@ -1,50 +1,41 @@
-name: Auro Testing.
+name: Auro Testing
 
 on:
   push:
-    branches: "Main"
+    branches: [ main ]
   pull_request:
-    branches: "Main"
+    branches: [ main ]
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
-  build:
+  lint-and-test:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
-        cache: 'pip'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: 'pip'
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest black
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Check for Outdated Dependencies
-      run: |
-          echo "Checking for newer versions of your libraries.."
-          pip list --outdated
-        
-    - name: Audit Dependencies
-      run: |
-        pip install safety
-        safety check --report|| echo "Check Complete. Review the report above for more info"
+      - name: Format Check (Black)
+        run: black . --check
 
-    - name: Run with Flake8
-      run: |
-        pip install flake8
-        
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Deployment Check
-      run: echo "Ready for Deployment"
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Security Audit
+        run: |
+          pip install safety
+          safety check
+
+      - name: Run Tests
+        run: pytest
