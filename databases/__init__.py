@@ -1,10 +1,10 @@
 from .badges import BadgesDatabase
 
-
 badges = BadgesDatabase()
 init_db_list = [
     ("badgesDB", badges),
 ]
+
 
 async def init_dbs():
     for name, db in init_db_list:

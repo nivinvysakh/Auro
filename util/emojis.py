@@ -1,6 +1,3 @@
-
-
-
 class Emojis:
     color = 2829616
     auro = "<:botico:1489908738323120260>"
@@ -17,7 +14,7 @@ class Emojis:
     join = "<:civillian:1486748879381860526>"
     mutual = "<:home:1486749154246922473>"
     id = "<:information:1486749308853424169>"
-    roles ="<:role:1486749772504236134>"
+    roles = "<:role:1486749772504236134>"
     heart = "<a:heart:1486750445102956765>"
     nickname_emoji = "<:earth:1486751475647516983>"
     devicesicon = "<:devices:1486716548856025148>"
@@ -30,6 +27,8 @@ class Emojis:
     bonk = "<a:bonk:1489649612779163709>"
     left_arrow = "<a:leftarrow:1489882175229923399>"
     right_arrow = "<a:rightarrow:1489882169756352512>"
+
+
 class BadgesIcon:
     developer = "<:developer:1486698723852681317>"
     beta_tester = "<:beta:1486699084751568896>"
@@ -37,13 +36,15 @@ class BadgesIcon:
     friend = "<:lumawave:1486700462739554396>"
     contributor = "<:contributor:1486700869658611903>"
 
+
 class ButtonEmojis:
     account = "<:user:1486714338050969811>"
     status = "<:status:1486714792734359662>"
     badges = "<:badges:1486715024624976014>"
     github = "<:github:1492213289424392223>"
     server = "<:server:1492213286286917682>"
- 
+
+
 class UserStautsEmo:
     online = "<:onlinegray:1486715930103779439>"
     idle = "<:idlegray:1486715928124325970>"

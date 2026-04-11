@@ -1,6 +1,7 @@
 import aiosqlite
 import json
 
+
 class BadgesDatabase:
     def __init__(self, db_path=r"./databases\DB\badge.db"):
         self.db_path = db_path
@@ -26,12 +27,11 @@ class BadgesDatabase:
         if badge in badges:
             badges.remove(badge)
             await self._save_badges(user_id, badges)
-            
+
     async def get_badges(self, user_id: int):
         async with aiosqlite.connect(self.db_path) as db:
             async with db.execute(
-                "SELECT badges FROM badges WHERE user_id = ?",
-                (user_id,)
+                "SELECT badges FROM badges WHERE user_id = ?", (user_id,)
             ) as cursor:
                 row = await cursor.fetchone()
                 if row is None:
@@ -43,26 +43,22 @@ class BadgesDatabase:
 
     async def remove_user(self, user_id: int):
         async with aiosqlite.connect(self.db_path) as db:
-            await db.execute(
-                "DELETE FROM badges WHERE user_id = ?",
-                (user_id,)
-            )
+            await db.execute("DELETE FROM badges WHERE user_id = ?", (user_id,))
             await db.commit()
 
     async def get_all_users(self):
         async with aiosqlite.connect(self.db_path) as db:
             async with db.execute("SELECT user_id, badges FROM badges") as cursor:
                 rows = await cursor.fetchall()
-                return [{
-                    "user_id": row[0],
-                    "badges": json.loads(row[1])
-                } for row in rows]
+                return [
+                    {"user_id": row[0], "badges": json.loads(row[1])} for row in rows
+                ]
 
     async def _save_badges(self, user_id: int, badges: list[str]):
         badges_json = json.dumps(badges)
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(
                 "INSERT OR REPLACE INTO badges (user_id, badges) VALUES (?, ?)",
-                (user_id, badges_json)
+                (user_id, badges_json),
             )
             await db.commit()
