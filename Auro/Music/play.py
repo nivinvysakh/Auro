@@ -22,6 +22,7 @@ sp = spotipy.Spotify(
 )
 
 
+
 class Player(pomice.Player):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -324,6 +325,7 @@ class Music(commands.Cog):
             text="Auro Engine • Queue System", icon_url=self.bot.user.display_avatar.url
         )
         await ctx.reply(embed=embed)
+
 
 
 async def setup(bot):

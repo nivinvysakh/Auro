@@ -34,7 +34,6 @@ class Inactivity(commands.Cog):
         before: discord.VoiceState,
         after: discord.VoiceState,
     ):
-
         if member.id == self.bot.user.id:
             if before.channel and not after.channel:
                 player = cast(Player, member.guild.voice_client)

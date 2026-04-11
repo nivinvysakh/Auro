@@ -8,12 +8,14 @@ class BadgesDatabase:
 
     async def init_db(self):
         async with aiosqlite.connect(self.db_path) as db:
-            await db.execute("""
+            await db.execute(
+                """
                 CREATE TABLE IF NOT EXISTS badges (
                     user_id INTEGER PRIMARY KEY,
                     badges TEXT DEFAULT '[]'
                 )
-            """)
+            """
+            )
             await db.commit()
 
     async def add_badge(self, user_id: int, badge: str):

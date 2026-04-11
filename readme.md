@@ -48,7 +48,7 @@ Auro is an open-source project. Contributions are welcome! Please fork the repos
 5. **Open** a pull request
 
 ## 🎶 License
-Auro is licensed under the MIT License. See the LICENSE file for more details.
+Auro is licensed under the AGPL-3.0 License. See the LICENSE file for more details.
 
 ---
 

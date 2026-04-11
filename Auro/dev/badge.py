@@ -5,6 +5,7 @@ from util.emojis import Emojis as _Emojis
 from util.emojis import BadgesIcon
 
 
+
 class Badges(commands.Cog):
     def __init__(self, bot: commands.AutoShardedBot):
         self.bot = bot
