@@ -9,6 +9,7 @@ import asyncio
 class Auro(commands.AutoShardedBot):
     def __init__(self):
         intents = discord.Intents.all()
+        self.black_list = []
         super().__init__(
             command_prefix="a!",
             intents=intents,
@@ -16,7 +17,7 @@ class Auro(commands.AutoShardedBot):
             chunk_guilds_at_startup=False,
             case_insensitive=True,
         )
-
+        
     def get_time(self):
         return datetime.datetime.now().strftime("%H:%M:%S")
 

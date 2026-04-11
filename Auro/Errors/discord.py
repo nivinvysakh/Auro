@@ -1,4 +1,5 @@
 import discord
+import pomice
 from discord.ext import commands
 from util.emojis import Emojis
 
@@ -33,6 +34,8 @@ class ErrorHandler(commands.Cog):
             ).set_thumbnail(url=self.bot.user.display_avatar.url)
             await ctx.reply(embed=embed, delete_after=5)
         elif isinstance(error, commands.CommandNotFound):
+            return
+        elif isinstance(error,pomice.FilterTagAlreadyInUse):
             return
         else:
             embed = discord.Embed(
