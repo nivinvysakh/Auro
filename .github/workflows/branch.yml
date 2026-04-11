@@ -14,6 +14,8 @@ jobs:
         working-directory: ./Auro
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: '.'
 
       - name: Set up Python
         uses: actions/setup-python@v5
