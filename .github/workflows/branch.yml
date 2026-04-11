@@ -1,5 +1,4 @@
-name: Auro Continuous Integration
-
+name: Auro
 on:
   push:
     branches: [ Main ]
@@ -10,6 +9,9 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Auro
     steps:
       - uses: actions/checkout@v4
 
