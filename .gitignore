@@ -1,3 +1,4 @@
 .env
 DB/
 *__pycache__/
+bin
