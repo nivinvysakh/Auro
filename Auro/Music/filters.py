@@ -30,6 +30,7 @@ class Filters(commands.Cog):
             color= discord.Color.blurple()
         ).set_footer(text="💝",icon_url=self.bot.user.avatar.url)
         await ctx.reply(embed=embed,delete_after=20)
+        
 
     @commands.hybrid_command(
         name="nightcore", description="🌙 Speed up the track and increase the pitch"

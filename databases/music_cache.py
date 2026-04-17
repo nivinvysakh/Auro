@@ -19,6 +19,7 @@ class MusicCache:
             """)
             await db.commit()
 
+
     async def get_cached_hash(self, query: str) -> str:
        
         async with aiosqlite.connect(self.path) as db:

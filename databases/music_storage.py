@@ -38,3 +38,4 @@ class MusicStorage:
                 (query.strip().lower(), track_hash, title, source)
             )
             await db.commit()
+            
