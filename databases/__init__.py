@@ -1,9 +1,15 @@
 from .badges import BadgesDatabase
+from .music_cache import MusicCache
+from .music_storage import MusicStorage
 
 badges = BadgesDatabase()
+music_cache = MusicCache()
+music_storage = MusicStorage()
 init_db_list = [
     ("badgesDB", badges),
-]
+    ("musicCacheDB",music_cache),
+    ("Music_Bash_System",music_storage)
+]   
 
 
 async def init_dbs():

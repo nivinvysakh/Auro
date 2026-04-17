@@ -1,3 +1,5 @@
+# Auro Music Discord bot
+# Licensed under AGPL-3
 import discord
 from discord.ext import commands
 import pomice
@@ -7,6 +9,8 @@ from util.emojis import Emojis
 from discord import app_commands
 from typing import cast
 from spotipy import SpotifyClientCredentials
+from databases import MusicCache
+from databases import MusicStorage
 import os
 from pathlib import Path
 
@@ -27,6 +31,8 @@ class Player(pomice.Player):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queue = pomice.Queue()
+        self.music_cache = MusicCache()
+        self.music_storage = MusicStorage()
         self.controller = None
         self.loop = False
         self.loop_queue = False
@@ -59,6 +65,35 @@ class Music(commands.Cog):
             return False
         return True
 
+    async def get_or_search_track(self, player: Player, query: str, search_type: str = "query") -> list:
+        
+        cached = await player.music_storage.get_cached_track(query)
+        if cached:
+            track_hash, _ = cached
+            results = await player.build_track(track_hash)
+            return [results] if results else []
+        
+        if search_type == "spotify":
+            results = await player.get_tracks(query=f"ytmsearch:{query}")
+            if not results:
+                results = await player.get_tracks(query=f"scsearch:{query}")
+            source = "Spotify"
+        elif search_type == "url":
+            results = await player.get_tracks(query=query)
+            source = "URL"
+        else:  
+            results = await player.get_tracks(query=f"ytmsearch:{query}")
+            if not results:
+                results = await player.get_tracks(query=f"scsearch:{query}")
+            source = "YouTube"
+        
+        
+        if results:
+            track_hash = getattr(results[0], "track_id", None) or results[0].info.get("track")
+            await player.music_storage.save_to_storage(query, track_hash, results[0].title, source)
+        
+        return results
+
     @commands.Cog.listener()
     async def on_pomice_track_start(self, player: Player, track: pomice.Track):
 
@@ -71,6 +106,9 @@ class Music(commands.Cog):
                     await player.controller.send(
                         f"{Emojis.warning} I need speaker permissions!"
                     )
+        if player.loop:
+            return
+        
         thumbnail = (
             getattr(track, "thumbnail", None)
             or track.info.get("thumbnail")
@@ -105,8 +143,11 @@ class Music(commands.Cog):
     @commands.Cog.listener()
     async def on_pomice_track_end(self, player: Player, track, reason):
         if player.loop:
-            await asyncio.sleep(0.2)
-            return await player.play(track)
+            cached_hash = await player.music_cache.get_cached_hash(f"loop_{player.guild.id}")
+            if cached_hash:
+                loop_track = await player.build_track(cached_hash)
+                await asyncio.sleep(0.2)
+                return await player.play(loop_track)
         elif player.loop_queue:
             await asyncio.sleep(0.5)
             player.queue.put(track)
@@ -141,18 +182,12 @@ class Music(commands.Cog):
         if "open.spotify.com" in search:
             request = sp.track(search)
             query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
-            results = await player.get_tracks(query=f"ytmsearch:{query}")
-            if not results:
-                results = await player.get_tracks(query=f"scsearch:{query}")
+            results = await self.get_or_search_track(player, query, "spotify")
 
         elif search.startswith(("http", "www")):
-            results = await player.get_tracks(query=search)
+            results = await self.get_or_search_track(player, search, "url")
         else:
-
-            results = await player.get_tracks(query=f"ytmsearch:{search}")
-
-        if not results:
-            results = await player.get_tracks(query=f"scsearch:{search}")
+            results = await self.get_or_search_track(player, search, "search")
 
         if isinstance(results, pomice.Playlist):
             added = 0
@@ -227,6 +262,14 @@ class Music(commands.Cog):
     async def stop(self, ctx):
         if ctx.voice_client:
             player = cast(Player, ctx.voice_client)
+            await player.music_cache.set_cached_hash(f"loop_{ctx.guild.id}", "", "")
+            
+            
+            if player.loop:
+                await player.music_storage.save_to_storage(
+                    f"loop_{ctx.guild.id}", "", "", "Cleared"
+                )
+            
             try:
                 await player.channel.edit(status=None)
             except:
@@ -264,35 +307,39 @@ class Music(commands.Cog):
         embed.add_field(name="Up Next", value=queue_text or "No songs in queue.")
         await ctx.reply(embed=embed)
 
-    @commands.hybrid_command(
-        name="loop",
-        description="🔁 Toggles looping for the current song.",
-        aliases=["ls", "repeat"],
-    )
+    @commands.hybrid_command(name="loop",description="🔄️ Toggles looping for the current playing song.")
     @commands.guild_only()
     async def loop(self, ctx: commands.Context):
         player = cast(Player, ctx.voice_client)
         if not player or not player.is_playing:
-            embed = discord.Embed(
-                description=f"{Emojis.warning} Nothing is playing to loop!",
-                color=discord.Color.yellow(),
-            )
-            return await ctx.reply(embed=embed, delete_after=10)
+            return await ctx.reply(f"{Emojis.warning} Nothing is playing to loop!")
 
         player.loop = not player.loop
-        status = "Enabled" if player.loop else "Disabled"
-        emoji = Emojis.success if player.loop else Emojis.error
+        
+        if player.loop:
+            current_track = player.current
+            track_hash = getattr(player.current, "track_id", None)
+            if not track_hash:
+                track_hash = current_track.info.get("track")
+            if not track_hash:
+                return 
+            await player.music_cache.set_cached_hash(
+                query=f"loop_{ctx.guild.id}", 
+                track_hash=track_hash,
+                title=current_track.title
+            )
+            
+            status = "Enabled"
+            color = discord.Color.blurple()
+        else:
+            status = "Disabled"
+            color = discord.Color.red()
 
         embed = discord.Embed(
-            description=f"{emoji} **Looping is now {status}** for: **{player.current.title}**",
-            color=discord.Color.blurple() if player.loop else discord.Color.red(),
+            description=f"**Looping is now {status}** for: **{player.current.title}**",
+            color=color
         )
-        embed.set_footer(
-            text="Auro Engine • Loop Logic", icon_url=self.bot.user.display_avatar.url
-        )
-
         await ctx.reply(embed=embed)
-
     @commands.hybrid_command(
         name="loopqueue",
         aliases=["lq"],

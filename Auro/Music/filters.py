@@ -25,7 +25,11 @@ class Filters(commands.Cog):
             )
 
         await player.set_volume(volume)
-        await ctx.reply(f"🔊 **Volume set to {volume}%!**")
+        embed = discord.Embed(
+            title=f"🔊 **Volume set to `{volume}`%!",
+            color= discord.Color.blurple()
+        ).set_footer(text="💝",icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed,delete_after=20)
 
     @commands.hybrid_command(
         name="nightcore", description="🌙 Speed up the track and increase the pitch"
@@ -41,8 +45,11 @@ class Filters(commands.Cog):
             await player.add_filter(filter_data)
         except pomice.FilterTagAlreadyInUse:
             await ctx.reply("❌ Nightcore mode is already enabled.", ephemeral=True)
-
-        await ctx.reply("🌙 **Nightcore mode enabled!**")
+        embed = discord.Embed(
+            title=f"🌙 **Nightcore mode enabled!**",
+            color= discord.Color.blurple()
+        ).set_footer(text="💝",icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
         name="vaporwave", description="💨 Slow down the track and lower the pitch"
@@ -58,7 +65,11 @@ class Filters(commands.Cog):
             await player.add_filter(filter_data)
         except pomice.FilterTagAlreadyInUse:
             await ctx.reply("❌ Vaporwave mode is already enabled.", ephemeral=True)
-        await ctx.reply("💨 **Vaporwave mode enabled!**")
+        embed = discord.Embed(
+            title=f"💨 **Vaporwave mode enabled!**",
+            color= discord.Color.blurple()
+        ).set_footer(text="💝",icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
         name="eqbassboost", description="🔊 Boost the bass frequencies"
@@ -73,7 +84,12 @@ class Filters(commands.Cog):
         except pomice.FilterTagAlreadyInUse:
             await ctx.reply("❌ Bassboost is already enabled.", ephemeral=True)
         await player.add_filter(filter_data)
-        await ctx.reply("🔊 **Bassboost enabled!**")
+        embed = discord.Embed(
+            title="Bassboost Enabled",
+            description="🔊 Heavy bass frequencies have been boosted for maximum thump!",
+            color=discord.Color.blurple()
+        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
         name="eqflat", description="🎚️ Flatten the equalizer settings"
@@ -90,7 +106,12 @@ class Filters(commands.Cog):
             await ctx.reply(
                 "❌ Flat equalizer settings are already enabled.", ephemeral=True
             )
-        await ctx.reply("🎚️ **Equalizer settings flattened!**")
+        embed = discord.Embed(
+            title="Equalizer Flattened",
+            description="🎚️ All frequencies have been balanced to neutral settings.",
+            color=discord.Color.blurple()
+        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
         name="eqmetal", description="🎸 Enhance the mid frequencies for a metal sound"
@@ -107,7 +128,12 @@ class Filters(commands.Cog):
             await ctx.reply(
                 "❌ Metal equalizer settings are already enabled.", ephemeral=True
             )
-        await ctx.reply("🎸 **Metal equalizer enabled!**")
+        embed = discord.Embed(
+            title="Metal Equalizer Enabled",
+            description="🎸 Mid frequencies enhanced for that aggressive metal sound!",
+            color=discord.Color.blurple()
+        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
         name="eqpiano", description="🎹 Enhance the high frequencies for a piano sound"
@@ -124,7 +150,12 @@ class Filters(commands.Cog):
             await ctx.reply(
                 "❌ Piano equalizer settings are already enabled.", ephemeral=True
             )
-        await ctx.reply("🎹 **Piano equalizer enabled!**")
+        embed = discord.Embed(
+            title="Piano Equalizer Enabled",
+            description="🎹 High frequencies enhanced for crystal clear piano notes!",
+            color=discord.Color.blurple()
+        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(name="8d", description="🔊 Enable 8D audio effect")
     @commands.guild_only()
@@ -138,7 +169,12 @@ class Filters(commands.Cog):
             await player.add_filter(filter_data)
         except pomice.FilterTagAlreadyInUse:
             await ctx.reply("❌ 8D audio effect is already enabled.", ephemeral=True)
-        await ctx.reply("🔊 **8D audio effect enabled!**")
+        embed = discord.Embed(
+            title="8D Audio Effect Enabled",
+            description="🔊 Immersive 3D spatial audio activated!",
+            color=discord.Color.blurple()
+        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed)
 
     @app_commands.command(
         name="seteq", description="Manually tune the Auro Engine frequency bands"
