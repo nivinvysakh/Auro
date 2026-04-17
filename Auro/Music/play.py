@@ -65,6 +65,7 @@ class Music(commands.Cog):
             return False
         return True
 
+
     async def get_or_search_track(self, player: Player, query: str, search_type: str = "query") -> list:
         
         cached = await player.music_storage.get_cached_track(query)
