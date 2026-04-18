@@ -151,10 +151,10 @@ class Lyrics(commands.Cog):
         view.message = msg
 
     @commands.hybrid_command(
-        name="seek", description="Jump to a specific time in the song"
+        name="seek", description="🌊 Jump to a specific time in the song"
     )
     @commands.guild_only()
-    @app_commands.describe(time="Time to seek to (mm:ss or hh:mm:ss)")
+    @app_commands.describe(time="✨ Time to seek to (mm:ss or hh:mm:ss)")
     async def seek(self, ctx: commands.Context, time: str):
         player = cast(pomice.Player, ctx.voice_client)
 

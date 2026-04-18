@@ -178,7 +178,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @app_commands.command(
-        name="seteq", description="Manually tune the Auro Engine frequency bands"
+        name="seteq", description="🎛️ Manually tune the Auro Engine frequency bands"
     )
     @app_commands.guild_only()
     @app_commands.describe(tuning="Format: 'band:gain' (e.g., '0:0.25 1:0.15')")
@@ -233,7 +233,7 @@ class Filters(commands.Cog):
             await interaction.followup.send(f"❌ **Auro Tuner Error:** `{e}`")
 
     @app_commands.command(
-        name="eq_help", description="Guide for the Auro Engine frequency bands"
+        name="eq_help", description="💞 Guide for the Auro Engine frequency bands"
     )
     async def eq_help(self, interaction: discord.Interaction):
         embed = discord.Embed(

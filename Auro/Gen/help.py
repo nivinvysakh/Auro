@@ -116,7 +116,7 @@ class Help(commands.Cog):
         self.bot = bot
 
     @commands.hybrid_command(
-        name="help", aliases=["h"], description="View the Auro command directory."
+        name="help", aliases=["h"], description="💝 View the Auro command directory."
     )
     @commands.guild_only()
     async def help(self, ctx: commands.Context):

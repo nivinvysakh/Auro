@@ -1,0 +1,5 @@
+﻿{
+  "name": "Auro-Bot",
+  "script": "main.py",
+  "interpreter": "python"
+}
