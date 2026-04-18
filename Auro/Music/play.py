@@ -38,14 +38,14 @@ class Player(pomice.Player):
         self.loop_queue = False
 
     async def do_next(self):
-        if self.is_playing or self.queue.is_empty:
+        if self.queue.is_empty:
             return
 
         try:
             track = self.queue.get()
             await self.play(track)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Error in do_next: {e}")
 
 
 class Music(commands.Cog):
@@ -164,10 +164,10 @@ class Music(commands.Cog):
         elif player.loop_queue:
             await asyncio.sleep(0.5)
             player.queue.put(track)
-            await player.do_next()
         else:
             await asyncio.sleep(0.8)
-            await player.do_next()
+        
+        await player.do_next()
 
     @commands.hybrid_command(
         name="play",
@@ -188,12 +188,17 @@ class Music(commands.Cog):
         else:
             player = cast(Player, ctx.voice_client)
         await player.music_cache.clear_guild_cache(ctx.guild.id)
+        await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
 
         search = search.strip()
 
         if "open.spotify.com" in search:
-            request = sp.track(search)
+            try:
+                request = sp.track(search)
+            except spotipy.exceptions.SpotifyException:
+                await ctx.reply(f"{Emojis.warning} Invalid Spotify track URL. Make sure it's a Track link, not a playlist or album.")
+                return
             query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
             results = await self.get_or_search_track(player, query, "spotify")
 
@@ -277,6 +282,7 @@ class Music(commands.Cog):
         if ctx.voice_client:
             player = cast(Player, ctx.voice_client)
             await player.music_cache.clear_guild_cache(ctx.guild.id)
+            await player.music_cache.clear_loop_queue(ctx.guild.id)
             
             try:
                 await player.channel.edit(status=None)
@@ -372,8 +378,31 @@ class Music(commands.Cog):
             return await ctx.reply(embed=embed, delete_after=11)
 
         player.loop_queue = not player.loop_queue
-        if not player.loop_queue:
-            await player.music_cache.clear_guild_cache(ctx.guild.id)
+        
+        if player.loop_queue:
+            
+            if player.is_playing:
+                current_track = player.current
+                track_hash = getattr(current_track, "track_id", None) or current_track.info.get("track")
+                await player.music_cache.set_cached_hash(
+                    query=f"loop_queue_{ctx.guild.id}_0",
+                    track_hash=track_hash,
+                    title=current_track.title
+                )
+            
+            
+            queue_list = list(player.queue)
+            for index, track in enumerate(queue_list, start=1):
+                track_hash = getattr(track, "track_id", None) or track.info.get("track")
+                await player.music_cache.set_cached_hash(
+                    query=f"loop_queue_{ctx.guild.id}_{index}",
+                    track_hash=track_hash,
+                    title=track.title
+                )
+        else:
+            
+            await player.music_cache.clear_loop_queue(ctx.guild.id)
+        
         status = "Enabled" if player.loop_queue else "Disabled"
         emoji = Emojis.success if player.loop_queue else Emojis.error
         embed = discord.Embed(

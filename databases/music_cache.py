@@ -50,10 +50,35 @@ class MusicCache:
         async with aiosqlite.connect(self.path) as db:
             await db.execute(
                 "DELETE FROM music_cache WHERE query = ?",
-                (f"loop_{guild_id}",)
+                (f"loop_{guild_id}".lower(),)
             )
             await db.commit()
 
+    async def clear_guild_cache_by_query(self, query: str):
+        
+        async with aiosqlite.connect(self.path) as db:
+            await db.execute(
+                "DELETE FROM music_cache WHERE query = ?",
+                (query.strip().lower(),)
+            )
+            await db.commit()
+    async def clear_all_guild_cache(self, guild_id: int):
+        
+        async with aiosqlite.connect(self.path) as db:
+            await db.execute(
+                "DELETE FROM music_cache WHERE query LIKE ?",
+                (f"%{guild_id}%",)
+            )
+            await db.commit()
+    async def clear_loop_queue(self, guild_id: int):
+        async with aiosqlite.connect(self.path) as db:
+            
+            query_pattern = f"loop_queue_{guild_id}_%"
+            await db.execute(
+                "DELETE FROM music_cache WHERE query LIKE ?",
+                (query_pattern,)
+            )
+            await db.commit()
     async def get_all(self):
         
         async with aiosqlite.connect(self.path) as db:

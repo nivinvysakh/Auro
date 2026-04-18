@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from util.emojis import Emojis as emojis, ButtonEmojis, BadgesIcon, UserStautsEmo
 from databases import BadgesDatabase
-
+from discord import app_commands
 
 class ProfileButtons(discord.ui.View):
     def __init__(self, target_user, command_owner, bot):
@@ -245,8 +245,9 @@ class Profile(commands.Cog):
         self.bot = bot
 
     @commands.hybrid_command(
-        name="profile", description="View a user profile", aliases=["pr"]
+        name="profile", description="🧔 View a user profile ", aliases=["pr"]
     )
+    @app_commands.describe(user="✨ The user to view the profile of (optional)")
     async def profile(self, ctx: commands.Context, user: discord.User = None):
         target_user = user or ctx.author
         if target_user.bot:
