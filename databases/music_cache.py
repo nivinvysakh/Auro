@@ -38,3 +38,24 @@ class MusicCache:
                 (query.strip().lower(), track_hash, title)
             )
             await db.commit()
+
+    async def clear_all(self):
+        async with aiosqlite.connect(self.path) as db:
+            await db.execute("DELETE FROM music_cache")
+            await db.commit()
+            await db.execute("VACUUM")
+
+    async def clear_guild_cache(self, guild_id: int):
+        
+        async with aiosqlite.connect(self.path) as db:
+            await db.execute(
+                "DELETE FROM music_cache WHERE query = ?",
+                (f"loop_{guild_id}",)
+            )
+            await db.commit()
+
+    async def get_all(self):
+        
+        async with aiosqlite.connect(self.path) as db:
+            async with db.execute("SELECT query, track_hash, title FROM music_cache ORDER BY query") as cursor:
+                return await cursor.fetchall()

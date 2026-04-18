@@ -58,7 +58,6 @@ class HelpView(discord.ui.View):
                     f"**{Emojis.dot} play** — Stream high-quality audio\n"
                     f"**{Emojis.dot} lyrics** — Fetch real-time song text\n"
                     f"**{Emojis.dot} filters** — Audio enhancement toggles\n"
-                    f"**{Emojis.dot} events** — Manage playback status\n"
                     f"**{Emojis.dot} stop/skip** — Queue control\n"
                     f"**{Emojis.dot} loop/loopqueue** — Track/Queue repeat toggles"
                 ),

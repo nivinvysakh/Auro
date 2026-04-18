@@ -67,18 +67,16 @@ class Music(commands.Cog):
 
 
     async def get_or_search_track(self, player: Player, query: str, search_type: str = "query") -> list:
-        
+        use_loop_cache = player.loop or player.loop_queue
         cached = await player.music_storage.get_cached_track(query)
-        
         if cached:
-            track_hash, _ = cached
+            track_hash, title = cached
             results = await player.build_track(track_hash)
             return [results] if results else []
-        
         if search_type == "spotify":
-            results = await player.get_tracks(query=f"ytmsearch:{query}")
+            results = await player.get_tracks(query=f"spsearch:{query}")
             if not results:
-                results = await player.get_tracks(query=f"scsearch:{query}")
+                results = await player.get_tracks(query=f"ytmsearch:{query}")
             source = "Spotify"
         elif search_type == "url":
             results = await player.get_tracks(query=query)
@@ -89,10 +87,23 @@ class Music(commands.Cog):
                 results = await player.get_tracks(query=f"scsearch:{query}")
             source = "YouTube"
         
-        
         if results:
             track_hash = getattr(results[0], "track_id", None) or results[0].info.get("track")
-            await player.music_storage.save_to_storage(query, track_hash, results[0].title, source)
+            title = results[0].title
+            
+            
+            existing = await player.music_storage.get_by_track_hash(track_hash)
+            if not existing:
+                
+                await player.music_storage.save_to_storage(query, track_hash, title, source)
+            else:
+                
+                cached_results = await player.build_track(track_hash)
+                if cached_results:
+                    results = [cached_results]
+            
+            if use_loop_cache:
+                await player.music_cache.set_cached_hash(query, track_hash, title)
         
         return results
 
@@ -250,6 +261,7 @@ class Music(commands.Cog):
             )
             return await ctx.reply(embed=embed, delete_after=10)
         player.loop = False
+        await player.music_cache.clear_guild_cache(ctx.guild.id)
         current_title = player.current.title
         await player.stop()
         embed = discord.Embed(
@@ -264,13 +276,7 @@ class Music(commands.Cog):
     async def stop(self, ctx):
         if ctx.voice_client:
             player = cast(Player, ctx.voice_client)
-            await player.music_cache.set_cached_hash(f"loop_{ctx.guild.id}", "", "")
-            
-            
-            if player.loop:
-                await player.music_storage.save_to_storage(
-                    f"loop_{ctx.guild.id}", "", "", "Cleared"
-                )
+            await player.music_cache.clear_guild_cache(ctx.guild.id)
             
             try:
                 await player.channel.edit(status=None)
@@ -334,6 +340,7 @@ class Music(commands.Cog):
             status = "Enabled"
             color = discord.Color.blurple()
         else:
+            await player.music_cache.clear_guild_cache(ctx.guild.id)
             status = "Disabled"
             color = discord.Color.red()
 
@@ -365,6 +372,8 @@ class Music(commands.Cog):
             return await ctx.reply(embed=embed, delete_after=11)
 
         player.loop_queue = not player.loop_queue
+        if not player.loop_queue:
+            await player.music_cache.clear_guild_cache(ctx.guild.id)
         status = "Enabled" if player.loop_queue else "Disabled"
         emoji = Emojis.success if player.loop_queue else Emojis.error
         embed = discord.Embed(
@@ -374,7 +383,6 @@ class Music(commands.Cog):
             text="Auro Engine • Queue System", icon_url=self.bot.user.display_avatar.url
         )
         await ctx.reply(embed=embed)
-
 
 
 async def setup(bot):
