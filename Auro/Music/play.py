@@ -187,7 +187,7 @@ class Music(commands.Cog):
             await player.add_filter(pomice.Filter(tag="reset"), fast_apply=True)
         else:
             player = cast(Player, ctx.voice_client)
-
+        await player.music_cache.clear_guild_cache(ctx.guild.id)
         player.controller = ctx.channel
 
         search = search.strip()
