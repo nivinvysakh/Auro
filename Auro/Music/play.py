@@ -13,11 +13,12 @@ from databases import MusicCache
 from databases import MusicStorage
 import os
 from pathlib import Path
-
+from ..Errors.db_bash import TrackHealer
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
 MIN_DURATION = 10 * 1000
 env_path = Path(".") / ".env"
+track_healer = TrackHealer()
 
 sp = spotipy.Spotify(
     client_credentials_manager=SpotifyClientCredentials(
@@ -245,7 +246,13 @@ class Music(commands.Cog):
             player.queue.put(valid_track)
             await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**")
         else:
-            await player.play(valid_track)
+            try:
+                await player.play(valid_track)
+            except Exception:
+               new_track =  await track_healer.repair(valid_track)
+               if new_track:
+                   healed_track = await player.build_track(new_track)
+                   await player.play(healed_track)
             try:
 
                 await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
