@@ -1,6 +1,6 @@
 # Auro 🌙
 
-<img src="https://github.com/ilynivin/Auro/blob/Main/img/botico.png?raw=true" align="right" width="150px" style="border-radius: 10px;">
+<img src="https://raw.githubusercontent.com/ilynivin/Auro/refs/heads/Main/img/botico.png?token=GHSAT0AAAAAAD2U67HEMDP4B2FMHN4MH3SG2PGFR4A" align="right" width="150px" style="border-radius: 10px;">
 
 A minimalist, high-performance music engine for Discord.
 
