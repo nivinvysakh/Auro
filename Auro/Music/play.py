@@ -156,6 +156,8 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_pomice_track_end(self, player: Player, track, reason):
+        if str(reason).lower() == "REPLACED":
+            return
         if player.loop:
             cached_hash = await player.music_cache.get_cached_hash(f"loop_{player.guild.id}")
             if cached_hash:
@@ -169,6 +171,42 @@ class Music(commands.Cog):
             await asyncio.sleep(0.8)
         
         await player.do_next()
+    
+    @commands.Cog.listener()
+    async def on_pomice_track_exception(self, player: Player, track: pomice.Track, exception):
+
+        new_hash = await track_healer.repair(track.title)
+        
+        if new_hash:
+            healed_track = await player.build_track(new_hash)
+            if healed_track:
+                
+                healed_track.requester = getattr(track, 'requester', None)
+                await player.play(healed_track)
+                return  
+
+       
+        if player.controller:
+            embed = discord.Embed(
+                title=f"{Emojis.warning} Playback Error",
+                description=(
+                    f"Auro failed to heal **{track.title}**.\n"
+                    f"Skipping to the next available track."
+                ),
+                color=discord.Color.red(),
+            ).set_footer(
+                text="Auro Engine • Self-Healing Failed", 
+                icon_url=self.bot.user.display_avatar.url
+            )
+            
+            await player.controller.send(embed=embed)
+            
+            
+            if not player.queue.is_empty:
+                await asyncio.sleep(1)
+                await player.do_next()
+            else:
+                await player.controller.send(f"{Emojis.warning} Queue is empty. Standing by.")
 
     @commands.hybrid_command(
         name="play",
@@ -249,7 +287,7 @@ class Music(commands.Cog):
             try:
                 await player.play(valid_track)
             except Exception:
-               new_track =  await track_healer.repair(valid_track)
+               new_track =  await track_healer.repair(valid_track.title)
                if new_track:
                    healed_track = await player.build_track(new_track)
                    await player.play(healed_track)

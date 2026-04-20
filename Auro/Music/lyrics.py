@@ -3,6 +3,7 @@ from discord.ext import commands
 import pomice
 import syncedlyrics
 import re
+import asyncio
 from typing import cast
 from util.emojis import Emojis
 from discord import app_commands
@@ -102,13 +103,13 @@ class Lyrics(commands.Cog):
         player = cast(pomice.Player, ctx.voice_client)
 
         if not player or not player.is_playing:
-            return await ctx.reply(f"{Emojis.error} No music is currently playing.")
+            return await ctx.send(f"{Emojis.error} No music is currently playing.")
 
-        await ctx.defer()
-
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.defer()
         track = player.current
         search_query = f"{track.title} {track.author}"
-        lrc_data = syncedlyrics.search(search_query)
+        lrc_data = await asyncio.to_thread(syncedlyrics.search, search_query)
 
         if not lrc_data:
             return await ctx.send(

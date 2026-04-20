@@ -3,7 +3,7 @@ from discord.ext import commands
 import pomice
 from typing import cast
 from discord import app_commands
-
+import asyncio
 
 class Filters(commands.Cog):
     def __init__(self, bot):
@@ -275,6 +275,53 @@ class Filters(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
 
         await interaction.response.send_message(embed=embed)
+
+    @commands.hybrid_command(
+            name="karaoke", description="🎤 Remove vocals for a karaoke experience"
+    )
+    @commands.guild_only()
+    async def karaoke(self, ctx: commands.Context):
+        toggle_karokke = True
+        player = cast(pomice.Player, ctx.voice_client)
+        
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title="❌ No active player found.",
+                    color=discord.Color.red()
+                )
+            )
+
+        try:
+            filter_data = pomice.filters.Karaoke(tag="karaoke")
+            await player.add_filter(filter_data, fast_apply=True)
+        except pomice.FilterTagAlreadyInUse:
+            await player.remove_filter("karaoke", fast_apply=True)
+            toggle_karokke = False
+            await ctx.reply(
+                embed=discord.Embed(
+                    title="🎤 Karaoke Mode Disabled",
+                    description="Vocals have been restored to the track.",
+                    color=discord.Color.blurple()
+                )
+            )
+
+        await ctx.reply(
+            embed=discord.Embed(
+                title="🎤 Karaoke Mode " + ("Enabled!" if toggle_karokke else "Disabled!"),
+                description="Vocals have been " + ("removed for karaoke fun!" if toggle_karokke else "restored to the track!"),
+                color=discord.Color.blurple()
+            )
+        )
+        lyrics_cmd = ctx.bot.get_command("lyrics")
+        if lyrics_cmd and toggle_karokke:
+            if ctx.interaction:
+                await asyncio.sleep(1)
+                await ctx.invoke(lyrics_cmd)
+            else:
+                async with ctx.typing():
+                    await asyncio.sleep(1)
+                    await ctx.invoke(lyrics_cmd)        
 
     @commands.hybrid_command(name="reset", description="♻️ Clear all audio filters")
     @commands.guild_only()
