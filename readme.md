@@ -1,3 +1,8 @@
+> [!NOTE]
+> Make sure you have Java 21 + installed and python 3.10+ to run the bot.
+
+
+
 # Auro 🌙
 
 <img align="right" src="/img/auro.svg" width=200 alt="Auro Bot Icon"/>
@@ -15,7 +20,7 @@ A minimalist, high-performance music engine for Discord.
 ## 🛠️ Setup
 1. **Install dependencies**:
    ```bash
-   pip install discord.py pomice syncedlyrics python-dotenv
+   pip install discord.py pomice syncedlyrics python-dotenv spotipy 
    ```
 2. **Configure environment**:
     Create a `.env` file with your Discord bot token.
@@ -34,8 +39,18 @@ A minimalist, high-performance music engine for Discord.
     ```
 4. **Run the bot**:
     ```bash
-    python main.py or py main.py
+    python main.py
     ```
+    or 
+    ```bash
+    py main.py
+    ```
+
+> [!important]
+> Make sure your Lavalink server is running before starting the bot.
+
+> [!tip]
+> Make sure you see the `Lavalink is ready` message in the console before using music commands.
 
 ## 🫂 Contributing
 Auro is an open-source project. Contributions are welcome! Please fork the repository and submit a pull request with your improvements.

@@ -1,8 +1,15 @@
+> [!NOTE]
+> Make sure you have Java 21 + installed and python 3.10+ to run the bot.
+
+
 # 🎵 Auro - Discord Music Bot
+
+<img align="Right" src="/img/auro.svg" width=200 alt="Auro Logo">
 
 A powerful and open-source Discord music bot built with [discord.py](https://github.com/Rapptz/discord.py) and [pomice](https://github.com/cloudwithax/pomice). It supports smooth music playback, queue management, and more.
 
----
+
+<br>
 
 ## 🚀 Features
 
@@ -19,7 +26,7 @@ A powerful and open-source Discord music bot built with [discord.py](https://git
 ### 1. Install Dependencies
 
 ```bash
-pip install discord.py pomice syncedlyrics python-dotenv black
+pip install discord.py pomice syncedlyrics python-dotenv black spotipy 
 ```
 
 ### 2. Configure Environment
@@ -42,13 +49,19 @@ await pomice.NodePool.create_node(
     secure=False
 )
 ```
+> Install Lavalink from [here](https://github.com/lavalink-devs/Lavalink)
 
 ### 4. Run the Bot
 
 ```bash
 python main.py
 ```
-
+or 
+```bash
+py main.py # Entry point 
+```
+> [!important]
+> Ensure your Lavalink server is running before starting the bot.
 ---
 
 ## 🧹 Code Formatting
