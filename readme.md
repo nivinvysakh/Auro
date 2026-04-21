@@ -1,6 +1,6 @@
 # Auro 🌙
 
-<img src="https://raw.githubusercontent.com/ilynivin/Auro/refs/heads/Main/img/botico.png?token=GHSAT0AAAAAAD2U67HEMDP4B2FMHN4MH3SG2PGFR4A" align="right" width="150px" style="border-radius: 10px;">
+<img src="https://github.com/ilynivin/Auro/blob/Main/img/botico.png?raw=true" align="right" width="150px" style="border-radius: 10px;">
 
 A minimalist, high-performance music engine for Discord.
 
@@ -54,8 +54,4 @@ Auro is licensed under the AGPL-3.0 License. See the LICENSE file for more detai
 
 <p align="center">
 Made with 💖 by Nivin
-<br>
-   
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-
 </p>
