@@ -96,7 +96,7 @@ class Lyrics(commands.Cog):
             return -1
 
     @commands.hybrid_command(
-        name="lyrics", description="Get the lyrics of the currently playing song"
+        name="lyrics", description="🎼 Get the lyrics of the currently playing song"
     )
     @commands.guild_only()
     async def lyrics(self, ctx: commands.Context):

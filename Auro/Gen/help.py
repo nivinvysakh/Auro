@@ -22,7 +22,7 @@ class HelpView(discord.ui.View):
             discord.ui.Button(
                 label="Server_link",
                 style=discord.ButtonStyle.link,
-                url="https://discord.gg/yourserver",
+                url="https://discord.gg/gRJjC3H6aA",
                 emoji=ButtonEmojis.server,
             )
         )

@@ -17,7 +17,7 @@ class TrackHealer:
                 return None
 
 
-            results: pomice.SearchResult = await node.get_tracks(query=f"ytsearch:{query}")
+            results: pomice.SearchResult = await node.get_tracks(query=f"ytmsearch:{query}")
             
             if not results or not results.tracks:
                 print(f"❌ Repair Failed: No results found for '{query}'")
@@ -29,7 +29,6 @@ class TrackHealer:
             new_title = fresh_track.title
 
 
-            await self.storage.init_db()
             await self.storage.save_to_storage(
                 query=query,
                 track_hash=new_hash,

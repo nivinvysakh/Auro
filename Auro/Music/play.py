@@ -1,5 +1,13 @@
-# Auro Music Discord bot
-# Licensed under AGPL-3
+
+"""
+                                                    Auro Music Player Module
+                                                    *-----------------------*
+
+ Licensed under the AGPL-3.0 License (the "License"); you may not use this file except in compliance with the License.
+This file has Cog Listerners for handling music playback events, including track start, end, exceptions, and user voice state changes. It also includes commands for playing, skipping, stopping, and managing the music queue etc .
+Developed by : ilynivin 💝
+
+"""
 import discord
 from discord.ext import commands
 import pomice
@@ -53,11 +61,13 @@ class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # -- Utility Method for Formatting Time ---
     def format_time(self, ms: int) -> str:
         minutes = ms // 60000
         seconds = (ms % 60000) // 1000
         return f"{minutes:02d}:{seconds:02d}"
 
+    # -- Validation Method to Filter Out Streams and Unreasonably Long/Short Tracks ---
     def is_valid(self, track: pomice.Track) -> bool:
 
         if track.is_stream:
@@ -66,7 +76,7 @@ class Music(commands.Cog):
             return False
         return True
 
-
+    # --- Helper Method for Track Retrieval and Caching ---
     async def get_or_search_track(self, player: Player, query: str, search_type: str = "query") -> list:
         use_loop_cache = player.loop or player.loop_queue
         cached = await player.music_storage.get_cached_track(query)
@@ -107,6 +117,8 @@ class Music(commands.Cog):
                 await player.music_cache.set_cached_hash(query, track_hash, title)
         
         return results
+    
+    # --- Event Listeners ---
 
     @commands.Cog.listener()
     async def on_pomice_track_start(self, player: Player, track: pomice.Track):
@@ -156,7 +168,9 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_pomice_track_end(self, player: Player, track, reason):
-        if str(reason).lower() == "REPLACED":
+        if str(reason).upper() == "REPLACED":
+            return
+        if str(reason).upper() == "load_failed":
             return
         if player.loop:
             cached_hash = await player.music_cache.get_cached_hash(f"loop_{player.guild.id}")
@@ -174,39 +188,59 @@ class Music(commands.Cog):
     
     @commands.Cog.listener()
     async def on_pomice_track_exception(self, player: Player, track: pomice.Track, exception):
-
+        print(f"⚠️ Track Exception: {track.title}. Initializing Healer...")
+        
+        track_healer = TrackHealer()
         new_hash = await track_healer.repair(track.title)
         
         if new_hash:
             healed_track = await player.build_track(new_hash)
             if healed_track:
-                
                 healed_track.requester = getattr(track, 'requester', None)
-                await player.play(healed_track)
-                return  
+                
+                if not player.is_playing:
+                    await player.play(healed_track)
+                else:
+                    
+                    player.queue.put_at_front(healed_track)
+                    await player.stop()
+                
+                if player.controller:
+                    await player.controller.send(
+                        embed = discord.Embed(
+                            title=f"{Emojis.success} Track Healed",
+                            description=f"Successfully healed **{track.title}**. Resuming playback.",
+                            color=discord.Color.green()
+                        )
+                    )
+                return 
 
-       
+        
         if player.controller:
             embed = discord.Embed(
                 title=f"{Emojis.warning} Playback Error",
-                description=(
-                    f"Auro failed to heal **{track.title}**.\n"
-                    f"Skipping to the next available track."
-                ),
+                description=f"Auro failed to heal **{track.title}**.\nSkipping...",
                 color=discord.Color.red(),
-            ).set_footer(
-                text="Auro Engine • Self-Healing Failed", 
-                icon_url=self.bot.user.display_avatar.url
-            )
+            ).set_footer(text="Auro Engine • Resilience Mode", icon_url=self.bot.user.display_avatar.url)
             
-            await player.controller.send(embed=embed)
-            
-            
-            if not player.queue.is_empty:
+            await player.controller.send(embed=embed, delete_after=15)
+        
+
+        await player.stop()
+        
+    @commands.Cog.listener()
+    async def on_pomice_track_stuck(self, player: Player, track: pomice.Track, threshold_ms: int):
+            if player.controller:
+                embed = discord.Embed(
+                    title=f"{Emojis.warning} Playback Stuck",
+                    description=f"Auro detected that **{track.title}** is stuck for over {threshold_ms}ms.\nSkipping to the next track.",
+                    color= discord.Color.red()
+                )
+                await player.controller.send(embed=embed)
                 await asyncio.sleep(1)
-                await player.do_next()
-            else:
-                await player.controller.send(f"{Emojis.warning} Queue is empty. Standing by.")
+                await player.stop()
+
+    #  --- Music Playback Commands ---
 
     @commands.hybrid_command(
         name="play",
@@ -286,11 +320,8 @@ class Music(commands.Cog):
         else:
             try:
                 await player.play(valid_track)
-            except Exception:
-               new_track =  await track_healer.repair(valid_track.title)
-               if new_track:
-                   healed_track = await player.build_track(new_track)
-                   await player.play(healed_track)
+            except Exception as e:
+                self.bot.dispatch("pomice_track_exception" , player , valid_track , e)
             try:
 
                 await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
@@ -458,6 +489,46 @@ class Music(commands.Cog):
         )
         await ctx.reply(embed=embed)
 
+    @commands.hybrid_command(
+        name="pause", description="⏸️ Pauses the current track."
+    )
+    @commands.guild_only()
+    async def pause(self, ctx):
+        player = cast(Player,ctx.voice_client)
+        if not player or not player.is_playing:
+            embed = discord.Embed(
+                title=f"{Emojis.warning} Nothing Playing", color= discord.Color.yellow()
+
+            ).set_footer(
+                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url 
+            )
+            return await ctx.reply(embed=embed, delete_after=10)
+        await player.set_pause(True)
+        await ctx.reply(
+            embed = discord.Embed(
+                title=f"{Emojis.success} Paused" , color= discord.Color.blurple()
+            )
+        )
+    @commands.hybrid_command(
+        name="resume", description="▶️ Resumes a paused track."
+    )
+    @commands.guild_only()
+    async def resume(self,ctx):
+        player = cast(Player,ctx.voice_client)
+        if not player or not player.is_playing:
+            embed = discord.Embed(
+                title=f"{Emojis.warning} Nothing Playing", color= discord.Color.yellow()
+
+            ).set_footer(
+                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url 
+            )
+            return await ctx.reply(embed=embed, delete_after=10)
+        await player.set_pause(False)
+        await ctx.reply(
+            embed = discord.Embed(
+                title=f"{Emojis.success} Resumed" , color= discord.Color.blurple()
+            )
+        )
 
 async def setup(bot):
     await bot.add_cog(Music(bot))
