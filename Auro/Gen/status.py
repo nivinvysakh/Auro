@@ -29,7 +29,9 @@ class Stats(commands.Cog):
             color=emojis.color,
         )
         bot_embed.add_field(
-            name="🛰️ Latency", value=f"`{round(self.bot.latency * 1000)}ms`", inline=True
+            name="🛰️ Latency",
+            value=f"`{round(self.bot.latency * 1000)}ms`",
+            inline=True,
         )
         bot_embed.add_field(name="⏳ Uptime", value=f"`{uptime}`", inline=True)
         bot_embed.add_field(
@@ -50,6 +52,7 @@ class Stats(commands.Cog):
             if node and node.is_connected:
                 stats = node.stats
                 cpu = stats.cpu_process_load * 100
+                latency = round(node.latency)
                 lava_embed.description = f"**Node:** `Auro` {emojis.success}"
                 lava_embed.add_field(
                     name="🎸 Players",
@@ -60,6 +63,9 @@ class Stats(commands.Cog):
                     name="⚡ Load",
                     value=f"**Node:** `{cpu:.2f}%` \n**System:** `{stats.cpu_cores}%`",
                     inline=True,
+                )
+                lava_embed.add_field(
+                    name="📶 Server Latency", value=f"`{latency}` Ms", inline=True
                 )
                 lava_embed.add_field(
                     name="📦 Version",

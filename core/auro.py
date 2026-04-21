@@ -9,6 +9,7 @@ import asyncio
 class Auro(commands.AutoShardedBot):
     def __init__(self):
         intents = discord.Intents.all()
+        self.black_list = []
         super().__init__(
             command_prefix="a!",
             intents=intents,
@@ -24,6 +25,8 @@ class Auro(commands.AutoShardedBot):
         print(
             f"{self.get_time()} | INFO      | Auro Infrastructure: Initializing Shards..."
         )
+
+        await asyncio.sleep(5)
 
         async def pomice_setup():
             try:
@@ -72,6 +75,15 @@ class Auro(commands.AutoShardedBot):
         print(
             f"{self.get_time()} | SUCCESS   | Pomice: Node {node.identifier} is fully CONNECTED."
         )
+
+    @commands.Cog.listener()
+    async def on_pomice_node_disconnect(self, node: pomice.Node):
+        await asyncio.sleep(5)
+        try:
+            await node.connect()
+            print(f"✅ Auro Engine [Node: {node.identifier}] is back online!")
+        except Exception as e:
+            print(f"Connection Error : {e}")
 
     async def on_ready(self):
         await self.change_presence(

@@ -44,7 +44,7 @@ class PurgeBot(commands.Cog):
     )
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
-    @app_commands.describe(amount="Number of messages to delete (1-100)")
+    @app_commands.describe(amount="✨ Number of messages to delete (1-100)")
     async def clearmsg(self, ctx: commands.Context, amount: int = 50):
         if amount < 1 or amount > 100:
             embed = discord.Embed(

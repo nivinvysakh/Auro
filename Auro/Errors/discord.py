@@ -1,4 +1,5 @@
 import discord
+import pomice
 from discord.ext import commands
 from util.emojis import Emojis
 

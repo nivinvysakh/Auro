@@ -8,7 +8,7 @@ class Contribute(commands.Cog):
         self.bot = bot
 
     @commands.hybrid_command(
-        name="contribute", description="Learn how to contribute to Auro"
+        name="contribute", description="✨ Learn how to contribute to Auro"
     )
     async def contribute(self, ctx):
         embed = discord.Embed(

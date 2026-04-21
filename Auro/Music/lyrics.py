@@ -3,9 +3,71 @@ from discord.ext import commands
 import pomice
 import syncedlyrics
 import re
+import asyncio
 from typing import cast
 from util.emojis import Emojis
 from discord import app_commands
+
+
+class LyricsView(discord.ui.View):
+
+    def __init__(self, pages, track, bot):
+        super().__init__(timeout=60)
+        self.pages = pages
+        self.current_page = 0
+        self.track = track
+        self.bot = bot
+        self.message = None
+
+    def create_embed(self):
+        embed = discord.Embed(
+            title=f"Lyrics | {self.track.title}",
+            description=self.pages[self.current_page],
+            color=discord.Color.blurple(),
+        )
+        embed.set_thumbnail(url=self.track.thumbnail)
+        embed.set_footer(
+            text=f"Page {self.current_page + 1}/{len(self.pages)} • Auro Engine",
+            icon_url=self.bot.user.display_avatar.url,
+        )
+        return embed
+
+    @discord.ui.button(
+        label="Back", style=discord.ButtonStyle.gray, emoji=Emojis.left_arrow
+    )
+    async def back_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        if self.current_page > 0:
+            self.current_page -= 1
+            await interaction.response.edit_message(
+                embed=self.create_embed(), view=self
+            )
+        else:
+            await interaction.response.defer()
+
+    @discord.ui.button(
+        label="Next", style=discord.ButtonStyle.gray, emoji=Emojis.right_arrow
+    )
+    async def next_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        if self.current_page < len(self.pages) - 1:
+            self.current_page += 1
+            await interaction.response.edit_message(
+                embed=self.create_embed(), view=self
+            )
+        else:
+            await interaction.response.defer()
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+        if self.message:
+            try:
+                await self.message.edit(view=self)
+            except:
+                pass
 
 
 class Lyrics(commands.Cog):
@@ -13,7 +75,6 @@ class Lyrics(commands.Cog):
         self.bot = bot
 
     def format_time(self, ms: int) -> str:
-
         seconds = int((ms / 1000) % 60)
         minutes = int((ms / (1000 * 60)) % 60)
         return f"{minutes:02d}:{seconds:02d}"
@@ -22,7 +83,6 @@ class Lyrics(commands.Cog):
         try:
             if ":" in time_str:
                 parts = time_str.split(":")
-
                 if len(parts) == 2:
                     minutes, seconds = map(int, parts)
                     total_seconds = (minutes * 60) + seconds
@@ -31,27 +91,25 @@ class Lyrics(commands.Cog):
                     total_seconds = (hours * 3600) + (minutes * 60) + seconds
             else:
                 total_seconds = int(time_str)
-
             return total_seconds * 1000
         except ValueError:
             return -1
 
     @commands.hybrid_command(
-        name="lyrics", description="Get the lyrics of the currently playing song"
+        name="lyrics", description="🎼 Get the lyrics of the currently playing song"
     )
     @commands.guild_only()
     async def lyrics(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
 
         if not player or not player.is_playing:
-            return await ctx.reply(f"{Emojis.error} No music is currently playing.")
+            return await ctx.send(f"{Emojis.error} No music is currently playing.")
 
-        await ctx.defer()
-
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.defer()
         track = player.current
         search_query = f"{track.title} {track.author}"
-
-        lrc_data = syncedlyrics.search(search_query)
+        lrc_data = await asyncio.to_thread(syncedlyrics.search, search_query)
 
         if not lrc_data:
             return await ctx.send(
@@ -60,9 +118,8 @@ class Lyrics(commands.Cog):
 
         lines = lrc_data.split("\n")
         current_pos_ms = player.position
-
-        processed_lyrics = []
-        current_line_text = "..."
+        processed_lines = []
+        found_now_playing = False
 
         for line in lines:
             match = re.search(r"\[(\d+):(\d+\.?\d*)\](.*)", line)
@@ -76,32 +133,29 @@ class Lyrics(commands.Cog):
 
             line_ms = (int(minutes) * 60 + float(seconds)) * 1000
 
-            if line_ms <= current_pos_ms:
-                current_line_text = f"**➜ {text}**"
+            if not found_now_playing and line_ms >= current_pos_ms:
+                processed_lines.append(f"**➜ {text}**")
+                found_now_playing = True
             else:
-                processed_lyrics.append(f"`[{minutes}:{seconds[:2]}]` {text}")
+                processed_lines.append(f"`[{minutes}:{seconds[:2]}]` {text}")
 
-        upcoming_display = "\n".join(processed_lyrics[:7])
+        pages = [
+            "\n".join(processed_lines[i : i + 10])
+            for i in range(0, len(processed_lines), 10)
+        ]
 
-        embed = discord.Embed(
-            title=f"Lyrics | {track.title}",
-            description=f"** {Emojis.musicplaying} Now Playing:**\n{current_line_text}\n\n**Upcoming:**\n{upcoming_display or '*End of track*'}",
-            color=discord.Color.blurple(),
-        )
+        if not pages:
+            return await ctx.send(f"{Emojis.error} No lyrics available for display.")
 
-        embed.set_thumbnail(url=track.thumbnail)
-        embed.set_footer(
-            text=f"Auro Engine • {self.format_time(current_pos_ms)} / {self.format_time(track.length)}",
-            icon_url=self.bot.user.display_avatar.url,
-        )
-
-        await ctx.send(embed=embed, delete_after=30)
+        view = LyricsView(pages, track, self.bot)
+        msg = await ctx.send(embed=view.create_embed(), view=view)
+        view.message = msg
 
     @commands.hybrid_command(
-        name="seek", description="Jump to a specific time in the song"
+        name="seek", description="🌊 Jump to a specific time in the song"
     )
     @commands.guild_only()
-    @app_commands.describe(time="Time to seek to (mm:ss or hh:mm:ss)")
+    @app_commands.describe(time="✨ Time to seek to (mm:ss or hh:mm:ss)")
     async def seek(self, ctx: commands.Context, time: str):
         player = cast(pomice.Player, ctx.voice_client)
 
@@ -112,13 +166,12 @@ class Lyrics(commands.Cog):
 
         if seek_ms < 0:
             return await ctx.reply(
-                f"{Emojis.error} Invalid time format. Use `mm:ss` or `hh:mm:ss`."
+                f"{Emojis.error} Invalid format. Use `mm:ss` or `hh:mm:ss`."
             )
         if seek_ms > player.current.length:
             return await ctx.reply(f"{Emojis.error} Time exceeds track length.")
 
         await player.seek(seek_ms)
-
         await ctx.reply(
             f"{Emojis.success} Seeked to {self.format_time(seek_ms)}.", delete_after=5
         )
