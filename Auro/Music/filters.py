@@ -4,13 +4,16 @@ import pomice
 from typing import cast
 from discord import app_commands
 from pomice.exceptions import FilterTagAlreadyInUse
+
+
 class Filters(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.hybrid_command(
-        name="volume", description="🔊 Adjust the playback volume (0-100%)",
-        aliases=["vol","v","volume_set","setvolume"]
+        name="volume",
+        description="🔊 Adjust the playback volume (0-100%)",
+        aliases=["vol", "v", "volume_set", "setvolume"],
     )
     @commands.guild_only()
     @app_commands.describe(volume="Volume level (0-100)")
@@ -26,15 +29,14 @@ class Filters(commands.Cog):
 
         await player.set_volume(volume)
         embed = discord.Embed(
-            title=f"🔊 **Volume set to `{volume}`%!",
-            color= discord.Color.blurple()
-        ).set_footer(text="💝",icon_url=self.bot.user.avatar.url)
-        await ctx.reply(embed=embed,delete_after=20)
-        
+            title=f"🔊 **Volume set to `{volume}`%!", color=discord.Color.blurple()
+        ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed, delete_after=20)
 
     @commands.hybrid_command(
-        name="nightcore", description="🌙 Speed up the track and increase the pitch",
-        aliases=["nc","nightcore_mode","enable_nightcore"]
+        name="nightcore",
+        description="🌙 Speed up the track and increase the pitch",
+        aliases=["nc", "nightcore_mode", "enable_nightcore"],
     )
     @commands.guild_only()
     async def nightcore(self, ctx: commands.Context):
@@ -46,16 +48,19 @@ class Filters(commands.Cog):
         try:
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
-            return await ctx.reply("❌ Nightcore mode is already enabled.\n To reset the filters, use the `/reset` command.", ephemeral=True)
+            return await ctx.reply(
+                "❌ Nightcore mode is already enabled.\n To reset the filters, use the `/reset` command.",
+                ephemeral=True,
+            )
         embed = discord.Embed(
-            title=f"🌙 **Nightcore mode enabled!**",
-            color= discord.Color.blurple()
-        ).set_footer(text="💝",icon_url=self.bot.user.avatar.url)
+            title=f"🌙 **Nightcore mode enabled!**", color=discord.Color.blurple()
+        ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="vaporwave", description="💨 Slow down the track and lower the pitch",
-        aliases=["vw","vaporwave_mode","enable_vaporwave"]
+        name="vaporwave",
+        description="💨 Slow down the track and lower the pitch",
+        aliases=["vw", "vaporwave_mode", "enable_vaporwave"],
     )
     @commands.guild_only()
     async def vaporwave(self, ctx: commands.Context):
@@ -67,16 +72,19 @@ class Filters(commands.Cog):
         try:
             await player.add_filter(filter_data)
         except pomice.FilterTagAlreadyInUse:
-           return await ctx.reply("❌ Vaporwave mode is already enabled.\n To reset the filters, use the `/reset` command.", ephemeral=True)
+            return await ctx.reply(
+                "❌ Vaporwave mode is already enabled.\n To reset the filters, use the `/reset` command.",
+                ephemeral=True,
+            )
         embed = discord.Embed(
-            title=f"💨 **Vaporwave mode enabled!**",
-            color= discord.Color.blurple()
-        ).set_footer(text="💝",icon_url=self.bot.user.avatar.url)
+            title=f"💨 **Vaporwave mode enabled!**", color=discord.Color.blurple()
+        ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqbassboost", description="🔊 Boost the bass frequencies",
-        aliases=["bb","bass_boost","enable_bassboost","eqbass"]
+        name="eqbassboost",
+        description="🔊 Boost the bass frequencies",
+        aliases=["bb", "bass_boost", "enable_bassboost", "eqbass"],
     )
     @commands.guild_only()
     async def bassboost(self, ctx: commands.Context):
@@ -87,17 +95,25 @@ class Filters(commands.Cog):
             filter_data = pomice.filters.Equalizer.boost()
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
-            return await ctx.reply("❌ Bassboost is already enabled. \n To reset the filters, use the `/reset` command.", ephemeral=True)
-        embed = discord.Embed(
-            title="Bassboost Enabled",
-            description="🔊 Heavy bass frequencies have been boosted for maximum thump!",
-            color=discord.Color.blurple()
-        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+            return await ctx.reply(
+                "❌ Bassboost is already enabled. \n To reset the filters, use the `/reset` command.",
+                ephemeral=True,
+            )
+        embed = (
+            discord.Embed(
+                title="Bassboost Enabled",
+                description="🔊 Heavy bass frequencies have been boosted for maximum thump!",
+                color=discord.Color.blurple(),
+            )
+            .set_thumbnail(url=self.bot.user.avatar.url)
+            .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        )
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqflat", description="🎚️ Flatten the equalizer settings",
-        aliases=["flat","equalizer_flat","enable_eqflat"]
+        name="eqflat",
+        description="🎚️ Flatten the equalizer settings",
+        aliases=["flat", "equalizer_flat", "enable_eqflat"],
     )
     @commands.guild_only()
     async def eqflat(self, ctx: commands.Context):
@@ -109,18 +125,24 @@ class Filters(commands.Cog):
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
             return await ctx.reply(
-                "❌ Flat equalizer settings are already enabled.\n To reset the filters, use the `/reset` command.", ephemeral=True
+                "❌ Flat equalizer settings are already enabled.\n To reset the filters, use the `/reset` command.",
+                ephemeral=True,
             )
-        embed = discord.Embed(
-            title="Equalizer Flattened",
-            description="🎚️ All frequencies have been balanced to neutral settings.",
-            color=discord.Color.blurple()
-        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        embed = (
+            discord.Embed(
+                title="Equalizer Flattened",
+                description="🎚️ All frequencies have been balanced to neutral settings.",
+                color=discord.Color.blurple(),
+            )
+            .set_thumbnail(url=self.bot.user.avatar.url)
+            .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        )
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqmetal", description="🎸 Enhance the mid frequencies for a metal sound",
-        aliases=["metal","equalizer_metal","enable_eqmetal"]
+        name="eqmetal",
+        description="🎸 Enhance the mid frequencies for a metal sound",
+        aliases=["metal", "equalizer_metal", "enable_eqmetal"],
     )
     @commands.guild_only()
     async def eqmetal(self, ctx: commands.Context):
@@ -132,18 +154,24 @@ class Filters(commands.Cog):
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
             return await ctx.reply(
-                "❌ Metal equalizer settings are already enabled.\n To reset the filters, use the `/reset` command.", ephemeral=True
+                "❌ Metal equalizer settings are already enabled.\n To reset the filters, use the `/reset` command.",
+                ephemeral=True,
             )
-        embed = discord.Embed(
-            title="Metal Equalizer Enabled",
-            description="🎸 Mid frequencies enhanced for that aggressive metal sound!",
-            color=discord.Color.blurple()
-        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        embed = (
+            discord.Embed(
+                title="Metal Equalizer Enabled",
+                description="🎸 Mid frequencies enhanced for that aggressive metal sound!",
+                color=discord.Color.blurple(),
+            )
+            .set_thumbnail(url=self.bot.user.avatar.url)
+            .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        )
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqpiano", description="🎹 Enhance the high frequencies for a piano sound",
-        aliases=["piano","equalizer_piano","enable_eqpiano"]
+        name="eqpiano",
+        description="🎹 Enhance the high frequencies for a piano sound",
+        aliases=["piano", "equalizer_piano", "enable_eqpiano"],
     )
     @commands.guild_only()
     async def eqpiano(self, ctx: commands.Context):
@@ -155,16 +183,25 @@ class Filters(commands.Cog):
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
             return await ctx.reply(
-                "❌ Piano equalizer settings are already enabled.\n To reset the filters, use the `/reset` command.", ephemeral=True
+                "❌ Piano equalizer settings are already enabled.\n To reset the filters, use the `/reset` command.",
+                ephemeral=True,
             )
-        embed = discord.Embed(
-            title="Piano Equalizer Enabled",
-            description="🎹 High frequencies enhanced for crystal clear piano notes!",
-            color=discord.Color.blurple()
-        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        embed = (
+            discord.Embed(
+                title="Piano Equalizer Enabled",
+                description="🎹 High frequencies enhanced for crystal clear piano notes!",
+                color=discord.Color.blurple(),
+            )
+            .set_thumbnail(url=self.bot.user.avatar.url)
+            .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        )
         await ctx.reply(embed=embed)
 
-    @commands.hybrid_command(name="8d", description="🔊 Enable 8D audio effect", aliases=["8d_audio","enable_8d"])
+    @commands.hybrid_command(
+        name="8d",
+        description="🔊 Enable 8D audio effect",
+        aliases=["8d_audio", "enable_8d"],
+    )
     @commands.guild_only()
     async def audio_8d(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
@@ -175,17 +212,24 @@ class Filters(commands.Cog):
         try:
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
-            return await ctx.reply("❌ 8D audio effect is already enabled.", ephemeral=True)
-        embed = discord.Embed(
-            title="8D Audio Effect Enabled",
-            description="🔊 Immersive 3D spatial audio activated!",
-            color=discord.Color.blurple()
-        ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+            return await ctx.reply(
+                "❌ 8D audio effect is already enabled.", ephemeral=True
+            )
+        embed = (
+            discord.Embed(
+                title="8D Audio Effect Enabled",
+                description="🔊 Immersive 3D spatial audio activated!",
+                color=discord.Color.blurple(),
+            )
+            .set_thumbnail(url=self.bot.user.avatar.url)
+            .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        )
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="seteq", description="🎛️ Manually tune the Auro Engine frequency bands",
-        aliases = ["set_equalizer","custom_eq","tune_auro"]
+        name="seteq",
+        description="🎛️ Manually tune the Auro Engine frequency bands",
+        aliases=["set_equalizer", "custom_eq", "tune_auro"],
     )
     @app_commands.guild_only()
     @app_commands.describe(tuning="Format: 'band:gain' (e.g., '0:0.25 1:0.15')")
@@ -240,8 +284,9 @@ class Filters(commands.Cog):
             await interaction.followup.send(f"❌ **Auro Tuner Error:** `{e}`")
 
     @commands.hybrid_command(
-        name="eq_help", description="💞 Guide for the Auro Engine frequency bands",
-        aliases=["eqguide","auro_eq_help","equalizer_guide"]
+        name="eq_help",
+        description="💞 Guide for the Auro Engine frequency bands",
+        aliases=["eqguide", "auro_eq_help", "equalizer_guide"],
     )
     async def eq_help(self, interaction: discord.Interaction):
         embed = discord.Embed(
@@ -284,7 +329,11 @@ class Filters(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
-    @commands.hybrid_command(name="reset", description="♻️ Clear all audio filters", aliases=["reset_filters","clear_filters","remove_filters"])
+    @commands.hybrid_command(
+        name="reset",
+        description="♻️ Clear all audio filters",
+        aliases=["reset_filters", "clear_filters", "remove_filters"],
+    )
     @commands.guild_only()
     async def reset_filters(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)

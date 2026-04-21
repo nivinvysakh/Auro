@@ -4,10 +4,10 @@ DB_PATH = "databases/DB/music_storage.db"
 
 
 class MusicStorage:
-    
 
     def __init__(self):
         self.path = DB_PATH
+
     async def init_db(self):
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA journal_mode=WAL;")
@@ -21,11 +21,13 @@ class MusicStorage:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            await db.execute("CREATE INDEX IF NOT EXISTS idx_query ON global_cache (search_query);")
+            await db.execute(
+                "CREATE INDEX IF NOT EXISTS idx_query ON global_cache (search_query);"
+            )
             await db.commit()
 
     async def get_cached_track(self, query: str):
-        
+
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")
             async with db.execute(
@@ -35,7 +37,7 @@ class MusicStorage:
                 return await cursor.fetchone()
 
     async def get_by_track_hash(self, track_hash: str):
-        
+
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")
             async with db.execute(
@@ -45,7 +47,7 @@ class MusicStorage:
                 return await cursor.fetchone()
 
     async def track_hash_exists(self, track_hash: str) -> bool:
-        
+
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")
             async with db.execute(
@@ -57,7 +59,7 @@ class MusicStorage:
     async def save_to_storage(
         self, query: str, track_hash: str, title: str, source: str = "Unknown"
     ):
-        
+
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")
             await db.execute(
@@ -65,8 +67,9 @@ class MusicStorage:
                 (track_hash, query.strip().lower(), title, source),
             )
             await db.commit()
+
     async def selective_flush(self, days: int):
-        
+
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")
             await db.execute(
@@ -77,7 +80,7 @@ class MusicStorage:
             await db.execute("VACUUM")
 
     async def flush_all(self):
-        
+
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")
             await db.execute("DELETE FROM global_cache")
@@ -85,8 +88,10 @@ class MusicStorage:
             await db.execute("VACUUM")
 
     async def get_all(self):
-        
+
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")
-            async with db.execute("SELECT search_query, track_hash, track_title, source FROM global_cache ORDER BY created_at DESC") as cursor:
+            async with db.execute(
+                "SELECT search_query, track_hash, track_title, source FROM global_cache ORDER BY created_at DESC"
+            ) as cursor:
                 return await cursor.fetchall()

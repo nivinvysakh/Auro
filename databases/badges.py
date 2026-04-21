@@ -10,14 +10,12 @@ class BadgesDatabase:
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute("PRAGMA journal_mode=WAL;")
             await db.execute("PRAGMA synchronous=NORMAL;")
-            await db.execute(
-                """
+            await db.execute("""
                 CREATE TABLE IF NOT EXISTS badges (
                     user_id INTEGER PRIMARY KEY,
                     badges TEXT DEFAULT '[]'
                 )
-            """
-            )
+            """)
             await db.commit()
 
     async def add_badge(self, user_id: int, badge: str):

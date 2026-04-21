@@ -4,6 +4,7 @@ from util.emojis import Emojis as emojis, ButtonEmojis, BadgesIcon, UserStautsEm
 from databases import BadgesDatabase
 from discord import app_commands
 
+
 class ProfileButtons(discord.ui.View):
     def __init__(self, target_user, command_owner, bot):
         super().__init__(timeout=60)

@@ -34,26 +34,26 @@ class Inactivity(commands.Cog):
         before: discord.VoiceState,
         after: discord.VoiceState,
     ):
-        
+
         if member.id == self.bot.user.id:
             player = cast(Player, member.guild.voice_client)
             if not player:
                 return
 
-            
             if before.channel and not after.channel:
                 await player.destroy()
                 return
 
-            
             if not before.suppress and after.suppress:
                 if isinstance(player.channel, discord.StageChannel):
                     if player.controller:
-                        await player.controller.send(f"{Emojis.warning} **Access Revoked:** Leaving Stage.", delete_after=15)
+                        await player.controller.send(
+                            f"{Emojis.warning} **Access Revoked:** Leaving Stage.",
+                            delete_after=15,
+                        )
                     await player.destroy()
                     return
 
-            
             if not before.mute and after.mute:
                 if not player.is_paused:
                     await player.set_pause(True)
@@ -61,37 +61,46 @@ class Inactivity(commands.Cog):
                         embed = discord.Embed(
                             title=f"{Emojis.warning} **Paused:** Auro is Muted",
                             color=discord.Color.yellow(),
-                        ).set_footer(text="Unmute to resume", icon_url=self.bot.user.display_avatar.url)
-                        await player.controller.send(embed=embed,delete_after=5)
+                        ).set_footer(
+                            text="Unmute to resume",
+                            icon_url=self.bot.user.display_avatar.url,
+                        )
+                        await player.controller.send(embed=embed, delete_after=5)
                 return
 
             elif before.mute and not after.mute:
                 if player.is_paused:
                     await player.set_pause(False)
                     if player.controller:
-                        await player.controller.send(f"{Emojis.success} **Resumed:** Audio restored.", delete_after=5)
+                        await player.controller.send(
+                            f"{Emojis.success} **Resumed:** Audio restored.",
+                            delete_after=5,
+                        )
                 return
 
-        
         player = cast(Player, member.guild.voice_client)
         if not player or not player.channel:
             return
 
         if len(player.channel.members) == 1:
             await asyncio.sleep(120)
-            
+
             player = cast(Player, member.guild.voice_client)
             if player and len(player.channel.members) == 1:
                 if player.controller:
-                    await player.controller.send(embed=discord.Embed(
-                        title=f"{Emojis.warning} **Disconnected:** Left voice channel due to inactivity.\n {Emojis.dot} **Reason:** No listeners detected.",
-                        color=discord.Color.yellow(),
-                    ).set_footer(text="Auro will rejoin when you play music again.", icon_url=self.bot.user.display_avatar.url)
+                    await player.controller.send(
+                        embed=discord.Embed(
+                            title=f"{Emojis.warning} **Disconnected:** Left voice channel due to inactivity.\n {Emojis.dot} **Reason:** No listeners detected.",
+                            color=discord.Color.yellow(),
+                        ).set_footer(
+                            text="Auro will rejoin when you play music again.",
+                            icon_url=self.bot.user.display_avatar.url,
+                        )
                     )
                 await player.destroy()
-        
+
         else:
-            
+
             if player.is_paused and not member.guild.me.voice.mute:
                 await player.set_pause(False)
 

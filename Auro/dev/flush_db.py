@@ -93,77 +93,87 @@ class Flush(commands.Cog):
     @commands.command(name="cachedump")
     @commands.is_owner()
     async def cache_dump(self, ctx: commands.Context):
-        
+
         await ctx.defer()
-        
-        
+
         cache_data = await self.music_cache.get_all()
         storage_data = await self.music_db.get_all()
-        
+
         embeds = []
-        
-        
+
         cache_embed = discord.Embed(
             title="🗂️ Music Cache Data (Loop) ",
             color=discord.Color.blurple(),
-            description=f"Total entries: **{len(cache_data)}**"
+            description=f"Total entries: **{len(cache_data)}**",
         ).set_thumbnail(url=self.bot.user.avatar.url)
-        
+
         if cache_data:
             for i, (query, track_hash, title) in enumerate(cache_data[:25], 1):
-                
-                short_hash = track_hash[:20] + "..." if len(track_hash) > 20 else track_hash
+
+                short_hash = (
+                    track_hash[:20] + "..." if len(track_hash) > 20 else track_hash
+                )
                 cache_embed.add_field(
                     name=f"{i}. {query[:50]}",
                     value=f"**Hash:** `{short_hash}`\n**Title:** {title[:60]}",
-                    inline=False
+                    inline=False,
                 )
         else:
             cache_embed.description += "\n\n*No cache entries*"
-        
+
         cache_embed.set_footer(
             text=f"Showing {min(25, len(cache_data))} of {len(cache_data)} entries",
-            icon_url=self.bot.user.avatar.url
+            icon_url=self.bot.user.avatar.url,
         )
         embeds.append(cache_embed)
-        
-        
+
         storage_embed = discord.Embed(
             title="💾 Music Storage Data",
             color=discord.Color.green(),
-            description=f"Total entries: **{len(storage_data)}**"
+            description=f"Total entries: **{len(storage_data)}**",
         ).set_thumbnail(url=self.bot.user.avatar.url)
-        
+
         if storage_data:
-            for i, (query, track_hash, title, source) in enumerate(storage_data[:20], 1):
-                
-                short_hash = track_hash[:20] + "..." if len(track_hash) > 20 else track_hash
+            for i, (query, track_hash, title, source) in enumerate(
+                storage_data[:20], 1
+            ):
+
+                short_hash = (
+                    track_hash[:20] + "..." if len(track_hash) > 20 else track_hash
+                )
                 storage_embed.add_field(
                     name=f"{i}. {query[:50]}",
                     value=f"**Hash:** `{short_hash}`\n**Title:** {title[:60]}\n**Source:** {source}",
-                    inline=False
+                    inline=False,
                 )
         else:
             storage_embed.description += "\n\n*No storage entries*"
-        
+
         storage_embed.set_footer(
             text=f"Showing {min(20, len(storage_data))} of {len(storage_data)} entries",
-            icon_url=self.bot.user.avatar.url
+            icon_url=self.bot.user.avatar.url,
         )
         embeds.append(storage_embed)
-        
-        
+
         summary_embed = discord.Embed(
-            title="📈 Cache Summary",
-            color=discord.Color.gold()
+            title="📈 Cache Summary", color=discord.Color.gold()
         ).set_thumbnail(url=self.bot.user.avatar.url)
-        summary_embed.add_field(name="🗂️ Cache Entries (Loop)", value=str(len(cache_data)), inline=True)
-        summary_embed.add_field(name="💾 Storage Entries", value=str(len(storage_data)), inline=True)
-        summary_embed.add_field(name="Total Unique Tracks", value=str(len(storage_data)), inline=True)
-        summary_embed.set_footer(text="Auro Engine • Cache Manager", icon_url=self.bot.user.avatar.url)
+        summary_embed.add_field(
+            name="🗂️ Cache Entries (Loop)", value=str(len(cache_data)), inline=True
+        )
+        summary_embed.add_field(
+            name="💾 Storage Entries", value=str(len(storage_data)), inline=True
+        )
+        summary_embed.add_field(
+            name="Total Unique Tracks", value=str(len(storage_data)), inline=True
+        )
+        summary_embed.set_footer(
+            text="Auro Engine • Cache Manager", icon_url=self.bot.user.avatar.url
+        )
         embeds.append(summary_embed)
-        
+
         await ctx.reply(embeds=embeds)
+
 
 async def setup(bot):
     await bot.add_cog(Flush(bot))

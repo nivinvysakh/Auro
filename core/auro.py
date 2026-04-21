@@ -17,7 +17,7 @@ class Auro(commands.AutoShardedBot):
             chunk_guilds_at_startup=False,
             case_insensitive=True,
         )
-        
+
     def get_time(self):
         return datetime.datetime.now().strftime("%H:%M:%S")
 

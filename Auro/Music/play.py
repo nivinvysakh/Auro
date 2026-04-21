@@ -1,4 +1,3 @@
-
 """
                                                     Auro Music Player Module
                                                     *-----------------------*
@@ -8,6 +7,7 @@ This file has Cog Listerners for handling music playback events, including track
 Developed by : ilynivin 💝
 
 """
+
 import discord
 from discord.ext import commands
 import pomice
@@ -22,6 +22,7 @@ from databases import MusicStorage
 import os
 from pathlib import Path
 from ..Errors.db_bash import TrackHealer
+
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
 MIN_DURATION = 10 * 1000
@@ -33,7 +34,6 @@ sp = spotipy.Spotify(
         client_id=os.getenv("client_id"), client_secret=os.getenv("client_secret")
     )
 )
-
 
 
 class Player(pomice.Player):
@@ -77,7 +77,9 @@ class Music(commands.Cog):
         return True
 
     # --- Helper Method for Track Retrieval and Caching ---
-    async def get_or_search_track(self, player: Player, query: str, search_type: str = "query") -> list:
+    async def get_or_search_track(
+        self, player: Player, query: str, search_type: str = "query"
+    ) -> list:
         use_loop_cache = player.loop or player.loop_queue
         cached = await player.music_storage.get_cached_track(query)
         if cached:
@@ -92,32 +94,35 @@ class Music(commands.Cog):
         elif search_type == "url":
             results = await player.get_tracks(query=query)
             source = "URL"
-        else:  
+        else:
             results = await player.get_tracks(query=f"ytmsearch:{query}")
             if not results:
                 results = await player.get_tracks(query=f"scsearch:{query}")
             source = "YouTube"
-        
+
         if results:
-            track_hash = getattr(results[0], "track_id", None) or results[0].info.get("track")
+            track_hash = getattr(results[0], "track_id", None) or results[0].info.get(
+                "track"
+            )
             title = results[0].title
-            
-            
+
             existing = await player.music_storage.get_by_track_hash(track_hash)
             if not existing:
-                
-                await player.music_storage.save_to_storage(query, track_hash, title, source)
+
+                await player.music_storage.save_to_storage(
+                    query, track_hash, title, source
+                )
             else:
-                
+
                 cached_results = await player.build_track(track_hash)
                 if cached_results:
                     results = [cached_results]
-            
+
             if use_loop_cache:
                 await player.music_cache.set_cached_hash(query, track_hash, title)
-        
+
         return results
-    
+
     # --- Event Listeners ---
 
     @commands.Cog.listener()
@@ -134,7 +139,7 @@ class Music(commands.Cog):
                     )
         if player.loop:
             return
-        
+
         thumbnail = (
             getattr(track, "thumbnail", None)
             or track.info.get("thumbnail")
@@ -173,7 +178,9 @@ class Music(commands.Cog):
         if str(reason).upper() == "load_failed":
             return
         if player.loop:
-            cached_hash = await player.music_cache.get_cached_hash(f"loop_{player.guild.id}")
+            cached_hash = await player.music_cache.get_cached_hash(
+                f"loop_{player.guild.id}"
+            )
             if cached_hash:
                 loop_track = await player.build_track(cached_hash)
                 await asyncio.sleep(0.2)
@@ -183,62 +190,67 @@ class Music(commands.Cog):
             player.queue.put(track)
         else:
             await asyncio.sleep(0.8)
-        
+
         await player.do_next()
-    
+
     @commands.Cog.listener()
-    async def on_pomice_track_exception(self, player: Player, track: pomice.Track, exception):
+    async def on_pomice_track_exception(
+        self, player: Player, track: pomice.Track, exception
+    ):
         print(f"⚠️ Track Exception: {track.title}. Initializing Healer...")
-        
+
         track_healer = TrackHealer()
         new_hash = await track_healer.repair(track.title)
-        
+
         if new_hash:
             healed_track = await player.build_track(new_hash)
             if healed_track:
-                healed_track.requester = getattr(track, 'requester', None)
-                
+                healed_track.requester = getattr(track, "requester", None)
+
                 if not player.is_playing:
                     await player.play(healed_track)
                 else:
-                    
+
                     player.queue.put_at_front(healed_track)
                     await player.stop()
-                
+
                 if player.controller:
                     await player.controller.send(
-                        embed = discord.Embed(
+                        embed=discord.Embed(
                             title=f"{Emojis.success} Track Healed",
                             description=f"Successfully healed **{track.title}**. Resuming playback.",
-                            color=discord.Color.green()
+                            color=discord.Color.green(),
                         )
                     )
-                return 
+                return
 
-        
         if player.controller:
             embed = discord.Embed(
                 title=f"{Emojis.warning} Playback Error",
                 description=f"Auro failed to heal **{track.title}**.\nSkipping...",
                 color=discord.Color.red(),
-            ).set_footer(text="Auro Engine • Resilience Mode", icon_url=self.bot.user.display_avatar.url)
-            
+            ).set_footer(
+                text="Auro Engine • Resilience Mode",
+                icon_url=self.bot.user.display_avatar.url,
+            )
+
             await player.controller.send(embed=embed, delete_after=15)
-        
 
         await player.stop()
-        
+
     @commands.Cog.listener()
-    async def on_pomice_track_stuck(self, player: Player, track: pomice.Track, threshold_ms: int):
-            if player.controller:
-                embed = discord.Embed(
-                    title=f"{Emojis.warning} Playback Stuck",
-                    description=f"Auro detected that **{track.title}** is stuck for over {threshold_ms}ms.\nSkipping to the next track.",
-                    color= discord.Color.red()
-                )
-                await player.controller.send(embed=embed)
-                await asyncio.sleep(1)
-                await player.stop()
+    async def on_pomice_track_stuck(
+        self, player: Player, track: pomice.Track, threshold_ms: int
+    ):
+        if player.controller:
+            embed = discord.Embed(
+                title=f"{Emojis.warning} Playback Stuck",
+                description=f"Auro detected that **{track.title}** is stuck for over {threshold_ms}ms.\nSkipping to the next track.",
+                color=discord.Color.red(),
+            )
+            await player.controller.send(embed=embed)
+            await asyncio.sleep(1)
+            await player.stop()
 
     #  --- Music Playback Commands ---
 
@@ -270,7 +282,9 @@ class Music(commands.Cog):
             try:
                 request = sp.track(search)
             except spotipy.exceptions.SpotifyException:
-                await ctx.reply(f"{Emojis.warning} Invalid Spotify track URL. Make sure it's a Track link, not a playlist or album.")
+                await ctx.reply(
+                    f"{Emojis.warning} Invalid Spotify track URL. Make sure it's a Track link, not a playlist or album."
+                )
                 return
             query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
             results = await self.get_or_search_track(player, query, "spotify")
@@ -321,7 +335,7 @@ class Music(commands.Cog):
             try:
                 await player.play(valid_track)
             except Exception as e:
-                self.bot.dispatch("pomice_track_exception" , player , valid_track , e)
+                self.bot.dispatch("pomice_track_exception", player, valid_track, e)
             try:
 
                 await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
@@ -359,7 +373,7 @@ class Music(commands.Cog):
             player = cast(Player, ctx.voice_client)
             await player.music_cache.clear_guild_cache(ctx.guild.id)
             await player.music_cache.clear_loop_queue(ctx.guild.id)
-            
+
             try:
                 await player.channel.edit(status=None)
             except:
@@ -397,7 +411,9 @@ class Music(commands.Cog):
         embed.add_field(name="Up Next", value=queue_text or "No songs in queue.")
         await ctx.reply(embed=embed)
 
-    @commands.hybrid_command(name="loop",description="🔄️ Toggles looping for the current playing song.")
+    @commands.hybrid_command(
+        name="loop", description="🔄️ Toggles looping for the current playing song."
+    )
     @commands.guild_only()
     async def loop(self, ctx: commands.Context):
         player = cast(Player, ctx.voice_client)
@@ -405,20 +421,20 @@ class Music(commands.Cog):
             return await ctx.reply(f"{Emojis.warning} Nothing is playing to loop!")
 
         player.loop = not player.loop
-        
+
         if player.loop:
             current_track = player.current
             track_hash = getattr(player.current, "track_id", None)
             if not track_hash:
                 track_hash = current_track.info.get("track")
             if not track_hash:
-                return 
+                return
             await player.music_cache.set_cached_hash(
-                query=f"loop_{ctx.guild.id}", 
+                query=f"loop_{ctx.guild.id}",
                 track_hash=track_hash,
-                title=current_track.title
+                title=current_track.title,
             )
-            
+
             status = "Enabled"
             color = discord.Color.blurple()
         else:
@@ -428,9 +444,10 @@ class Music(commands.Cog):
 
         embed = discord.Embed(
             description=f"**Looping is now {status}** for: **{player.current.title}**",
-            color=color
+            color=color,
         )
         await ctx.reply(embed=embed)
+
     @commands.hybrid_command(
         name="loopqueue",
         aliases=["lq"],
@@ -454,31 +471,32 @@ class Music(commands.Cog):
             return await ctx.reply(embed=embed, delete_after=11)
 
         player.loop_queue = not player.loop_queue
-        
+
         if player.loop_queue:
-            
+
             if player.is_playing:
                 current_track = player.current
-                track_hash = getattr(current_track, "track_id", None) or current_track.info.get("track")
+                track_hash = getattr(
+                    current_track, "track_id", None
+                ) or current_track.info.get("track")
                 await player.music_cache.set_cached_hash(
                     query=f"loop_queue_{ctx.guild.id}_0",
                     track_hash=track_hash,
-                    title=current_track.title
+                    title=current_track.title,
                 )
-            
-            
+
             queue_list = list(player.queue)
             for index, track in enumerate(queue_list, start=1):
                 track_hash = getattr(track, "track_id", None) or track.info.get("track")
                 await player.music_cache.set_cached_hash(
                     query=f"loop_queue_{ctx.guild.id}_{index}",
                     track_hash=track_hash,
-                    title=track.title
+                    title=track.title,
                 )
         else:
-            
+
             await player.music_cache.clear_loop_queue(ctx.guild.id)
-        
+
         status = "Enabled" if player.loop_queue else "Disabled"
         emoji = Emojis.success if player.loop_queue else Emojis.error
         embed = discord.Embed(
@@ -489,46 +507,42 @@ class Music(commands.Cog):
         )
         await ctx.reply(embed=embed)
 
-    @commands.hybrid_command(
-        name="pause", description="⏸️ Pauses the current track."
-    )
+    @commands.hybrid_command(name="pause", description="⏸️ Pauses the current track.")
     @commands.guild_only()
     async def pause(self, ctx):
-        player = cast(Player,ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player or not player.is_playing:
             embed = discord.Embed(
-                title=f"{Emojis.warning} Nothing Playing", color= discord.Color.yellow()
-
+                title=f"{Emojis.warning} Nothing Playing", color=discord.Color.yellow()
             ).set_footer(
-                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url 
+                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
             )
             return await ctx.reply(embed=embed, delete_after=10)
         await player.set_pause(True)
         await ctx.reply(
-            embed = discord.Embed(
-                title=f"{Emojis.success} Paused" , color= discord.Color.blurple()
+            embed=discord.Embed(
+                title=f"{Emojis.success} Paused", color=discord.Color.blurple()
             )
         )
-    @commands.hybrid_command(
-        name="resume", description="▶️ Resumes a paused track."
-    )
+
+    @commands.hybrid_command(name="resume", description="▶️ Resumes a paused track.")
     @commands.guild_only()
-    async def resume(self,ctx):
-        player = cast(Player,ctx.voice_client)
+    async def resume(self, ctx):
+        player = cast(Player, ctx.voice_client)
         if not player or not player.is_playing:
             embed = discord.Embed(
-                title=f"{Emojis.warning} Nothing Playing", color= discord.Color.yellow()
-
+                title=f"{Emojis.warning} Nothing Playing", color=discord.Color.yellow()
             ).set_footer(
-                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url 
+                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
             )
             return await ctx.reply(embed=embed, delete_after=10)
         await player.set_pause(False)
         await ctx.reply(
-            embed = discord.Embed(
-                title=f"{Emojis.success} Resumed" , color= discord.Color.blurple()
+            embed=discord.Embed(
+                title=f"{Emojis.success} Resumed", color=discord.Color.blurple()
             )
         )
+
 
 async def setup(bot):
     await bot.add_cog(Music(bot))

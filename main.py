@@ -18,7 +18,6 @@ AURO_BANNER = r"""
 """
 
 
-
 async def run_auro():
     os.system("cls" if os.name == "nt" else "clear")
     print(f"{Fore.LIGHTBLUE_EX}{AURO_BANNER}")

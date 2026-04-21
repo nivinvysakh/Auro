@@ -7,9 +7,9 @@ music_cache = MusicCache()
 music_storage = MusicStorage()
 init_db_list = [
     ("badgesDB", badges),
-    ("musicCacheDB",music_cache),
-    ("Music_Bash_System",music_storage)
-]   
+    ("musicCacheDB", music_cache),
+    ("Music_Bash_System", music_storage),
+]
 
 
 async def init_dbs():
