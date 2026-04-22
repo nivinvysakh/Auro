@@ -226,10 +226,9 @@ class Filters(commands.Cog):
         )
         await ctx.reply(embed=embed)
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="seteq",
         description="🎛️ Manually tune the Auro Engine frequency bands",
-        aliases=["set_equalizer", "custom_eq", "tune_auro"],
     )
     @app_commands.guild_only()
     @app_commands.describe(tuning="Format: 'band:gain' (e.g., '0:0.25 1:0.15')")
@@ -283,10 +282,9 @@ class Filters(commands.Cog):
         except Exception as e:
             await interaction.followup.send(f"❌ **Auro Tuner Error:** `{e}`")
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="eq_help",
         description="💞 Guide for the Auro Engine frequency bands",
-        aliases=["eqguide", "auro_eq_help", "equalizer_guide"],
     )
     async def eq_help(self, interaction: discord.Interaction):
         embed = discord.Embed(
