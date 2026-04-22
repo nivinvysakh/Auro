@@ -2,10 +2,10 @@
 echo Auro Engine : Starting Node Update ...
 echo Fetching Main branch from Github ....
 
-git pull origin main
+git pull origin Main
 
 echo Restarting Auro 
 
-pm2 restart Auro --interpreter "C:\Users\SERVER\AppData\Local\Programs\Python\Python314\python.exe"
+pm2 restart Auro-Bot
 
 echo Update Complete .
