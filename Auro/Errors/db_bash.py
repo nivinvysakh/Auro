@@ -14,7 +14,7 @@ class TrackHealer:
 
             node = pomice.NodePool.get_node()
             if not node:
-                print("🚨 Repair Error: No Pomice node available.")
+                print("Repair Error: No Pomice node available.")
                 return None
 
             results: pomice.SearchResult = await node.get_tracks(
@@ -22,7 +22,7 @@ class TrackHealer:
             )
 
             if not results or not results.tracks:
-                print(f"❌ Repair Failed: No results found for '{query}'")
+                print(f"Repair Failed: No results found for '{query}'")
                 return None
 
             fresh_track = results.tracks[0]
@@ -36,13 +36,13 @@ class TrackHealer:
                 source="YouTube (Self-Healed)",
             )
 
-            print(f"✅ Self-Healing Complete: {new_title}")
+            print(f"Self-Healing Complete: {new_title}")
             return new_hash
 
         except Exception as e:
-            print(f"🚨 Repair System Exception: {e}")
+            print(f"Repair System Exception: {e}")
             return None
 
 
 async def setup(bot):
-    print("✅ db_bash extension acknowledged.")
+    print("db_bash extension acknowledged.")
