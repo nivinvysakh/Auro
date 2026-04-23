@@ -4,6 +4,7 @@ import time
 import psutil
 import platform
 import pomice
+import subprocess
 from util.emojis import Emojis as emojis
 
 
@@ -11,7 +12,15 @@ class Stats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.start_time = time.time()
-
+    async def get_branch_name(self):
+        try:
+            result = subprocess.check_output(
+                ["git","branch","--show-current"],
+                text=True
+            )
+            return result.strip()
+        except Exception :
+            return "Unknown"
     @commands.hybrid_command(
         name="stats", description="📊 System and Lavalink Dashboard"
     )
@@ -41,6 +50,11 @@ class Stats(commands.Cog):
             name="⚙️ Environment",
             value=f"`{platform.system()}` | `Py {platform.python_version()}`",
             inline=False,
+        )
+        bot_embed.add_field(
+            name="🌳 Branch", 
+            value=f"`{await self.get_branch_name()}`", 
+            inline=False
         )
         bot_embed.set_footer(text="Auro System Layer")
         bot_embed.set_thumbnail(url=self.bot.user.display_avatar.url)
