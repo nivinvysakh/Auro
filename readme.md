@@ -1,5 +1,5 @@
 > [!CAUTION]
-> This Branch is `Beta` and may contain bugs. Use with caution. Use the `main` branch for a stable experience.
+> This Branch is `Beta` and may contain bugs. Use with caution. Use the `Main` branch for a stable experience.
 &nbsp;
 
 > [!NOTE]
