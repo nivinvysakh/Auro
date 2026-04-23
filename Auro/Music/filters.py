@@ -4,7 +4,7 @@ import pomice
 from typing import cast
 from discord import app_commands
 from pomice.exceptions import FilterTagAlreadyInUse
-
+from util.emojis import Emojis
 
 class Filters(commands.Cog):
     def __init__(self, bot):
@@ -326,7 +326,62 @@ class Filters(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
 
         await interaction.response.send_message(embed=embed)
-
+    @commands.hybrid_command(
+            name="eq_Treble_Boost",
+            description="✨ Boost the high frequencies for extra sparkle",
+            aliases=["treble_boost", "enable_treble_boost", "eqtreble","eq_tb"],
+    )
+    @commands.guild_only()
+    async def eq_treble_boost(self, ctx: commands.Context):
+        player = cast(pomice.Player, ctx.voice_client)
+        if not player :
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.error} No active player found.",
+                    color= discord.Color.red()
+                ),
+                delete_after=20
+            )
+        treble_boost_raw = [
+            (0, -0.05),
+            (1, -0.05),
+            (2, -0.1),
+            (3, 0.0),
+            (4, 0.0),
+            (5, 0.05),
+            (6, 0.1),
+            (7, 0.15),
+            (8, 0.2),
+            (9, 0.25),
+            (10, 0.3),
+            (11, 0.35),
+            (12, 0.4),
+            (13, 0.45),
+            (14, 0.5)
+        ]
+        try:
+            eq_filter = pomice.filters.Equalizer(tag="treble_boost", levels=treble_boost_raw)
+            await player.add_filter(
+                eq_filter,fast_apply=True
+            )
+        except FilterTagAlreadyInUse :
+            return await ctx.reply(
+                embed= discord.Embed(
+                    title=f"{Emojis.warning} Treble_boost is already in use.",
+                    description="To reset the filters run `/reset` command.",
+                    color= discord.Color.yellow()
+                ),
+                delete_after=15
+            )
+        await ctx.reply(
+            embed= discord.Embed(
+                title=f"{Emojis.success} Treble Boost Enabled!",
+                description="✨ High frequencies have been boosted for extra sparkle!",
+                color= discord.Color.blurple()
+            ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(
+                text="💝", icon_url=self.bot.user.avatar.url
+            )
+        )
     @commands.hybrid_command(
         name="reset",
         description="♻️ Clear all audio filters",
