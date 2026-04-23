@@ -43,7 +43,7 @@ class ButtonEmojis:
     badges = "<:badges:1486715024624976014>"
     github = "<:github:1492213289424392223>"
     server = "<:server:1492213286286917682>"
-
+    home = "<:home_button:1496760531451772939>"
 
 class UserStautsEmo:
     online = "<:onlinegray:1486715930103779439>"

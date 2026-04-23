@@ -239,7 +239,34 @@ class ProfileButtons(discord.ui.View):
 
         await self.apply_tiered_theme(embed, "badges")
         await interaction.edit_original_response(embed=embed, view=self)
-
+    
+    @discord.ui.button(
+        label="Home", style=discord.ButtonStyle.secondary, emoji=ButtonEmojis.home,
+        disabled=True
+    )
+    async def home_button(
+        self, interation : discord.Interaction, button: discord.ui.Button
+    ):
+        await self.handle_button_state(interation, button)
+        embed = discord.Embed(title=f"Overview of `{self.target.name}`")
+        embed.set_thumbnail(url=self.target.display_avatar.url)
+        embed.add_field(
+            name=f"{emojis.id} ID", value=f"`{self.target.id}`", inline=True
+        )
+        embed.add_field(
+            name=f"{emojis.heart} Name",
+            value=f"*{self.target.global_name or self.target.name}*",
+            inline=True,
+        )
+        member = interation.guild.get_member(self.target.id)
+        nickname = (
+            f"*{member.nick}*" if member and member.nick else f"{emojis.error} None"
+        )
+        embed.add_field(
+            name=f"{emojis.nickname_emoji} Nickname", value=nickname, inline=True
+        )
+        await self.apply_tiered_theme(embed, "overview")
+        await interation.edit_original_response(embed=embed, view=self)
 
 class Profile(commands.Cog):
     def __init__(self, bot: commands.AutoShardedBot):
