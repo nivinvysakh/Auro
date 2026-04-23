@@ -17,8 +17,8 @@
 
 | Github Username | Discord User ID | Date of First Contribution | Type of Contribution|
 |-----------------|-----------------|----------------------------|---------------------|
-| [Eclipse](https://github.com/thatsoeclipse)|`957196694393614367`| 26-3-2025| `Main`|
-| [Nivin](https://github.com/ilynivin)| *Null* | 26-3-2025| `Main`|
+| [Eclipse](https://github.com/thatsoeclipse)|`957196694393614367`| 26-3-2026| `Main`|
+| [Nivin](https://github.com/ilynivin)| *Null* | 26-3-2026| `Main`|
 
 ## 🪳 Bug Hunters Index
 
@@ -27,7 +27,7 @@
 
 | Discord Username | Date of First Bug Report | Type of Bug Reported|
 |------------------|--------------------------|---------------------|
-| *flying_at_mach2*| 21-4-2025| `Karoke_Bug` (Discontinued Feature.)|
+| *flying_at_mach2*| 21-4-2026| `Karoke_Bug` (Discontinued Feature.)|
 
 &nbsp;
 
@@ -38,13 +38,13 @@
 
 | Discord Username | Date of Joining Beta Testing |
 |------------------|-----------------------------|
-| *flying_at_mach2*| `21-4-2025`|
-| *emi62958* | `18-4-2025`|
-| *theogalileo1* | `17-4-2025`|
-| *foxinc* | `18-4-2025`|
-| *Trobo* | `18-4-2025`|
-| *alphabolt9958* | `3-4-2025`|
-| *rotten.petals* | `20-4-2025`|
+| *flying_at_mach2*| `21-4-2026`|
+| *emi62958* | `18-4-2026`|
+| *theogalileo1* | `17-4-2026`|
+| *foxinc* | `18-4-2026`|
+| *Trobo* | `18-4-2026`|
+| *alphabolt9958* | `3-4-2026`|
+| *rotten.petals* | `20-4-2026`|
 
 ---
 
