@@ -26,7 +26,7 @@ class Stats(commands.Cog):
         bot_embed = discord.Embed(
             title="🤖 Auro Bot Core",
             description=f"**Status:** `Online` {emojis.success}",
-            color=emojis.color,
+            color=discord.Color.from_rgb(255, 255, 255),
         )
         bot_embed.add_field(
             name="🛰️ Latency",
