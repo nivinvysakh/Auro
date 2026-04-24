@@ -368,25 +368,33 @@ class Music(commands.Cog):
     @commands.hybrid_command(
         name="stop", description=" ❌ Stops the music, clears the queue, and leaves."
     )
-    async def stop(self, ctx):
-        if ctx.voice_client:
-            player = cast(Player, ctx.voice_client)
-            await player.music_cache.clear_guild_cache(ctx.guild.id)
-            await player.music_cache.clear_loop_queue(ctx.guild.id)
+    async def stop(self, ctx:commands.Context):
+        if not ctx.voice_client:
+            return await ctx.reply(
+                embed= discord.Embed(
+                    title=f"{Emojis.warning} I am not connected to a voice channel. ",
+                    color= discord.Color.yellow()
+                ),
+                delete_after=15
+            )
+        
+        player = cast(Player, ctx.voice_client)
+        await player.music_cache.clear_guild_cache(ctx.guild.id)
+        await player.music_cache.clear_loop_queue(ctx.guild.id)
 
-            try:
-                await player.channel.edit(status=None)
-            except:
+        try:
+            await player.channel.edit(status=None)
+        except:
                 pass
-            await ctx.voice_client.destroy()
-            embed = discord.Embed(
+        await ctx.voice_client.destroy()
+        embed = discord.Embed(
                 title=f"{Emojis.success} Session Terminated",
                 description="The queue has been cleared and the player has disconnected.",
                 color=discord.Color.blurple(),
             ).set_footer(
                 text="Auro Engine • Offline", icon_url=self.bot.user.display_avatar.url
             )
-            await ctx.reply(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
         name="queue", description="🎶 Shows the current song and upcoming tracks."
@@ -395,14 +403,15 @@ class Music(commands.Cog):
         player = cast(Player, ctx.voice_client)
         if not player or (player.queue.is_empty and not player.is_playing):
             embed = discord.Embed(
-                description=f"{Emojis.warning} Queue is Empty",
-                color=discord.Color.yellow,
+                description=f"{Emojis.warning} Queue is Empty or not connected to vc.",
+                color=discord.Color.yellow(),
             )
             return await ctx.reply(embed=embed, delete_after=15)
 
         embed = discord.Embed(title="🎶 Current Queue", color=discord.Color.blue())
         if player.is_playing:
             embed.description = f"**Now Playing:** {player.current.title}\n\n"
+            embed.set_thumbnail(url=player.current.thumbnail)
 
         queue_text = ""
         for i, t in enumerate(list(player.queue)[:10], 1):
@@ -418,7 +427,9 @@ class Music(commands.Cog):
     async def loop(self, ctx: commands.Context):
         player = cast(Player, ctx.voice_client)
         if not player or not player.is_playing:
-            return await ctx.reply(f"{Emojis.warning} Nothing is playing to loop!")
+            return await ctx.reply(embed=discord.Embed(
+                description=f"{Emojis.warning} i am not connected to voice channel or there is nothing on queue."
+            ))
 
         player.loop = not player.loop
 
