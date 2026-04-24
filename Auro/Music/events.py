@@ -83,8 +83,8 @@ class Inactivity(commands.Cog):
             return
 
         if len(player.channel.members) == 1:
-            await asyncio.sleep(120)
-
+            await player.set_pause(True)
+            await asyncio.sleep(300)
             player = cast(Player, member.guild.voice_client)
             if player and len(player.channel.members) == 1:
                 if player.controller:

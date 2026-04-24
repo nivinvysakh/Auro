@@ -25,14 +25,22 @@ class Filters(commands.Cog):
                 description="`＞︿＜`",
                 color= discord.Color.yellow()
             )
-            return ctx.reply(embed=embed)
-
+            return await ctx.reply(embed=embed)
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        
         if volume < 0 or volume > 100:
             embed = discord.Embed(
                 title=f"{Emojis.warning} Volume must be in between **0** and **100**",
                 color= discord.Color.yellow()
             )
-            return ctx.reply(embed=embed)
+            return await ctx.reply(embed=embed)
 
         await player.set_volume(volume)
         embed = discord.Embed(
@@ -55,6 +63,14 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         filter_data = pomice.filters.Timescale.nightcore()
         try:
@@ -86,6 +102,14 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         filter_data = pomice.filters.Timescale.vaporwave()
         try:
@@ -117,6 +141,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         try:
             filter_data = pomice.filters.Equalizer.boost()
             await player.add_filter(filter_data)
@@ -153,6 +184,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         filter_data = pomice.filters.Equalizer.flat()
         try:
             await player.add_filter(filter_data)
@@ -189,6 +227,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         filter_data = pomice.filters.Equalizer.metal()
         try:
             await player.add_filter(filter_data)
@@ -225,6 +270,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         filter_data = pomice.filters.Equalizer.piano()
         try:
             await player.add_filter(filter_data)
@@ -261,6 +313,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         filter_data = pomice.filters.Rotation(tag="8d", rotation_hertz=0.2)
         try:
@@ -295,7 +354,10 @@ class Filters(commands.Cog):
             return await interaction.response.send_message(
                 f"{Emojis.warning} I'm not in a Voice Channel.", ephemeral=True
             )
-
+        if not interaction.user.voice or interaction.user.voice.channel != player.channel:
+            return await interaction.response.send_message(
+                f"╮(￣ω￣;)╭ You're not in {player.channel.mention}!", ephemeral=True
+            )
         await interaction.response.defer()
 
         try:
@@ -401,6 +463,14 @@ class Filters(commands.Cog):
                 ),
                 delete_after=20
             )
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        
         treble_boost_raw = [
             (0, -0.05),
             (1, -0.05),
@@ -456,6 +526,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         await player.reset_filters(fast_apply=True)
         embed = discord.Embed(

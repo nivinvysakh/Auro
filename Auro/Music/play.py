@@ -264,7 +264,15 @@ class Music(commands.Cog):
     async def play(self, ctx: commands.Context, *, search: str):
         if not ctx.author.voice:
             return await ctx.reply(f"{Emojis.warning} You must be in a VC!")
-
+        
+        if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        
         await ctx.defer()
 
         if not ctx.voice_client:
@@ -355,6 +363,13 @@ class Music(commands.Cog):
                 text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
             )
             return await ctx.reply(embed=embed, delete_after=10)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         player.loop = False
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         current_title = player.current.title
@@ -376,6 +391,13 @@ class Music(commands.Cog):
                     color= discord.Color.yellow()
                 ),
                 delete_after=15
+            )
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
             )
         
         player = cast(Player, ctx.voice_client)
@@ -407,6 +429,13 @@ class Music(commands.Cog):
                 color=discord.Color.yellow(),
             )
             return await ctx.reply(embed=embed, delete_after=15)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         embed = discord.Embed(title="🎶 Current Queue", color=discord.Color.blue())
         if player.is_playing:
@@ -430,7 +459,13 @@ class Music(commands.Cog):
             return await ctx.reply(embed=discord.Embed(
                 description=f"{Emojis.warning} i am not connected to voice channel or there is nothing on queue."
             ))
-
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         player.loop = not player.loop
 
         if player.loop:
@@ -473,7 +508,13 @@ class Music(commands.Cog):
                 color=discord.Color.yellow(),
             )
             return await ctx.reply(embed=embed, delete_after=5)
-
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         if len(player.queue) < 1:
             embed = discord.Embed(
                 description=f"{Emojis.warning} Only one song playing. Use `/loop` why wasiting my Resources `(◞‸◟；)` ",
@@ -529,6 +570,13 @@ class Music(commands.Cog):
                 text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
             )
             return await ctx.reply(embed=embed, delete_after=10)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         await player.set_pause(True)
         await ctx.reply(
             embed=discord.Embed(
@@ -547,6 +595,13 @@ class Music(commands.Cog):
                 text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
             )
             return await ctx.reply(embed=embed, delete_after=10)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         await player.set_pause(False)
         await ctx.reply(
             embed=discord.Embed(
