@@ -5,6 +5,7 @@ from typing import cast
 from discord import app_commands
 from pomice.exceptions import FilterTagAlreadyInUse
 from util.emojis import Emojis
+from presets import Eq_Presets
 
 class Filters(commands.Cog):
     def __init__(self, bot):
@@ -471,25 +472,8 @@ class Filters(commands.Cog):
                 )
             )
         
-        treble_boost_raw = [
-            (0, -0.05),
-            (1, -0.05),
-            (2, -0.1),
-            (3, 0.0),
-            (4, 0.0),
-            (5, 0.05),
-            (6, 0.1),
-            (7, 0.15),
-            (8, 0.2),
-            (9, 0.25),
-            (10, 0.3),
-            (11, 0.35),
-            (12, 0.4),
-            (13, 0.45),
-            (14, 0.5)
-        ]
         try:
-            eq_filter = pomice.filters.Equalizer(tag="treble_boost", levels=treble_boost_raw)
+            eq_filter = pomice.filters.Equalizer(tag="treble_boost", levels=Eq_Presets.TREBLE_BOOST)
             await player.add_filter(
                 eq_filter,fast_apply=True
             )
