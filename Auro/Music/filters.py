@@ -5,6 +5,7 @@ from typing import cast
 from discord import app_commands
 from pomice.exceptions import FilterTagAlreadyInUse
 from util.emojis import Emojis
+from filters.eq_filters import Eq_Presets
 
 class Filters(commands.Cog):
     def __init__(self, bot):
@@ -25,14 +26,22 @@ class Filters(commands.Cog):
                 description="`＞︿＜`",
                 color= discord.Color.yellow()
             )
-            return ctx.reply(embed=embed)
-
+            return await ctx.reply(embed=embed)
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        
         if volume < 0 or volume > 100:
             embed = discord.Embed(
                 title=f"{Emojis.warning} Volume must be in between **0** and **100**",
                 color= discord.Color.yellow()
             )
-            return ctx.reply(embed=embed)
+            return await ctx.reply(embed=embed)
 
         await player.set_volume(volume)
         embed = discord.Embed(
@@ -55,6 +64,14 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         filter_data = pomice.filters.Timescale.nightcore()
         try:
@@ -86,6 +103,14 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         filter_data = pomice.filters.Timescale.vaporwave()
         try:
@@ -103,7 +128,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqbassboost",
+        name="eq_bassboost",
         description="🔊 Boost the bass frequencies",
         aliases=["bb", "bass_boost", "enable_bassboost", "eqbass"],
     )
@@ -117,6 +142,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         try:
             filter_data = pomice.filters.Equalizer.boost()
             await player.add_filter(filter_data)
@@ -139,7 +171,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqflat",
+        name="eq_flat",
         description="🎚️ Flatten the equalizer settings",
         aliases=["flat", "equalizer_flat", "enable_eqflat"],
     )
@@ -153,6 +185,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         filter_data = pomice.filters.Equalizer.flat()
         try:
             await player.add_filter(filter_data)
@@ -175,7 +214,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqmetal",
+        name="eq_metal",
         description="🎸 Enhance the mid frequencies for a metal sound",
         aliases=["metal", "equalizer_metal", "enable_eqmetal"],
     )
@@ -189,6 +228,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         filter_data = pomice.filters.Equalizer.metal()
         try:
             await player.add_filter(filter_data)
@@ -211,7 +257,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqpiano",
+        name="eq_piano",
         description="🎹 Enhance the high frequencies for a piano sound",
         aliases=["piano", "equalizer_piano", "enable_eqpiano"],
     )
@@ -225,6 +271,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         filter_data = pomice.filters.Equalizer.piano()
         try:
             await player.add_filter(filter_data)
@@ -261,6 +314,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         filter_data = pomice.filters.Rotation(tag="8d", rotation_hertz=0.2)
         try:
@@ -295,7 +355,10 @@ class Filters(commands.Cog):
             return await interaction.response.send_message(
                 f"{Emojis.warning} I'm not in a Voice Channel.", ephemeral=True
             )
-
+        if not interaction.user.voice or interaction.user.voice.channel != player.channel:
+            return await interaction.response.send_message(
+                f"╮(￣ω￣;)╭ You're not in {player.channel.mention}!", ephemeral=True
+            )
         await interaction.response.defer()
 
         try:
@@ -401,25 +464,16 @@ class Filters(commands.Cog):
                 ),
                 delete_after=20
             )
-        treble_boost_raw = [
-            (0, -0.05),
-            (1, -0.05),
-            (2, -0.1),
-            (3, 0.0),
-            (4, 0.0),
-            (5, 0.05),
-            (6, 0.1),
-            (7, 0.15),
-            (8, 0.2),
-            (9, 0.25),
-            (10, 0.3),
-            (11, 0.35),
-            (12, 0.4),
-            (13, 0.45),
-            (14, 0.5)
-        ]
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        
         try:
-            eq_filter = pomice.filters.Equalizer(tag="treble_boost", levels=treble_boost_raw)
+            eq_filter = pomice.filters.Equalizer(tag="treble_boost", levels=Eq_Presets.TREBLE_BOOST)
             await player.add_filter(
                 eq_filter,fast_apply=True
             )
@@ -456,6 +510,13 @@ class Filters(commands.Cog):
                 color= discord.Color.yellow()
             )
             return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         await player.reset_filters(fast_apply=True)
         embed = discord.Embed(

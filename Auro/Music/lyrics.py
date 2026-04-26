@@ -103,7 +103,13 @@ class Lyrics(commands.Cog):
         player = cast(pomice.Player, ctx.voice_client)
 
         if not player or not player.is_playing:
-            return await ctx.send(f"{Emojis.error} No music is currently playing.")
+            return await ctx.send(
+                embeds=discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+                )
+            )
 
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.defer()
@@ -160,7 +166,21 @@ class Lyrics(commands.Cog):
         player = cast(pomice.Player, ctx.voice_client)
 
         if not player or not player.is_playing:
-            return await ctx.reply(f"{Emojis.error} No music is currently playing.")
+            return await ctx.reply(
+                embed=discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+                )
+            )
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         seek_ms = self.parse_time(time)
 
@@ -169,11 +189,19 @@ class Lyrics(commands.Cog):
                 f"{Emojis.error} Invalid format. Use `mm:ss` or `hh:mm:ss`."
             )
         if seek_ms > player.current.length:
-            return await ctx.reply(f"{Emojis.error} Time exceeds track length.")
+            return await ctx.reply(
+                embed= discord.Embed(
+                    description=f"{Emojis.warning} Track limit exceeded.",
+                    color= discord.Color.yellow()
+                )
+            )
 
         await player.seek(seek_ms)
         await ctx.reply(
-            f"{Emojis.success} Seeked to {self.format_time(seek_ms)}.", delete_after=5
+            embed= discord.Embed(
+                description=f"{Emojis.success} Seeked to {self.format_time(seek_ms)}.",
+                color= discord.Color.green()
+            ).set_author(name="Auro", icon_url=self.bot.user.avatar.url).set_thumbnail(url=player.current.thumbnail),delete_after=15
         )
 
 
