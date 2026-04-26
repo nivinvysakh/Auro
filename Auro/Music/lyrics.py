@@ -11,13 +11,14 @@ from discord import app_commands
 
 class LyricsView(discord.ui.View):
 
-    def __init__(self, pages, track, bot):
+    def __init__(self,pages, track, bot,author):
         super().__init__(timeout=60)
         self.pages = pages
         self.current_page = 0
         self.track = track
         self.bot = bot
         self.message = None
+        self.author = author
 
     def create_embed(self):
         embed = discord.Embed(
@@ -38,6 +39,11 @@ class LyricsView(discord.ui.View):
     async def back_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                "This menu isn't for you! ┐(￣ヘ￣)┌", ephemeral=True
+            )
+
         if self.current_page > 0:
             self.current_page -= 1
             await interaction.response.edit_message(
@@ -52,6 +58,11 @@ class LyricsView(discord.ui.View):
     async def next_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                "This menu isn't for you! ┐(￣ヘ￣)┌", ephemeral=True
+            )
+        
         if self.current_page < len(self.pages) - 1:
             self.current_page += 1
             await interaction.response.edit_message(
@@ -153,7 +164,7 @@ class Lyrics(commands.Cog):
         if not pages:
             return await ctx.send(f"{Emojis.error} No lyrics available for display.")
 
-        view = LyricsView(pages, track, self.bot)
+        view = LyricsView(pages, track, self.bot,ctx.author)
         msg = await ctx.send(embed=view.create_embed(), view=view)
         view.message = msg
 

@@ -260,7 +260,7 @@ class Music(commands.Cog):
         description="🎶 Play a song from YouTube / SoundCloud / Spotify ",
     )
     @commands.guild_only()
-    @app_commands.describe(search="Search for a song or paste a link")
+    @app_commands.describe(search="🌛 Search for a song or paste a link")
     async def play(self, ctx: commands.Context, *, search: str):
         if not ctx.author.voice:
             return await ctx.reply(f"{Emojis.warning} You must be in a VC!")
@@ -291,7 +291,10 @@ class Music(commands.Cog):
                 request = sp.track(search)
             except spotipy.exceptions.SpotifyException:
                 await ctx.reply(
-                    f"{Emojis.warning} Invalid Spotify track URL. Make sure it's a Track link, not a playlist or album."
+                    embed=discord.Embed(
+                        description=f"{Emojis.warning} Invalid Spotify track URL. Make sure it's a Track link, not a playlist or album.",
+                        color=discord.Color.yellow()
+                    )
                 )
                 return
             query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
