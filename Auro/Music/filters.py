@@ -5,7 +5,7 @@ from typing import cast
 from discord import app_commands
 from pomice.exceptions import FilterTagAlreadyInUse
 from util.emojis import Emojis
-from presets import Eq_Presets
+from filters.eq_filters import Eq_Presets
 
 class Filters(commands.Cog):
     def __init__(self, bot):
@@ -128,7 +128,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqbassboost",
+        name="eq_bassboost",
         description="🔊 Boost the bass frequencies",
         aliases=["bb", "bass_boost", "enable_bassboost", "eqbass"],
     )
@@ -171,7 +171,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqflat",
+        name="eq_flat",
         description="🎚️ Flatten the equalizer settings",
         aliases=["flat", "equalizer_flat", "enable_eqflat"],
     )
@@ -214,7 +214,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqmetal",
+        name="eq_metal",
         description="🎸 Enhance the mid frequencies for a metal sound",
         aliases=["metal", "equalizer_metal", "enable_eqmetal"],
     )
@@ -257,7 +257,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqpiano",
+        name="eq_piano",
         description="🎹 Enhance the high frequencies for a piano sound",
         aliases=["piano", "equalizer_piano", "enable_eqpiano"],
     )

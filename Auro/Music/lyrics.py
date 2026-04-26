@@ -201,7 +201,7 @@ class Lyrics(commands.Cog):
             embed= discord.Embed(
                 description=f"{Emojis.success} Seeked to {self.format_time(seek_ms)}.",
                 color= discord.Color.green()
-            ).set_author(name="Auro", icon_url=self.bot.user.avatar.url),delete_after=15
+            ).set_author(name="Auro", icon_url=self.bot.user.avatar.url).set_thumbnail(url=player.current.thumbnail),delete_after=15
         )
 
 
