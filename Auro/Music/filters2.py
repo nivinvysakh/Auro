@@ -146,53 +146,7 @@ class Filter2(commands.Cog):
                 description=f"Frequency: `{frequency}Hz` | Depth: `{depth}`",
                 color= discord.Color.green() if depth < 0.8 else discord.Color.gold()
             )
-        )
-    @commands.hybrid_command(
-        name="eq_auro",
-        description="✨ Apply the Auro signature EQ (Bass + Vocals)"
-    )
-    @commands.guild_only()
-    async def auro(self,ctx:commands.Context):
-        player = cast(pomice.Player,ctx.voice_client)
-        if not player:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    title=f"{Emojis.error} No active player found.",
-                    description="`＞︿＜`",
-                    color= discord.Color.yellow()
-                )
-            )
-        if not ctx.author.voice or  ctx.author.voice.channel != ctx.voice_client.channel:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
-                    color= discord.Colour.yellow()
-                )                
-            )
-        await player.set_volume(75)
-        try:
-            await player.add_filter(
-            pomice.Equalizer(
-                tag="auro",
-                levels= Eq_Presets.auro_gains
-            )
-            )
-        except FilterTagAlreadyInUse:
-            return await ctx.reply(
-                embed = discord.Embed(
-                title=f"{Emojis.warning} `Auro` is active.",
-                description="`（；´д｀）ゞ`",
-                color= discord.Color.yellow()
-                )
-            )
-        await ctx.reply(
-            embed=discord.Embed(
-                title=f"{Emojis.auro} Auro Filter Enabled",
-                description="Applied **Signature EQ**: Heavy Bass + Vocal Clarity.",
-                color=discord.Color.gold()
-            ).set_footer(text="Auro Engine • Audio Hardened")
-        )
-        
+        )        
 
 async def setup(bot):
     await bot.add_cog(Filter2(bot))
