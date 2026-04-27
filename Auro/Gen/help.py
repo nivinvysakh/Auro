@@ -1,13 +1,24 @@
 import discord
 from discord.ext import commands
 from util.emojis import Emojis, ButtonEmojis
+import aiohttp
 
+
+async def get_latest_version():
+    url = "https://api.github.com/repos/ilynivin/Auro/releases/latest"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                data = await response.json()
+                return data.get("tag_name", "Unknown")
+            return "v1.0.0"
 
 class HelpView(discord.ui.View):
-    def __init__(self, bot, author):
+    def __init__(self, bot, author, version):
         super().__init__(timeout=60)
         self.bot = bot
         self.author = author
+        self.version = version
         self.current_page = 1
         self.message = None
         self.add_item(
@@ -31,9 +42,9 @@ class HelpView(discord.ui.View):
         embed = discord.Embed(
             color=discord.Color.blurple(), title=f"{Emojis.auro} Auro Infrastructure"
         )
-        embed.set_image(url="https://cdn.pfps.gg/banners/3752-anime.gif")
+        embed.set_image(url="https://i.pinimg.com/originals/5a/24/39/5a24398389aacad9095f240abeca30b8.gif")
         embed.set_footer(
-            text=f"Auro v1.0.0 | Page {self.current_page}/2",
+            text=f"Auro {self.version} | Page {self.current_page}/2",
             icon_url=self.bot.user.avatar.url,
         )
 
@@ -59,7 +70,8 @@ class HelpView(discord.ui.View):
                     f"**{Emojis.dot} lyrics** — Fetch real-time song text\n"
                     f"**{Emojis.dot} filters** — Audio enhancement toggles\n"
                     f"**{Emojis.dot} stop/skip** — Queue control\n"
-                    f"**{Emojis.dot} loop/loopqueue** — Track/Queue repeat toggles"
+                    f"**{Emojis.dot} loop/loopqueue** — Track/Queue repeat toggles\n"
+                    f"**{Emojis.dot} Fix** — Hard-resets the Auro Engine to fix 'Ghost Audio' issues.\n"
                 ),
                 inline=False,
             )
@@ -78,7 +90,7 @@ class HelpView(discord.ui.View):
 
     @discord.ui.button(
         label="Back",
-        style=discord.ButtonStyle.danger,
+        style=discord.ButtonStyle.gray,
         disabled=True,
         emoji=Emojis.left_arrow,
     )
@@ -91,7 +103,7 @@ class HelpView(discord.ui.View):
         await interaction.response.edit_message(embed=self.create_embed(), view=self)
 
     @discord.ui.button(
-        label="Next", style=discord.ButtonStyle.success, emoji=Emojis.right_arrow
+        label="Next", style=discord.ButtonStyle.blurple, emoji=Emojis.right_arrow
     )
     async def next_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -120,10 +132,11 @@ class Help(commands.Cog):
     )
     @commands.guild_only()
     async def help(self, ctx: commands.Context):
-        view = HelpView(self.bot, ctx.author)
+        version = await get_latest_version()
+        view = HelpView(self.bot, ctx.author , version)
         embed = view.create_embed()
 
-        message = await ctx.send(embed=embed, view=view)
+        message = await ctx.reply(embed=embed, view=view)
         view.message = message
 
 
