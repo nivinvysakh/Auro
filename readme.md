@@ -1,7 +1,3 @@
-> [!CAUTION]
-> This Branch is `Beta` and may contain bugs. Use with caution. Use the `Main` branch for a stable experience.
-&nbsp;
-
 > [!NOTE]
 > Make sure you have Java 21 + installed and python 3.10+ to run the bot.
 
