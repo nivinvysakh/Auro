@@ -6,7 +6,17 @@ import platform
 import pomice
 import subprocess
 from util.emojis import Emojis as emojis
+import aiohttp
 
+
+async def get_latest_version():
+    url = "https://api.github.com/repos/ilynivin/Auro/releases/latest"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                data = await response.json()
+                return data.get("tag_name", "Unknown")
+            return "v1.0.0"
 
 class Stats(commands.Cog):
     def __init__(self, bot):
@@ -26,7 +36,7 @@ class Stats(commands.Cog):
     )
     async def stats(self, ctx: commands.Context):
         await ctx.defer()
-
+        version = await get_latest_version()
         uptime = str(
             time.strftime("%Hh %Mm %Ss", time.gmtime(time.time() - self.start_time))
         )
@@ -54,6 +64,11 @@ class Stats(commands.Cog):
         bot_embed.add_field(
             name="🌳 Branch", 
             value=f"`{await self.get_branch_name()}`", 
+            inline=False
+        )
+        bot_embed.add_field(
+            name="🌛 Version",
+            value=f"`{version}`",
             inline=False
         )
         bot_embed.set_footer(text="Auro System Layer")

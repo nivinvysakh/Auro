@@ -424,14 +424,24 @@ class Music(commands.Cog):
     @commands.hybrid_command(
         name="queue", description="🎶 Shows the current song and upcoming tracks."
     )
-    async def queue(self, ctx):
+    async def queue(self, ctx:commands.Context):
         player = cast(Player, ctx.voice_client)
-        if not player or (player.queue.is_empty and not player.is_playing):
-            embed = discord.Embed(
-                description=f"{Emojis.warning} Queue is Empty or not connected to vc.",
-                color=discord.Color.yellow(),
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.error} No active player found.",
+                    description="`＞︿＜`",
+                    color=discord.Color.yellow()
+                )
             )
-            return await ctx.reply(embed=embed, delete_after=15)
+        if player.queue.is_empty and not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.warning} Auro is currently idle.",
+                    description="The queue is empty and nothing is playing! `(￣ω￣;)`",
+                    color=discord.Color.yellow()
+                )
+            )
         if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -458,10 +468,22 @@ class Music(commands.Cog):
     @commands.guild_only()
     async def loop(self, ctx: commands.Context):
         player = cast(Player, ctx.voice_client)
-        if not player or not player.is_playing:
-            return await ctx.reply(embed=discord.Embed(
-                description=f"{Emojis.warning} i am not connected to voice channel or there is nothing on queue."
-            ))
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.error} No active player found.",
+                    description="`＞︿＜`",
+                    color=discord.Color.yellow()
+                )
+            )
+        if not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} There is no song playing to loop! `(￣ω￣;)`",
+                    color=discord.Colour.yellow()
+                )
+            )
+
         if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -507,10 +529,11 @@ class Music(commands.Cog):
         player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
-                description=f"{Emojis.warning} I'm not connected to a VC.",
-                color=discord.Color.yellow(),
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
             )
-            return await ctx.reply(embed=embed, delete_after=5)
+            return await ctx.reply(embed=embed)
         if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -564,15 +587,23 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(name="pause", description="⏸️ Pauses the current track.")
     @commands.guild_only()
-    async def pause(self, ctx):
+    async def pause(self, ctx:commands.Context):
         player = cast(Player, ctx.voice_client)
-        if not player or not player.is_playing:
-            embed = discord.Embed(
-                title=f"{Emojis.warning} Nothing Playing", color=discord.Color.yellow()
-            ).set_footer(
-                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.error} No active player found.",
+                    description="`＞︿＜`",
+                    color= discord.Color.yellow()
+                )
             )
-            return await ctx.reply(embed=embed, delete_after=10)
+        if not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} There is no song playing to pause! `(￣ω￣;)`",
+                    color= discord.Color.yellow()
+                )
+            )
         if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -589,15 +620,23 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(name="resume", description="▶️ Resumes a paused track.")
     @commands.guild_only()
-    async def resume(self, ctx):
+    async def resume(self, ctx: commands.Context):
         player = cast(Player, ctx.voice_client)
-        if not player or not player.is_playing:
-            embed = discord.Embed(
-                title=f"{Emojis.warning} Nothing Playing", color=discord.Color.yellow()
-            ).set_footer(
-                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.error} No active player found.",
+                    description="`＞︿＜`",
+                    color=discord.Color.yellow()
+                )
             )
-            return await ctx.reply(embed=embed, delete_after=10)
+        if not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} There is no song playing to resume! `(￣ω￣;)`",
+                    color=discord.Color.yellow()
+                )
+            )
         if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(

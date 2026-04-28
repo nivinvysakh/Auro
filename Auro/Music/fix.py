@@ -12,7 +12,7 @@ class Fix(commands.Cog):
     
     @commands.hybrid_command(
         name="fix",
-        description="🍋‍🟩 Hard-resets the Auro Engine to fix 'Ghost Audio' issues.",
+        description="🍋 Hard-resets the Auro Engine to fix 'Ghost Audio' issues.",
         aliases=["reset_player","hard_reset"]
     )
     @commands.guild_only()
@@ -51,7 +51,7 @@ class Fix(commands.Cog):
             if current_track:
                 await new_player.play(current_track, start=position)
         except Exception as e :
-            print(e)
+            print(f"Fix command error : {e}")
             return await ctx.reply(
                 embed=discord.Embed(
                     description=f"{Emojis.warning} ⚠️ **Recovery Failed** . Please Contact the devs so that they can fully reset the system.",
