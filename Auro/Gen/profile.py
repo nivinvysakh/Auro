@@ -42,6 +42,22 @@ class ProfileButtons(discord.ui.View):
                 "badges": "https://i.pinimg.com/originals/33/ed/e3/33ede3813b49035b5dc3e1044b8d47fa.gif",
             }
             embed.set_image(url=gifs.get(page_type, gifs["overview"]))
+        elif "Developer" in badges:
+            embed.title = (
+                f"{self.target.name}'s {page_type.title()} [{BadgesIcon.developer}]"
+            )
+            embed.color = discord.Color.red()
+            embed.set_author(
+                name=f"{self.target.name}",
+                icon_url="https://media.tenor.com/zWjGMaQ8h5EAAAAM/screnshotted.gif"
+            )
+            gifs = {
+                "overview": "https://i.pinimg.com/originals/7b/b9/ed/7bb9ed00d54da2404408d685534a36d4.gif",
+                "status": "https://i.pinimg.com/originals/47/ff/22/47ff225d6df531b371221b6bbbef6928.gif",
+                "account": "https://i.pinimg.com/originals/6a/23/30/6a2330e2ed77ec9df2075b222e5aa87f.gif",
+                "badges": "https://i.pinimg.com/originals/33/ed/e3/33ede3813b49035b5dc3e1044b8d47fa.gif",
+            }
+            embed.set_image(url=gifs.get(page_type, gifs["overview"]))
         elif "Staff" in badges:
             embed.title = (
                 f"{self.target.name}'s {page_type.title()} [{BadgesIcon.staff}]"

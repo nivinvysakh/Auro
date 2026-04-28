@@ -24,7 +24,7 @@ class Contribute(commands.Cog):
         version = await get_latest_version()
         await ctx.defer()
         embed = discord.Embed(
-            title="Contributing to Auro",
+            title="Contributing to Auro `(*^▽^*)`",
             description="> Thank you for your interest in contributing to Auro! We welcome contributions from the community. Here are some ways you can [contribute:](https://github.com/ilynivin/Auro)",
             color=discord.Color.blue(),
         )

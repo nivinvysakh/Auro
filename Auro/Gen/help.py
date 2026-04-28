@@ -90,7 +90,7 @@ class HelpView(discord.ui.View):
 
     @discord.ui.button(
         label="Back",
-        style=discord.ButtonStyle.gray,
+        style=discord.ButtonStyle.blurple,
         disabled=True,
         emoji=Emojis.left_arrow,
     )
@@ -112,7 +112,14 @@ class HelpView(discord.ui.View):
         button.disabled = True
         self.children[0].disabled = False
         await interaction.response.edit_message(embed=self.create_embed(), view=self)
-
+    
+    @discord.ui.button(
+            label="delete",
+            style= discord.ButtonStyle.gray,
+            emoji=f"{Emojis.error}"
+    )
+    async def delete(self, intraction: discord.Interaction , button: discord.ui.button):
+        await intraction.message.delete()
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
 
         if interaction.user != self.author:

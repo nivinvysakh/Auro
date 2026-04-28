@@ -89,7 +89,17 @@ class LyricsView(discord.ui.View):
         await interaction.response.edit_message(
             embed=self.create_embed(), view=self
         )
-        
+    @discord.ui.button(
+            label="delete",
+            style=discord.ButtonStyle.danger,
+            emoji=f"{Emojis.error}"
+    )
+    async def delete(self, interaction : discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                "This menu isn't for you! ┐(￣ヘ￣)┌", ephemeral=True
+            )
+        await interaction.message.delete()
     async def on_timeout(self):
         for child in self.children:
             child.disabled = True

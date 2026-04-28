@@ -95,14 +95,29 @@ class Rules_send(commands.Cog):
             inline=False
         )
         embed.add_field(
-            name="⏸️ Respect Staff 🛡️",
-            value="Respect the Moderators and Admins. Their instructions are final. Disrespecting or arguing with staff results in a timeout or ban.",
+            name="⏸️ Neutral Ground 🚫",
+            value=(
+                "Auro Support is for technical help, music, and coding. Political, "
+                "religious, or controversial debates are strictly prohibited to keep "
+                "the focus on development."
+            ),
             inline=False
         )
-        
         embed.add_field(
-            name="⚖️ Common Sense",
-            value="Staff have the final say. Use your head; if it feels wrong, don't do it.",
+            name="🛠️ Efficient Support",
+            value=(
+                "When asking for help, please provide details. Don't just say 'it's broken.' "
+                "Send error logs, describe the issue, and be patient!"
+            ),
+            inline=False
+        )
+        embed.add_field(
+            name="⚖️ Staff Authority & Appeals",
+            value=(
+                "Respect the Moderators and Admins; their instructions are final. "
+                "However, if you believe a staff decision was incorrect, you may **contact the Server Owner**. "
+                "You **must** provide proper evidence (screenshots or screen recordings) for the appeal to be considered."
+            ),
             inline=False
         )
 
