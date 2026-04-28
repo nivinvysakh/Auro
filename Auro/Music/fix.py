@@ -48,6 +48,7 @@ class Fix(commands.Cog):
             await player.destroy()
             await asyncio.sleep(2)
             new_player = cast(pomice.Player, await vc_channel.connect(cls=Player))
+            new_player.controller = ctx.channel
             if current_track:
                 await new_player.play(current_track, start=position)
         except Exception as e :
