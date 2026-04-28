@@ -144,7 +144,7 @@ class Lyrics(commands.Cog):
 
         if not player :
             return await ctx.reply(
-                embeds=discord.Embed(
+                embed=discord.Embed(
                 title=f"{Emojis.error} No active player found.",
                 description="`＞︿＜`",
                 color= discord.Color.yellow()
