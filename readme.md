@@ -2,7 +2,6 @@
 > Make sure you have Java 21 + installed and python 3.10+ to run the bot.
 
 
-
 # Auro 🌙
 
 <img align="right" src="/img/auro.svg" width=200 alt="Auro Bot Icon"/>
