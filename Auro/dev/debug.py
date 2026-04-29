@@ -61,7 +61,6 @@ class Debug(commands.Cog):
         
         if player:
             node = player.node
-            node_id = getattr(node, 'identifier', getattr(node, 'id', getattr(node, 'name', 'Unknown')))
             
             embed.add_field(
                 name=f"🎵 Current Server State ({ctx.guild.name})",
