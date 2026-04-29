@@ -1,7 +1,17 @@
 import discord
 from discord.ext import commands
 from util.emojis import Emojis
+import aiohttp
 
+
+async def get_latest_version():
+    url = "https://api.github.com/repos/ilynivin/Auro/releases/latest"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                data = await response.json()
+                return data.get("tag_name", "Unknown")
+            return "v1.0.0"
 
 class Contribute(commands.Cog):
     def __init__(self, bot):
@@ -10,9 +20,11 @@ class Contribute(commands.Cog):
     @commands.hybrid_command(
         name="contribute", description="✨ Learn how to contribute to Auro"
     )
-    async def contribute(self, ctx):
+    async def contribute(self, ctx:commands.Context):
+        version = await get_latest_version()
+        await ctx.defer()
         embed = discord.Embed(
-            title="Contributing to Auro",
+            title="Contributing to Auro `(*^▽^*)`",
             description="> Thank you for your interest in contributing to Auro! We welcome contributions from the community. Here are some ways you can [contribute:](https://github.com/ilynivin/Auro)",
             color=discord.Color.blue(),
         )
@@ -37,11 +49,14 @@ class Contribute(commands.Cog):
             inline=False,
         )
         embed.set_footer(
-            text="Thank you for helping us make Auro better!",
+            text=f"Thank you for helping us make Auro better! • Version : {version}",
             icon_url=self.bot.user.avatar.url,
         )
         embed.set_thumbnail(url=self.bot.user.avatar.url)
-        await ctx.send(embed=embed)
+        if ctx.interaction:
+            await ctx.interaction.followup.send(embed=embed)
+        else:
+            await ctx.reply(embed=embed)
 
 
 async def setup(bot):

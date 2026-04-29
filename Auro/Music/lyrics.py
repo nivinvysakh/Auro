@@ -70,7 +70,36 @@ class LyricsView(discord.ui.View):
             )
         else:
             await interaction.response.defer()
-
+    @discord.ui.button(
+            label="Locate" , style=discord.ButtonStyle.blurple , emoji="🏹"
+    )
+    async def locator_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                "This menu isn't for you! ┐(￣ヘ￣)┌", ephemeral=True
+            )
+        found_page = 0
+        for index, content in enumerate(self.pages):
+            if "➜" in content:
+                found_page = index
+                break
+        self.current_page = found_page
+        await interaction.response.edit_message(
+            embed=self.create_embed(), view=self
+        )
+    @discord.ui.button(
+            label="delete",
+            style=discord.ButtonStyle.danger,
+            emoji=f"{Emojis.error}"
+    )
+    async def delete(self, interaction : discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                "This menu isn't for you! ┐(￣ヘ￣)┌", ephemeral=True
+            )
+        await interaction.message.delete()
     async def on_timeout(self):
         for child in self.children:
             child.disabled = True
@@ -113,15 +142,21 @@ class Lyrics(commands.Cog):
     async def lyrics(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
 
-        if not player or not player.is_playing:
-            return await ctx.send(
-                embeds=discord.Embed(
+        if not player :
+            return await ctx.reply(
+                embed=discord.Embed(
                 title=f"{Emojis.error} No active player found.",
                 description="`＞︿＜`",
                 color= discord.Color.yellow()
                 )
             )
-
+        if not player.current:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} Nothing is playing right now. Play a song first! `(￣ω￣;)`",
+                    color=discord.Color.yellow()
+                )
+            )
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.defer()
         track = player.current
@@ -176,12 +211,19 @@ class Lyrics(commands.Cog):
     async def seek(self, ctx: commands.Context, time: str):
         player = cast(pomice.Player, ctx.voice_client)
 
-        if not player or not player.is_playing:
+        if not player :
             return await ctx.reply(
                 embed=discord.Embed(
                 title=f"{Emojis.error} No active player found.",
                 description="`＞︿＜`",
                 color= discord.Color.yellow()
+                )
+            )
+        if not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} Nothing is playing right now. Play a song first! `(￣ω￣;)`",
+                    color=discord.Color.yellow()
                 )
             )
         
