@@ -28,6 +28,7 @@ class Emojis:
     left_arrow = "<a:leftarrow:1489882175229923399>"
     right_arrow = "<a:rightarrow:1489882169756352512>"
     loading = "<a:loading:1498708305776873562>"
+    book = "<a:book:1498935528870117487>"
 
 
 class BadgesIcon:
