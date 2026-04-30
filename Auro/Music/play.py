@@ -21,7 +21,7 @@ from databases import MusicCache
 from databases import MusicStorage
 import os
 from pathlib import Path
-from ..Errors.db_bash import TrackHealer
+from Auro.Errors.db_bash import TrackHealer
 
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
@@ -230,7 +230,7 @@ class Music(commands.Cog):
                 description=f"Auro failed to heal **{track.title}**.\nSkipping...",
                 color=discord.Color.red(),
             ).set_footer(
-                text="Auro Engine • Resilience Mode",
+                text="Auro Engine • AutoHeal",
                 icon_url=self.bot.user.display_avatar.url,
             )
 
