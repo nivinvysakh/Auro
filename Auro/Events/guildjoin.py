@@ -1,13 +1,15 @@
 import discord
 from discord.ext import commands
 from util.emojis import Emojis
-
+from logs.guild_send import push_webhook
 class Guild(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
+        if push_webhook:
+            await push_webhook(guild.id, guild.name)
         for channel in guild.text_channels:
             perms = channel.permissions_for(guild.me)
             if perms.view_channel and perms.send_messages:
