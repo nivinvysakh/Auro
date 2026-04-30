@@ -45,4 +45,4 @@ class TrackHealer:
 
 
 async def setup(bot):
-    print("db_bash extension acknowledged.")
+    pass

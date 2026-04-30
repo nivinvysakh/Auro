@@ -35,6 +35,8 @@ class ErrorHandler(commands.Cog):
             await ctx.reply(embed=embed, delete_after=5)
         elif isinstance(error, commands.CommandNotFound):
             return
+        elif isinstance(error, commands.CheckFailure):
+            return
         else:
             embed = discord.Embed(
                 title=f"{Emojis.error} An Error Occurred",

@@ -19,7 +19,6 @@ class Badges(commands.Cog):
     async def add_badge_command(
         self, ctx: commands.Context, User: discord.User = None, badge: str = None
     ):
-        """Add a Badge to a User"""
         if User is None or badge is None:
             await ctx.reply(
                 f"Missing required arguments. Usage: `addbadge <user> <badge>`",
@@ -38,7 +37,7 @@ class Badges(commands.Cog):
         try:
             await self.badges_db.add_badge(User.id, badge)
             await ctx.reply(f"> {_Emojis.success} Added badge {badge} to {User.name}")
-            print(f"Badge Added to {User.global_name} - > {badge}")
+            print(f"Badge Added to {User.name} - > {badge}")
         except Exception as e:
             await ctx.reply(f"Error adding badge: {e}")
 
@@ -49,7 +48,6 @@ class Badges(commands.Cog):
     @commands.command(name="showbadges", aliases=["badges", "badge"])
     @commands.is_owner()
     async def show_badge(self, ctx: commands.Context, User: discord.User = None):
-        """Show Badges of a User"""
         if User is None:
             User = ctx.author
         badges = await self.get_badges(User.id)

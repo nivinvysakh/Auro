@@ -21,7 +21,7 @@ from databases import MusicCache
 from databases import MusicStorage
 import os
 from pathlib import Path
-from ..Errors.db_bash import TrackHealer
+from Auro.Errors.db_bash import TrackHealer
 
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
@@ -230,7 +230,7 @@ class Music(commands.Cog):
                 description=f"Auro failed to heal **{track.title}**.\nSkipping...",
                 color=discord.Color.red(),
             ).set_footer(
-                text="Auro Engine • Resilience Mode",
+                text="Auro Engine • AutoHeal",
                 icon_url=self.bot.user.display_avatar.url,
             )
 
@@ -260,11 +260,19 @@ class Music(commands.Cog):
         description="🎶 Play a song from YouTube / SoundCloud / Spotify ",
     )
     @commands.guild_only()
-    @app_commands.describe(search="Search for a song or paste a link")
+    @app_commands.describe(search="🌛 Search for a song or paste a link")
     async def play(self, ctx: commands.Context, *, search: str):
         if not ctx.author.voice:
             return await ctx.reply(f"{Emojis.warning} You must be in a VC!")
-
+        
+        if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        
         await ctx.defer()
 
         if not ctx.voice_client:
@@ -283,7 +291,10 @@ class Music(commands.Cog):
                 request = sp.track(search)
             except spotipy.exceptions.SpotifyException:
                 await ctx.reply(
-                    f"{Emojis.warning} Invalid Spotify track URL. Make sure it's a Track link, not a playlist or album."
+                    embed=discord.Embed(
+                        description=f"{Emojis.warning} Invalid Spotify track URL. Make sure it's a Track link, not a playlist or album.",
+                        color=discord.Color.yellow()
+                    )
                 )
                 return
             query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
@@ -355,6 +366,13 @@ class Music(commands.Cog):
                 text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
             )
             return await ctx.reply(embed=embed, delete_after=10)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         player.loop = False
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         current_title = player.current.title
@@ -368,41 +386,74 @@ class Music(commands.Cog):
     @commands.hybrid_command(
         name="stop", description=" ❌ Stops the music, clears the queue, and leaves."
     )
-    async def stop(self, ctx):
-        if ctx.voice_client:
-            player = cast(Player, ctx.voice_client)
-            await player.music_cache.clear_guild_cache(ctx.guild.id)
-            await player.music_cache.clear_loop_queue(ctx.guild.id)
+    async def stop(self, ctx:commands.Context):
+        if not ctx.voice_client:
+            return await ctx.reply(
+                embed= discord.Embed(
+                    title=f"{Emojis.warning} I am not connected to a voice channel. ",
+                    color= discord.Color.yellow()
+                ),
+                delete_after=15
+            )
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        
+        player = cast(Player, ctx.voice_client)
+        await player.music_cache.clear_guild_cache(ctx.guild.id)
+        await player.music_cache.clear_loop_queue(ctx.guild.id)
 
-            try:
-                await player.channel.edit(status=None)
-            except:
+        try:
+            await player.channel.edit(status=None)
+        except:
                 pass
-            await ctx.voice_client.destroy()
-            embed = discord.Embed(
+        await ctx.voice_client.destroy()
+        embed = discord.Embed(
                 title=f"{Emojis.success} Session Terminated",
                 description="The queue has been cleared and the player has disconnected.",
                 color=discord.Color.blurple(),
             ).set_footer(
                 text="Auro Engine • Offline", icon_url=self.bot.user.display_avatar.url
             )
-            await ctx.reply(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
         name="queue", description="🎶 Shows the current song and upcoming tracks."
     )
-    async def queue(self, ctx):
+    async def queue(self, ctx:commands.Context):
         player = cast(Player, ctx.voice_client)
-        if not player or (player.queue.is_empty and not player.is_playing):
-            embed = discord.Embed(
-                description=f"{Emojis.warning} Queue is Empty",
-                color=discord.Color.yellow,
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.error} No active player found.",
+                    description="`＞︿＜`",
+                    color=discord.Color.yellow()
+                )
             )
-            return await ctx.reply(embed=embed, delete_after=15)
+        if player.queue.is_empty and not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.warning} Auro is currently idle.",
+                    description="The queue is empty and nothing is playing! `(￣ω￣;)`",
+                    color=discord.Color.yellow()
+                )
+            )
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         embed = discord.Embed(title="🎶 Current Queue", color=discord.Color.blue())
         if player.is_playing:
             embed.description = f"**Now Playing:** {player.current.title}\n\n"
+            embed.set_thumbnail(url=player.current.thumbnail)
 
         queue_text = ""
         for i, t in enumerate(list(player.queue)[:10], 1):
@@ -417,9 +468,29 @@ class Music(commands.Cog):
     @commands.guild_only()
     async def loop(self, ctx: commands.Context):
         player = cast(Player, ctx.voice_client)
-        if not player or not player.is_playing:
-            return await ctx.reply(f"{Emojis.warning} Nothing is playing to loop!")
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.error} No active player found.",
+                    description="`＞︿＜`",
+                    color=discord.Color.yellow()
+                )
+            )
+        if not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} There is no song playing to loop! `(￣ω￣;)`",
+                    color=discord.Colour.yellow()
+                )
+            )
 
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         player.loop = not player.loop
 
         if player.loop:
@@ -458,11 +529,18 @@ class Music(commands.Cog):
         player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
-                description=f"{Emojis.warning} I'm not connected to a VC.",
-                color=discord.Color.yellow(),
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
             )
-            return await ctx.reply(embed=embed, delete_after=5)
-
+            return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         if len(player.queue) < 1:
             embed = discord.Embed(
                 description=f"{Emojis.warning} Only one song playing. Use `/loop` why wasiting my Resources `(◞‸◟；)` ",
@@ -509,15 +587,30 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(name="pause", description="⏸️ Pauses the current track.")
     @commands.guild_only()
-    async def pause(self, ctx):
+    async def pause(self, ctx:commands.Context):
         player = cast(Player, ctx.voice_client)
-        if not player or not player.is_playing:
-            embed = discord.Embed(
-                title=f"{Emojis.warning} Nothing Playing", color=discord.Color.yellow()
-            ).set_footer(
-                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.error} No active player found.",
+                    description="`＞︿＜`",
+                    color= discord.Color.yellow()
+                )
             )
-            return await ctx.reply(embed=embed, delete_after=10)
+        if not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} There is no song playing to pause! `(￣ω￣;)`",
+                    color= discord.Color.yellow()
+                )
+            )
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         await player.set_pause(True)
         await ctx.reply(
             embed=discord.Embed(
@@ -527,15 +620,30 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(name="resume", description="▶️ Resumes a paused track.")
     @commands.guild_only()
-    async def resume(self, ctx):
+    async def resume(self, ctx: commands.Context):
         player = cast(Player, ctx.voice_client)
-        if not player or not player.is_playing:
-            embed = discord.Embed(
-                title=f"{Emojis.warning} Nothing Playing", color=discord.Color.yellow()
-            ).set_footer(
-                text="Auro Engine • Warning", icon_url=self.bot.user.display_avatar.url
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.error} No active player found.",
+                    description="`＞︿＜`",
+                    color=discord.Color.yellow()
+                )
             )
-            return await ctx.reply(embed=embed, delete_after=10)
+        if not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} There is no song playing to resume! `(￣ω￣;)`",
+                    color=discord.Color.yellow()
+                )
+            )
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         await player.set_pause(False)
         await ctx.reply(
             embed=discord.Embed(

@@ -11,13 +11,14 @@ from discord import app_commands
 
 class LyricsView(discord.ui.View):
 
-    def __init__(self, pages, track, bot):
+    def __init__(self,pages, track, bot,author):
         super().__init__(timeout=60)
         self.pages = pages
         self.current_page = 0
         self.track = track
         self.bot = bot
         self.message = None
+        self.author = author
 
     def create_embed(self):
         embed = discord.Embed(
@@ -38,6 +39,11 @@ class LyricsView(discord.ui.View):
     async def back_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                "This menu isn't for you! ┐(￣ヘ￣)┌", ephemeral=True
+            )
+
         if self.current_page > 0:
             self.current_page -= 1
             await interaction.response.edit_message(
@@ -52,6 +58,11 @@ class LyricsView(discord.ui.View):
     async def next_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                "This menu isn't for you! ┐(￣ヘ￣)┌", ephemeral=True
+            )
+        
         if self.current_page < len(self.pages) - 1:
             self.current_page += 1
             await interaction.response.edit_message(
@@ -59,7 +70,36 @@ class LyricsView(discord.ui.View):
             )
         else:
             await interaction.response.defer()
-
+    @discord.ui.button(
+            label="Locate" , style=discord.ButtonStyle.blurple , emoji="🏹"
+    )
+    async def locator_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                "This menu isn't for you! ┐(￣ヘ￣)┌", ephemeral=True
+            )
+        found_page = 0
+        for index, content in enumerate(self.pages):
+            if "➜" in content:
+                found_page = index
+                break
+        self.current_page = found_page
+        await interaction.response.edit_message(
+            embed=self.create_embed(), view=self
+        )
+    @discord.ui.button(
+            label="delete",
+            style=discord.ButtonStyle.danger,
+            emoji=f"{Emojis.error}"
+    )
+    async def delete(self, interaction : discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                "This menu isn't for you! ┐(￣ヘ￣)┌", ephemeral=True
+            )
+        await interaction.message.delete()
     async def on_timeout(self):
         for child in self.children:
             child.disabled = True
@@ -102,9 +142,21 @@ class Lyrics(commands.Cog):
     async def lyrics(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
 
-        if not player or not player.is_playing:
-            return await ctx.send(f"{Emojis.error} No music is currently playing.")
-
+        if not player :
+            return await ctx.reply(
+                embed=discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+                )
+            )
+        if not player.current:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} Nothing is playing right now. Play a song first! `(￣ω￣;)`",
+                    color=discord.Color.yellow()
+                )
+            )
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.defer()
         track = player.current
@@ -147,7 +199,7 @@ class Lyrics(commands.Cog):
         if not pages:
             return await ctx.send(f"{Emojis.error} No lyrics available for display.")
 
-        view = LyricsView(pages, track, self.bot)
+        view = LyricsView(pages, track, self.bot,ctx.author)
         msg = await ctx.send(embed=view.create_embed(), view=view)
         view.message = msg
 
@@ -159,8 +211,29 @@ class Lyrics(commands.Cog):
     async def seek(self, ctx: commands.Context, time: str):
         player = cast(pomice.Player, ctx.voice_client)
 
-        if not player or not player.is_playing:
-            return await ctx.reply(f"{Emojis.error} No music is currently playing.")
+        if not player :
+            return await ctx.reply(
+                embed=discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+                )
+            )
+        if not player.is_playing:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} Nothing is playing right now. Play a song first! `(￣ω￣;)`",
+                    color=discord.Color.yellow()
+                )
+            )
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         seek_ms = self.parse_time(time)
 
@@ -169,11 +242,19 @@ class Lyrics(commands.Cog):
                 f"{Emojis.error} Invalid format. Use `mm:ss` or `hh:mm:ss`."
             )
         if seek_ms > player.current.length:
-            return await ctx.reply(f"{Emojis.error} Time exceeds track length.")
+            return await ctx.reply(
+                embed= discord.Embed(
+                    description=f"{Emojis.warning} Track limit exceeded.",
+                    color= discord.Color.yellow()
+                )
+            )
 
         await player.seek(seek_ms)
         await ctx.reply(
-            f"{Emojis.success} Seeked to {self.format_time(seek_ms)}.", delete_after=5
+            embed= discord.Embed(
+                description=f"{Emojis.success} Seeked to {self.format_time(seek_ms)}.",
+                color= discord.Color.green()
+            ).set_author(name="Auro", icon_url=self.bot.user.avatar.url).set_thumbnail(url=player.current.thumbnail),delete_after=15
         )
 
 

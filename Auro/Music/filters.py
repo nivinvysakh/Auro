@@ -4,7 +4,8 @@ import pomice
 from typing import cast
 from discord import app_commands
 from pomice.exceptions import FilterTagAlreadyInUse
-
+from util.emojis import Emojis
+from filters.eq_filters import Eq_Presets
 
 class Filters(commands.Cog):
     def __init__(self, bot):
@@ -20,12 +21,27 @@ class Filters(commands.Cog):
     async def volume(self, ctx: commands.Context, volume: int):
         player = cast(pomice.Player, ctx.voice_client)
         if not player:
-            return await ctx.reply("❌ I'm not playing anything.", ephemeral=True)
-
-        if volume < 0 or volume > 100:
-            return await ctx.reply(
-                "❌ Volume must be between 0 and 100.", ephemeral=True
+            embed = discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
             )
+            return await ctx.reply(embed=embed)
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        
+        if volume < 0 or volume > 100:
+            embed = discord.Embed(
+                title=f"{Emojis.warning} Volume must be in between **0** and **100**",
+                color= discord.Color.yellow()
+            )
+            return await ctx.reply(embed=embed)
 
         await player.set_volume(volume)
         embed = discord.Embed(
@@ -42,16 +58,31 @@ class Filters(commands.Cog):
     async def nightcore(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
         if not player:
-            return await ctx.reply("❌ I'm not playing anything.", ephemeral=True)
+            embed = discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+            )
+            return await ctx.reply(embed=embed)
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         filter_data = pomice.filters.Timescale.nightcore()
         try:
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
-            return await ctx.reply(
-                "❌ Nightcore mode is already enabled.\n To reset the filters, use the `/reset` command.",
-                ephemeral=True,
+            embed = discord.Embed(
+                title=f"{Emojis.warning} `nightcore` is active.",
+                description="`（；´д｀）ゞ`",
+                color= discord.Color.yellow()
             )
+            return await ctx.reply(embed=embed)
         embed = discord.Embed(
             title=f"🌙 **Nightcore mode enabled!**", color=discord.Color.blurple()
         ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
@@ -66,23 +97,38 @@ class Filters(commands.Cog):
     async def vaporwave(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
         if not player:
-            return await ctx.reply("❌ I'm not playing anything.", ephemeral=True)
+            embed = discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+            )
+            return await ctx.reply(embed=embed)
+        
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         filter_data = pomice.filters.Timescale.vaporwave()
         try:
             await player.add_filter(filter_data)
         except pomice.FilterTagAlreadyInUse:
-            return await ctx.reply(
-                "❌ Vaporwave mode is already enabled.\n To reset the filters, use the `/reset` command.",
-                ephemeral=True,
+            embed = discord.Embed(
+                title=f"{Emojis.warning} `vaporwave` is active.",
+                description="`（；´д｀）ゞ`",
+                color= discord.Colour.yellow()
             )
+            return await ctx.reply(embed=embed)
         embed = discord.Embed(
             title=f"💨 **Vaporwave mode enabled!**", color=discord.Color.blurple()
         ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqbassboost",
+        name="eq_bassboost",
         description="🔊 Boost the bass frequencies",
         aliases=["bb", "bass_boost", "enable_bassboost", "eqbass"],
     )
@@ -90,15 +136,29 @@ class Filters(commands.Cog):
     async def bassboost(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
         if not player:
-            return await ctx.reply("❌ I'm not playing anything.", ephemeral=True)
+            embed = discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+            )
+            return ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         try:
             filter_data = pomice.filters.Equalizer.boost()
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
-            return await ctx.reply(
-                "❌ Bassboost is already enabled. \n To reset the filters, use the `/reset` command.",
-                ephemeral=True,
+            embed = discord.Embed(
+                title=f"{Emojis.warning} `bassboost` is active.",
+                description="`（；´д｀）ゞ`",
+                color= discord.Color.yellow()
             )
+            return await ctx.reply(embed=embed)
         embed = (
             discord.Embed(
                 title="Bassboost Enabled",
@@ -111,7 +171,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqflat",
+        name="eq_flat",
         description="🎚️ Flatten the equalizer settings",
         aliases=["flat", "equalizer_flat", "enable_eqflat"],
     )
@@ -119,15 +179,29 @@ class Filters(commands.Cog):
     async def eqflat(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
         if not player:
-            return await ctx.reply("❌ I'm not playing anything.", ephemeral=True)
+            embed = discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+            )
+            return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         filter_data = pomice.filters.Equalizer.flat()
         try:
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
-            return await ctx.reply(
-                "❌ Flat equalizer settings are already enabled.\n To reset the filters, use the `/reset` command.",
-                ephemeral=True,
+            embed = discord.Embed(
+                title=f"{Emojis.warning} `eqflat` is active.",
+                description="`（；´д｀）ゞ`",
+                color= discord.Color.yellow()
             )
+            return ctx.reply(embed=embed)
         embed = (
             discord.Embed(
                 title="Equalizer Flattened",
@@ -140,7 +214,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqmetal",
+        name="eq_metal",
         description="🎸 Enhance the mid frequencies for a metal sound",
         aliases=["metal", "equalizer_metal", "enable_eqmetal"],
     )
@@ -148,15 +222,29 @@ class Filters(commands.Cog):
     async def eqmetal(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
         if not player:
-            return await ctx.reply("❌ I'm not playing anything.", ephemeral=True)
+            embed = discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+            )
+            return ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         filter_data = pomice.filters.Equalizer.metal()
         try:
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
-            return await ctx.reply(
-                "❌ Metal equalizer settings are already enabled.\n To reset the filters, use the `/reset` command.",
-                ephemeral=True,
+            embed = discord.Embed(
+                title=f"{Emojis.warning} `eqmetal` is active ",
+                description= "`（；´д｀）ゞ`",
+                color= discord.Color.yellow()
             )
+            return ctx.reply(embed=embed)
         embed = (
             discord.Embed(
                 title="Metal Equalizer Enabled",
@@ -169,7 +257,7 @@ class Filters(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
-        name="eqpiano",
+        name="eq_piano",
         description="🎹 Enhance the high frequencies for a piano sound",
         aliases=["piano", "equalizer_piano", "enable_eqpiano"],
     )
@@ -177,15 +265,29 @@ class Filters(commands.Cog):
     async def eqpiano(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
         if not player:
-            return await ctx.reply("❌ I'm not playing anything.", ephemeral=True)
+            embed = discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+            )
+            return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
         filter_data = pomice.filters.Equalizer.piano()
         try:
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
-            return await ctx.reply(
-                "❌ Piano equalizer settings are already enabled.\n To reset the filters, use the `/reset` command.",
-                ephemeral=True,
+            embed = discord.Embed(
+                title=f"{Emojis.error} `Eqpiano` is active .",
+                description="`（；´д｀）ゞ`",
+                color= discord.Colour.yellow()
             )
+            return ctx.reply(embed=embed)
         embed = (
             discord.Embed(
                 title="Piano Equalizer Enabled",
@@ -206,15 +308,30 @@ class Filters(commands.Cog):
     async def audio_8d(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
         if not player:
-            return await ctx.reply("❌ I'm not playing anything.", ephemeral=True)
+            embed = discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+            )
+            return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         filter_data = pomice.filters.Rotation(tag="8d", rotation_hertz=0.2)
         try:
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
-            return await ctx.reply(
-                "❌ 8D audio effect is already enabled.", ephemeral=True
+            embed = discord.Embed(
+                title=f"{Emojis.warning} `8d` filter is active.",
+                description="`（；´д｀）ゞ`",
+                color= discord.Color.yellow()
             )
+            return await ctx.reply(embed=embed)
         embed = (
             discord.Embed(
                 title="8D Audio Effect Enabled",
@@ -236,9 +353,12 @@ class Filters(commands.Cog):
         player = cast(pomice.Player, interaction.guild.voice_client)
         if not player:
             return await interaction.response.send_message(
-                "⚠️ I'm not in a Voice Channel.", ephemeral=True
+                f"{Emojis.warning} I'm not in a Voice Channel.", ephemeral=True
             )
-
+        if not interaction.user.voice or interaction.user.voice.channel != player.channel:
+            return await interaction.response.send_message(
+                f"╮(￣ω￣;)╭ You're not in {player.channel.mention}!", ephemeral=True
+            )
         await interaction.response.defer()
 
         try:
@@ -326,7 +446,55 @@ class Filters(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
 
         await interaction.response.send_message(embed=embed)
+    @commands.hybrid_command(
+            name="eq_treble_boost",
+            description="✨ Boost the high frequencies for extra sparkle",
+            aliases=["treble_boost", "enable_treble_boost", "eqtreble","eq_tb"],
+    )
+    @commands.guild_only()
+    async def eq_treble_boost(self, ctx: commands.Context):
+        player = cast(pomice.Player, ctx.voice_client)
+        if not player :
+            return await ctx.reply(
+                embed=discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
 
+                ),
+                delete_after=20
+            )
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        
+        try:
+            eq_filter = pomice.filters.Equalizer(tag="treble_boost", levels=Eq_Presets.TREBLE_BOOST)
+            await player.add_filter(
+                eq_filter,fast_apply=True
+            )
+        except FilterTagAlreadyInUse :
+            return await ctx.reply(
+                embed= discord.Embed(
+                    title=f"{Emojis.warning} Treble_boost is already in use.",
+                    description="To reset the filters run `/reset` command.",
+                    color= discord.Color.yellow()
+                ),
+                delete_after=15
+            )
+        await ctx.reply(
+            embed= discord.Embed(
+                title=f"{Emojis.success} Treble Boost Enabled!",
+                description="✨ High frequencies have been boosted for extra sparkle!",
+                color= discord.Color.blurple()
+            ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(
+                text="💝", icon_url=self.bot.user.avatar.url
+            )
+        )
     @commands.hybrid_command(
         name="reset",
         description="♻️ Clear all audio filters",
@@ -336,10 +504,26 @@ class Filters(commands.Cog):
     async def reset_filters(self, ctx: commands.Context):
         player = cast(pomice.Player, ctx.voice_client)
         if not player:
-            return await ctx.reply("❌ No active player found.")
+            embed = discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow()
+            )
+            return await ctx.reply(embed=embed)
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
 
         await player.reset_filters(fast_apply=True)
-        await ctx.reply("♻️ **All audio filters have been cleared.**")
+        embed = discord.Embed(
+            description=f"{Emojis.success} **All audio filters have been cleared.**",
+            color= discord.Color.blurple()
+        ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed)
 
 
 async def setup(bot):
