@@ -26,7 +26,7 @@ A powerful and open-source Discord music bot built with [discord.py](https://git
 ### 1. Install Dependencies
 
 ```bash
-pip install discord.py pomice syncedlyrics python-dotenv black spotipy 
+pip install -r requirements.txt
 ```
 
 ### 2. Configure Environment
