@@ -20,3 +20,4 @@ Add any screenshots to help explain your changes.
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] My changes generate no new warnings
+- [ ] I have added my github username to the contributors registy in `contributors.md`

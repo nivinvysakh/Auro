@@ -1,6 +1,19 @@
+<div align="center">
+
+![Python](https://img.shields.io/badge/python-3776AB?style=plastic&logo=python&logoColor=white)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Lavalink](https://img.shields.io/badge/lavalink-757575?style=plastic&logo=cog&logoColor=white)
+![Discord.py](https://img.shields.io/badge/discord.py-5865F2?style=plastic&logo=discord&logoColor=white)
+![License](https://img.shields.io/badge/license-AGPL--v3-red?style=plastic)
+
+
+</div>
+
+&nbsp;
 > [!NOTE]
 > Make sure you have Java 21 + installed and python 3.10+ to run the bot.
 
+&nbsp;
 
 # Auro 🌙
 
@@ -47,12 +60,16 @@ A minimalist, high-performance music engine for Discord.
 
 > [!important]
 > Make sure your Lavalink server is running before starting the bot.
+&nbsp;
 
 > [!tip]
 > Make sure you see the `Lavalink is ready` message in the console before using music commands.
 
 ## 🫂 Contributing
 Auro is an open-source project. Contributions are welcome! Please fork the repository and submit a pull request with your improvements.
+
+- ✨ **Wall of Fame:** Check out our [Contributors Registry](./contributors.md) to see the legends helping Auro grow.
+
 <br>
 
 1. **Fork** the repository
