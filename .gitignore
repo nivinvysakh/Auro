@@ -2,4 +2,3 @@
 DB/
 *__pycache__/
 .cache
-logs/
