@@ -47,6 +47,8 @@ class Radio(commands.Cog):
             track = results[0]
             track.title = f"Auro Radio: {genre.name}"
             track.author = "Nightride FM"
+            await player.channel.edit(status=None)
+            await asyncio.sleep(3)
             try:
                 await player.channel.edit(status=f"📻 Tuning: **{genre.name}**")
             except:
