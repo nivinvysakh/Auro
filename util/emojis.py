@@ -29,6 +29,7 @@ class Emojis:
     right_arrow = "<a:rightarrow:1489882169756352512>"
     loading = "<a:loading:1498708305776873562>"
     book = "<a:book:1498935528870117487>"
+    wave = "<a:wave:1499328046862176332>"
 
 
 class BadgesIcon:
