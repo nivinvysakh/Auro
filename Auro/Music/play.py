@@ -279,7 +279,7 @@ class Music(commands.Cog):
             await player.add_filter(pomice.Filter(tag="reset"), fast_apply=True)
         else:
             player = cast(Player, ctx.voice_client)
-        if player.current.is_stream:
+        if not player.current.is_stream:
             return await ctx.reply(
                 embed=discord.Embed(
                     title=f"{Emojis.warning} `play` is not available for Radio",
