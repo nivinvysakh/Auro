@@ -279,15 +279,16 @@ class Music(commands.Cog):
             await player.add_filter(pomice.Filter(tag="reset"), fast_apply=True)
         else:
             player = cast(Player, ctx.voice_client)
-        await player.music_cache.clear_guild_cache(ctx.guild.id)
-        await player.music_cache.clear_loop_queue(ctx.guild.id)
         if player.current.is_stream:
             return await ctx.reply(
                 embed=discord.Embed(
-                    description=f"{Emojis.warning} `Loop` is not available for Radio",
+                    title=f"{Emojis.warning} `play` is not available for Radio",
+                    description="Stop the Radio by `a!stop` or `a!skip`",
                     color= discord.Colour.yellow()
                 )
             )
+        await player.music_cache.clear_guild_cache(ctx.guild.id)
+        await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
         await player.channel.edit(status=None) 
         search = search.strip()
