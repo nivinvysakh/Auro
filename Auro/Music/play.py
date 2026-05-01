@@ -283,7 +283,7 @@ class Music(commands.Cog):
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
-
+        await player.channel.edit(status=None) 
         search = search.strip()
 
         if "open.spotify.com" in search:
@@ -338,7 +338,6 @@ class Music(commands.Cog):
             )
 
         valid_track.requester = ctx.author
-
         if player.is_playing:
             player.queue.put(valid_track)
             await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**")
@@ -357,7 +356,7 @@ class Music(commands.Cog):
     @commands.hybrid_command(
         name="skip", description="⏭️ Skips the current song and plays the next one."
     )
-    async def skip(self, ctx):
+    async def skip(self, ctx: commands.Context):
         player = cast(Player, ctx.voice_client)
         if not player or not player.is_playing:
             embed = discord.Embed(
@@ -371,6 +370,13 @@ class Music(commands.Cog):
                 embed=discord.Embed(
                     description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
                     color=discord.Color.yellow()
+                )
+            )
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed= discord.Embed(
+                    description=f"{Emojis.success} `Radio` mode switched to `Player` mode",
+                    color=discord.Color.blurple()
                 )
             )
         player.loop = False
@@ -442,6 +448,14 @@ class Music(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.musicplaying} Now Playing Live Stream",
+                    description=f"[{player.current.title} / `{player.current.author}`]",
+                    color= discord.Colour.red()
+                ).set_thumbnail(url=self.bot.user.avatar.url)
+            )
         if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -483,7 +497,13 @@ class Music(commands.Cog):
                     color=discord.Colour.yellow()
                 )
             )
-
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} `Loop` is not available for Radio",
+                    color= discord.Colour.yellow()
+                )
+            )
         if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -539,6 +559,13 @@ class Music(commands.Cog):
                 embed=discord.Embed(
                     description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
                     color=discord.Color.yellow()
+                )
+            )
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} `Loop_Queue` is not available for Radio",
+                    color= discord.Colour.yellow()
                 )
             )
         if len(player.queue) < 1:
