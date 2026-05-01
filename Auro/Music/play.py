@@ -264,15 +264,6 @@ class Music(commands.Cog):
     async def play(self, ctx: commands.Context, *, search: str):
         if not ctx.author.voice:
             return await ctx.reply(f"{Emojis.warning} You must be in a VC!")
-        
-        if player.current.is_stream:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    title=f"{Emojis.warning} `play` is not available for Radio",
-                    description="Stop the Radio by `a!stop` or `a!skip`",
-                    color= discord.Colour.yellow()
-                )
-            )
         if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -290,6 +281,13 @@ class Music(commands.Cog):
             player = cast(Player, ctx.voice_client)
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} `Loop` is not available for Radio",
+                    color= discord.Colour.yellow()
+                )
+            )
         player.controller = ctx.channel
         await player.channel.edit(status=None) 
         search = search.strip()
