@@ -374,6 +374,7 @@ class Music(commands.Cog):
             )
         if player.current.is_stream:
             await player.stop()
+            await player.channel.edit(status=None)
             return await ctx.reply(
                 embed= discord.Embed(
                     description=f"{Emojis.success} `Radio` mode switched to `Player` mode",
