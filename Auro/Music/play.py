@@ -265,6 +265,14 @@ class Music(commands.Cog):
         if not ctx.author.voice:
             return await ctx.reply(f"{Emojis.warning} You must be in a VC!")
         
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    title=f"{Emojis.warning} `play` is not available for Radio",
+                    description="Stop the Radio by `a!stop` or `a!skip`",
+                    color= discord.Colour.yellow()
+                )
+            )
         if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
