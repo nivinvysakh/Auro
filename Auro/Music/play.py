@@ -262,6 +262,14 @@ class Music(commands.Cog):
     @commands.guild_only()
     @app_commands.describe(search="🌛 Search for a song or paste a link")
     async def play(self, ctx: commands.Context, *, search: str):
+        lock = self.bot.get_cog("Stopvc")
+        if lock and lock.maintenance_lock:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} **Auro Maintenance:** New sessions are currently locked by the developer. [dev]",
+                    color= discord.Color.red()
+                )
+            )
         if not ctx.author.voice:
             return await ctx.reply(f"{Emojis.warning} You must be in a VC!")
         if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
