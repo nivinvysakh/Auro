@@ -157,6 +157,13 @@ class Lyrics(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} `Lyrics` is not available for Radio",
+                    color= discord.Color.yellow()
+                )
+            )
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.defer()
         track = player.current
@@ -164,7 +171,7 @@ class Lyrics(commands.Cog):
         lrc_data = await asyncio.to_thread(syncedlyrics.search, search_query)
 
         if not lrc_data:
-            return await ctx.send(
+            return await ctx.reply(
                 f"{Emojis.error} No synced lyrics found for **{track.title}**."
             )
 
@@ -226,7 +233,13 @@ class Lyrics(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
-        
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} `Seek` is not available for Radio",
+                    color= discord.Color.yellow()
+                )
+            )
         if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
