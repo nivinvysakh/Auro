@@ -395,7 +395,7 @@ class Filters(commands.Cog):
             await interaction.followup.send(embed=embed)
 
         except FilterTagAlreadyInUse:
-            await interaction.followup.send(embed=discord.Embed(
+            return await interaction.followup.send(embed=discord.Embed(
                 title=f"{Emojis.warning} Custom Tune  is already in use.",
                 description="To reset the filters run `/reset` command.",
                 color= discord.Color.yellow()
