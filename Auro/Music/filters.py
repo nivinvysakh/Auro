@@ -362,11 +362,8 @@ class Filters(commands.Cog):
         await interaction.response.defer()
 
         try:
-
-            eq = pomice.Equalizer.flat()
-
             pairs = tuning.split()
-            applied_bands = []
+            filter_data = []
 
             for pair in pairs:
                 if ":" not in pair:
@@ -377,18 +374,16 @@ class Filters(commands.Cog):
                 if 0 <= band <= 14:
 
                     clamped_gain = max(-0.25, min(1.0, gain))
+                    filter_data.append((band, clamped_gain))
 
-                    eq.raw[band] = clamped_gain
-                    applied_bands.append((band, clamped_gain))
-
-            if not applied_bands:
+            if not filter_data:
                 return await interaction.followup.send("❌ No valid bands found.")
-
+            eq = pomice.Equalizer(levels=filter_data, tag="Custom_Eq")
             await player.add_filter(eq, fast_apply=True)
 
             embed = discord.Embed(
                 title="🎚️ Auro Engine: Custom Tuning",
-                description="\n".join([f"Band {b} → `{g}`" for b, g in applied_bands]),
+                description="\n".join([f"Band {b} → `{g}`" for b, g in filter_data]),
                 color=discord.Color.blurple(),
             )
 
@@ -399,8 +394,12 @@ class Filters(commands.Cog):
 
             await interaction.followup.send(embed=embed)
 
-        except Exception as e:
-            await interaction.followup.send(f"❌ **Auro Tuner Error:** `{e}`")
+        except FilterTagAlreadyInUse:
+            await interaction.followup.send(embed=discord.Embed(
+                title=f"{Emojis.warning} Custom Tune  is already in use.",
+                description="To reset the filters run `/reset` command.",
+                color= discord.Color.yellow()
+            ))
 
     @app_commands.command(
         name="eq_help",
