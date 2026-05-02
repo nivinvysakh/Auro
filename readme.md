@@ -24,7 +24,7 @@ A minimalist, high-performance music engine for Discord.
 ## 🛠️ Setup
 1. **Install dependencies**:
    ```bash
-   pip install discord.py pomice syncedlyrics python-dotenv spotipy 
+   pip install -r requirements.txt
    ```
 2. **Configure environment**:
     Create a `.env` file with your Discord bot token.

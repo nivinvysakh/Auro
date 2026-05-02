@@ -276,7 +276,7 @@ class Music(commands.Cog):
 
         if not ctx.voice_client:
             player = await ctx.author.voice.channel.connect(cls=Player, self_deaf=True)
-            await player.add_filter(pomice.Filter(tag="reset"), fast_apply=True)
+            await player.reset_filters(fast_apply=True)
         else:
             player = cast(Player, ctx.voice_client)
         if player.current and player.current.is_stream:
@@ -579,7 +579,7 @@ class Music(commands.Cog):
             )
         if len(player.queue) < 1:
             embed = discord.Embed(
-                description=f"{Emojis.warning} Only one song playing. Use `/loop` why wasiting my Resources `(◞‸◟；)` ",
+                description=f"{Emojis.warning} Only one song playing. Use `/loop` why wasting my Resources `(◞‸◟；)` ",
                 color=discord.Color.yellow(),
             )
             return await ctx.reply(embed=embed, delete_after=11)
