@@ -21,6 +21,11 @@ class Radio(commands.Cog):
         app_commands.Choice(name="🚗 Synthwave Night", value="synthwave")
     ])
     async def radio(self, interaction: discord.Interaction, genre: app_commands.Choice[str]):
+        lock = self.bot.get_cog("Stopvc")
+        if lock and lock.maintenance_lock:
+            return await interaction.response.send_message(
+                content=f"{Emojis.warning} **Auro Maintenance:** New sessions are currently locked by the developer. [dev]",ephemeral=True
+            )
         if not interaction.user.voice:
             return await interaction.response.send_message(f"{Emojis.error} You need to be in a voice channel!", ephemeral=True)
         
