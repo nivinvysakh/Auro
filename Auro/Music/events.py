@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import pomice
 import asyncio
 from util.emojis import Emojis
 from typing import cast
