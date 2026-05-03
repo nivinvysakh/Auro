@@ -42,6 +42,7 @@ class Player(pomice.Player):
         self.queue = pomice.Queue()
         self.music_cache = MusicCache()
         self.music_storage = MusicStorage()
+        self.manual_pause = False
         self.controller = None
         self.loop = False
         self.loop_queue = False
@@ -656,6 +657,7 @@ class Music(commands.Cog):
                 )
             )
         await player.set_pause(True)
+        player.manual_pause = True
         await ctx.reply(
             embed=discord.Embed(
                 title=f"{Emojis.success} Paused", color=discord.Color.blurple()
@@ -689,6 +691,7 @@ class Music(commands.Cog):
                 )
             )
         await player.set_pause(False)
+        player.manual_pause = False
         await ctx.reply(
             embed=discord.Embed(
                 title=f"{Emojis.success} Resumed", color=discord.Color.blurple()
