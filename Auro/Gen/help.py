@@ -52,7 +52,7 @@ class HelpView(discord.ui.View):
 
         if self.current_page == 1:
             embed.add_field(
-                name="📁 General Module",
+                name=f"{Emojis.alien} General Module",
                 value=(
                     f"**{Emojis.dot} status** — View system latency\n"
                     f"**{Emojis.dot} profile** — User information card\n"
@@ -64,7 +64,7 @@ class HelpView(discord.ui.View):
             )
         else:
             embed.add_field(
-                name="🎵 Music Module",
+                name=f"{Emojis.music_help} Music Module",
                 value=(
                     f"**{Emojis.dot} play** — Stream high-quality audio\n"
                     f"**{Emojis.dot} lyrics** — Fetch real-time song text\n"
@@ -73,6 +73,7 @@ class HelpView(discord.ui.View):
                     f"**{Emojis.dot} loop/loopqueue** — Track/Queue repeat toggles\n"
                     f"**{Emojis.dot} Fix** — Hard-resets the Auro Engine to fix 'Ghost Audio' issues.\n"
                     f"**{Emojis.dot} Radio** — Tune into stable, 24/7 high-quality streams.\n"
+                    f"**{Emojis.dot} track_details** — Get the details of currently playing song.\n"
                 ),
                 inline=False,
             )

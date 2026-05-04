@@ -30,6 +30,8 @@ class Emojis:
     loading = "<a:loading:1498708305776873562>"
     book = "<a:book:1498935528870117487>"
     wave = "<a:wave:1499328046862176332>"
+    music_help = "<:music1:1500731504911847454>"
+    alien = "<a:alien:1500731923033755820>"
 
 
 class BadgesIcon:

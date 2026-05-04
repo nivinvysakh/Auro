@@ -1,8 +1,9 @@
 import discord
-from discord.ext import commands
 import pomice
+from discord.ext import commands
 from typing import cast
 from discord import app_commands
+from Auro.Music.play import Player
 from pomice.exceptions import FilterTagAlreadyInUse
 from util.emojis import Emojis
 from filters.eq_filters import Eq_Presets
@@ -19,7 +20,7 @@ class Filters(commands.Cog):
     @commands.guild_only()
     @app_commands.describe(volume="Volume level (0-100)")
     async def volume(self, ctx: commands.Context, volume: int):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
                 title=f"{Emojis.error} No active player found.",
@@ -56,7 +57,7 @@ class Filters(commands.Cog):
     )
     @commands.guild_only()
     async def nightcore(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
                 title=f"{Emojis.error} No active player found.",
@@ -95,7 +96,7 @@ class Filters(commands.Cog):
     )
     @commands.guild_only()
     async def vaporwave(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
                 title=f"{Emojis.error} No active player found.",
@@ -134,7 +135,7 @@ class Filters(commands.Cog):
     )
     @commands.guild_only()
     async def bassboost(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
                 title=f"{Emojis.error} No active player found.",
@@ -177,7 +178,7 @@ class Filters(commands.Cog):
     )
     @commands.guild_only()
     async def eqflat(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
                 title=f"{Emojis.error} No active player found.",
@@ -220,7 +221,7 @@ class Filters(commands.Cog):
     )
     @commands.guild_only()
     async def eqmetal(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
                 title=f"{Emojis.error} No active player found.",
@@ -263,7 +264,7 @@ class Filters(commands.Cog):
     )
     @commands.guild_only()
     async def eqpiano(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
                 title=f"{Emojis.error} No active player found.",
@@ -306,7 +307,7 @@ class Filters(commands.Cog):
     )
     @commands.guild_only()
     async def audio_8d(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
                 title=f"{Emojis.error} No active player found.",
@@ -350,7 +351,7 @@ class Filters(commands.Cog):
     @app_commands.guild_only()
     @app_commands.describe(tuning="Format: 'band:gain' (e.g., '0:0.25 1:0.15')")
     async def seteq(self, interaction: discord.Interaction, tuning: str):
-        player = cast(pomice.Player, interaction.guild.voice_client)
+        player = cast(Player, interaction.guild.voice_client)
         if not player:
             return await interaction.response.send_message(
                 f"{Emojis.warning} I'm not in a Voice Channel.", ephemeral=True
@@ -452,7 +453,7 @@ class Filters(commands.Cog):
     )
     @commands.guild_only()
     async def eq_treble_boost(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player :
             return await ctx.reply(
                 embed=discord.Embed(
@@ -501,7 +502,7 @@ class Filters(commands.Cog):
     )
     @commands.guild_only()
     async def reset_filters(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
                 title=f"{Emojis.error} No active player found.",
