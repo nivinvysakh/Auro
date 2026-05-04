@@ -302,7 +302,6 @@ class Music(commands.Cog):
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
-        await player.channel.edit(status=None) 
         search = search.strip()
 
         if "open.spotify.com" in search:
