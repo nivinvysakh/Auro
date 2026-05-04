@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
-import pomice
 import syncedlyrics
 import re
 import asyncio
+from Auro.Music.play import Player
 from typing import cast
 from util.emojis import Emojis
 from discord import app_commands
@@ -140,7 +140,7 @@ class Lyrics(commands.Cog):
     )
     @commands.guild_only()
     async def lyrics(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
 
         if not player :
             return await ctx.reply(
@@ -161,6 +161,13 @@ class Lyrics(commands.Cog):
             return await ctx.reply(
                 embed=discord.Embed(
                     description=f"{Emojis.warning} `Lyrics` is not available for Radio",
+                    color= discord.Color.yellow()
+                )
+            )
+        if (player.current.title).startswith("Auro"):
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} No Lyrics for Custom_play audio",
                     color= discord.Color.yellow()
                 )
             )
@@ -216,7 +223,7 @@ class Lyrics(commands.Cog):
     @commands.guild_only()
     @app_commands.describe(time="✨ Time to seek to (mm:ss or hh:mm:ss)")
     async def seek(self, ctx: commands.Context, time: str):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
 
         if not player :
             return await ctx.reply(

@@ -63,9 +63,14 @@ class Track_details(commands.Cog):
             result_embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         else :
             result_embed.add_field(name="⏱️ Progress", value=f"`{format_time(position_ms)} / {format_time(duration_ms)}`", inline=False)
-            result_embed.set_thumbnail(url=player.current.thumbnail)
+            if (player.current.title).startswith("Auro"):
+                result_embed.set_thumbnail(url=self.bot.user.avatar.url)
+            else :
+                result_embed.set_thumbnail(url=player.current.thumbnail)
         result_embed.add_field(name="📡 Live Stream", value=f"{Emojis.success}" if player.current.is_stream else f"{Emojis.error}", inline=False)
         result_embed.add_field(name="⏩ Seekable", value=f"{Emojis.success}" if player.current.is_seekable else f"{Emojis.error}", inline=False)
+        if not player.current.is_stream:
+            result_embed.add_field(name="🌸 Loop", value=f"{Emojis.success}" if player.loop else f"{Emojis.error}")
         result_embed.set_image(url="https://i.pinimg.com/originals/92/c6/56/92c6565d9a7f1b52361302580bb21e8d.gif")
         result_embed.set_footer(text=f"Auro Engine v1.0.0", icon_url=self.bot.user.display_avatar.url)
 

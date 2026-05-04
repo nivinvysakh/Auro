@@ -3,6 +3,7 @@ import discord
 from typing import cast
 from util.emojis import Emojis
 from pomice.exceptions import FilterTagAlreadyInUse
+from Auro.Music.play import Player
 from discord.ext  import commands
 from filters.eq_filters import Eq_Presets
 from discord import app_commands
@@ -16,7 +17,7 @@ class Filter2(commands.Cog):
     )
     @commands.guild_only()
     async def eq_dynamic(self,ctx:commands.Context):
-        player = cast(pomice.Player,ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             return await ctx.reply(
                 embed= discord.Embed(
@@ -60,7 +61,7 @@ class Filter2(commands.Cog):
     )
     @commands.guild_only()
     async def eq_smooth(self,ctx:commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -106,7 +107,7 @@ class Filter2(commands.Cog):
         depth="🌛 How hard the pitch shifts (0.0 to 1.0)"
     )
     async def vibrato(self,ctx:commands.Context,frequency: float = 2.0, depth: float = 0.5):
-        player = cast(pomice.Player,ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
         if not player:
             return await ctx.reply(
                 embed=discord.Embed(
