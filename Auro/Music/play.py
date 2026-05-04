@@ -100,7 +100,10 @@ class Music(commands.Cog):
             if not results:
                 results = await player.get_tracks(query=f"scsearch:{query}")
             source = "YouTube"
-
+        if isinstance(results, pomice.Playlist):
+            return results
+        if not results:
+            return []
         if results:
             track_hash = getattr(results[0], "track_id", None) or results[0].info.get(
                 "track"
@@ -320,26 +323,38 @@ class Music(commands.Cog):
             results = await self.get_or_search_track(player, search, "url")
         else:
             results = await self.get_or_search_track(player, search, "search")
-
         if isinstance(results, pomice.Playlist):
-            added = 0
-            for track in results.tracks:
-                if not self.is_valid(track):
-                    continue
-                track.requester = ctx.author
-                player.queue.put(track)
-                added += 1
-
-            if added == 0:
-                return await ctx.send(
-                    f"{Emojis.warning} No suitable tracks found (Filtered Live/Documentaries)."
+            await player.destroy()
+            not_supported = discord.Embed(
+                title=f"{Emojis.warning} Playlist Not Supported",
+                color=discord.Color.orange()
+            )
+            not_supported.add_field(
+                name="What happened?",
+                value="Auro doesn't support playlists yet.",
+                inline= False
+            )
+            not_supported.add_field(
+                name="What you can do",
+                value=(
+                    f"{Emojis.dot} Use a **single track link**\n"
+                    f"{Emojis.dot} Or search for a song name"
                 )
-
-            if not player.is_playing:
-                await player.do_next()
-
-            return await ctx.send(
-                f"{Emojis.success} Loaded **{added}** tracks from playlist."
+            )
+            not_supported.add_field(
+                name="Examples",
+                value=(
+                    "`a!play blinding lights`\n"
+                    "`a!play https://youtu.be/...`"
+                ),
+                inline=False
+            )
+            not_supported.set_footer(
+                    text="Auro Music • Single tracks only",
+                    icon_url=self.bot.user.display_avatar.url)
+            return await ctx.reply(
+                embed=not_supported,
+                delete_after=20
             )
 
         valid_track = None
