@@ -499,6 +499,8 @@ class Music(commands.Cog):
         embed = discord.Embed(title="🎶 Current Queue", color=discord.Color.blue())
         if player.is_playing:
             embed.description = f"**Now Playing:** {player.current.title}\n\n"
+            if (player.current.title).startswith("Auro"):
+                embed.set_thumbnail(url=self.bot.user.avatar.url)
             embed.set_thumbnail(url=player.current.thumbnail)
 
         queue_text = ""
