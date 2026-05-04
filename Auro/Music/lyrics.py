@@ -164,6 +164,13 @@ class Lyrics(commands.Cog):
                     color= discord.Color.yellow()
                 )
             )
+        if (player.current.title).startswith("Auro"):
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} No Lyrics for Custom_play audio",
+                    color= discord.Color.yellow()
+                )
+            )
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.defer()
         track = player.current

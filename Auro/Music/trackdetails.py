@@ -63,7 +63,10 @@ class Track_details(commands.Cog):
             result_embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         else :
             result_embed.add_field(name="⏱️ Progress", value=f"`{format_time(position_ms)} / {format_time(duration_ms)}`", inline=False)
-            result_embed.set_thumbnail(url=player.current.thumbnail)
+            if (player.current.title).startswith("Auro"):
+                result_embed.set_thumbnail(url=self.bot.user.avatar.url)
+            else :
+                result_embed.set_thumbnail(url=player.current.thumbnail)
         result_embed.add_field(name="📡 Live Stream", value=f"{Emojis.success}" if player.current.is_stream else f"{Emojis.error}", inline=False)
         result_embed.add_field(name="⏩ Seekable", value=f"{Emojis.success}" if player.current.is_seekable else f"{Emojis.error}", inline=False)
         if not player.current.is_stream:
