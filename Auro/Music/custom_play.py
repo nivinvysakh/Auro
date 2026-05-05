@@ -17,6 +17,7 @@ class CustomPlay(commands.Cog):
     @app_commands.describe(
         file="🔗 The audio file you want to play (mp3, wav, flac, etc.)"
     )
+    @commands.cooldown(1,30,commands.BucketType.guild)
     async def custom(self,interaction : discord.Interaction , file : discord.Attachment ):
         await interaction.response.defer()
         ALLOWED_EXTENSIONS = ('mp3', 'wav', 'flac', 'ogg', 'm4a', 'aac')

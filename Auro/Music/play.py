@@ -501,7 +501,8 @@ class Music(commands.Cog):
             embed.description = f"**Now Playing:** {player.current.title}\n\n"
             if (player.current.title).startswith("Auro"):
                 embed.set_thumbnail(url=self.bot.user.avatar.url)
-            embed.set_thumbnail(url=player.current.thumbnail)
+            else :
+                embed.set_thumbnail(url=player.current.thumbnail)
 
         queue_text = ""
         for i, t in enumerate(list(player.queue)[:10], 1):
