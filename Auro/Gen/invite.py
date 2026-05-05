@@ -8,7 +8,8 @@ class invite(commands.Cog):
 
     @commands.hybrid_command(
         name="invite",
-        aliases=["link","add"]
+        aliases=["link","add"],
+        description="🔗 Get the official invite link"
     )
     async def invite(self,ctx: commands.Context):
         embed = discord.Embed(
