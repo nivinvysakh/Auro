@@ -22,6 +22,7 @@ from databases import MusicStorage
 import os
 from pathlib import Path
 from Auro.Errors.db_bash import TrackHealer
+from ui.selections import TrackSelectionView
 
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
@@ -79,7 +80,7 @@ class Music(commands.Cog):
 
     # --- Helper Method for Track Retrieval and Caching ---
     async def get_or_search_track(
-        self, player: Player, query: str, search_type: str = "query"
+        self, ctx: commands.Context, player: Player, query: str, search_type: str = "query" 
     ) -> list:
         use_loop_cache = player.loop or player.loop_queue
         cached = await player.music_storage.get_cached_track(query)
@@ -103,6 +104,23 @@ class Music(commands.Cog):
         if isinstance(results, pomice.Playlist):
             return results
         if not results:
+            return []
+        if len(results) > 1 :
+            view = TrackSelectionView(results[:5])
+            msg = await ctx.send(content=f"🔎 {ctx.author.mention}, multiple results found. Select the correct version:", view=view )
+            await view.wait()
+            await msg.delete()
+            if view.selected_track:
+                track_hash = getattr(view.selected_track, "track_id", None) or view.selected_track.info.get("track")
+                await player.music_storage.save_to_storage(
+                    query=query, 
+                    track_hash=track_hash, 
+                    title=view.selected_track.title, 
+                    source=source
+                )
+                return [view.selected_track]
+            await player.destroy()
+            await ctx.reply(f"{ctx.author.mention} No Choice is selected.",delete_after=5)
             return []
         if results:
             track_hash = getattr(results[0], "track_id", None) or results[0].info.get(
@@ -316,12 +334,12 @@ class Music(commands.Cog):
                 )
                 return
             query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
-            results = await self.get_or_search_track(player, query, "spotify")
+            results = await self.get_or_search_track(ctx,player, query, "spotify")
 
         elif search.startswith(("http", "www")):
-            results = await self.get_or_search_track(player, search, "url")
+            results = await self.get_or_search_track(ctx,player, search, "url")
         else:
-            results = await self.get_or_search_track(player, search, "search")
+            results = await self.get_or_search_track(ctx,player, search, "search")
         if isinstance(results, pomice.Playlist):
             await player.destroy()
             not_supported = discord.Embed(
@@ -363,9 +381,7 @@ class Music(commands.Cog):
                 break
 
         if not valid_track:
-            return await ctx.send(
-                f"{Emojis.warning} That track was filtered (Live/Too long/Too short)."
-            )
+            return
 
         valid_track.requester = ctx.author
         if player.is_playing:
