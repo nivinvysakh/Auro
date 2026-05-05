@@ -17,7 +17,7 @@ class invite(commands.Cog):
             description=(
                 "[Invite Me](https://aurobot.netlify.app/)"
             ),
-            color= discord.Color.blurple
+            color= discord.Color.blurple()
         )
         embed.set_thumbnail(url=self.bot.user.avatar.url)
         await ctx.reply(
