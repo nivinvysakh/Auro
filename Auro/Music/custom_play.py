@@ -59,6 +59,7 @@ class CustomPlay(commands.Cog):
                 )
             )
         try :
+            await player.channel.edit(status=None)
             result = await player.get_tracks(file.url)
             if not result:
                 await interaction.followup.send(

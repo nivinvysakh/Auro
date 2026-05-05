@@ -27,12 +27,23 @@ class MusicStorage:
             await db.commit()
 
     async def get_cached_track(self, query: str):
-
         async with aiosqlite.connect(self.path) as db:
-            await db.execute("PRAGMA synchronous=NORMAL;")
+            clean_query = query.strip().lower()
+            
+            
             async with db.execute(
-                "SELECT track_hash, track_title FROM global_cache WHERE search_query = ?",
-                (query.strip().lower(),),
+                "SELECT track_hash, track_title FROM global_cache WHERE search_query = ?", 
+                (clean_query,)
+            ) as cursor:
+                result = await cursor.fetchone()
+                if result:
+                    return result
+
+            
+            
+            async with db.execute(
+                "SELECT track_hash, track_title FROM global_cache WHERE search_query LIKE ? LIMIT 1",
+                (f"%{clean_query}%",)
             ) as cursor:
                 return await cursor.fetchone()
 
