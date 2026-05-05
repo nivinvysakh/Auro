@@ -302,7 +302,6 @@ class Music(commands.Cog):
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
-        await player.channel.edit(status=None) 
         search = search.strip()
 
         if "open.spotify.com" in search:
@@ -500,7 +499,10 @@ class Music(commands.Cog):
         embed = discord.Embed(title="🎶 Current Queue", color=discord.Color.blue())
         if player.is_playing:
             embed.description = f"**Now Playing:** {player.current.title}\n\n"
-            embed.set_thumbnail(url=player.current.thumbnail)
+            if (player.current.title).startswith("Auro"):
+                embed.set_thumbnail(url=self.bot.user.avatar.url)
+            else :
+                embed.set_thumbnail(url=player.current.thumbnail)
 
         queue_text = ""
         for i, t in enumerate(list(player.queue)[:10], 1):
