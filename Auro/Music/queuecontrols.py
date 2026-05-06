@@ -187,6 +187,50 @@ class QueueControls(commands.Cog):
                 description=f"Successfully randomized **{len(player.queue)}** tracks.",
                 color=discord.Color.purple()
             )
-        )      
+        )
+    @commands.hybrid_command(
+        name="queue_move",
+        description="🔄 Move a track to a specific position in the queue."
+    )
+    @app_commands.describe(
+        current_pos="🌟 The current number of the song in the queue",
+        target_pos="❇️ The number of the position you want to move it to"
+    )
+    @commands.guild_only()
+    async def move(self,ctx:commands.Context, current_pos : int , target_pos : int):
+        player = cast(Player,ctx.voice_client)
+        if not player:
+            return await ctx.reply(
+                embed=discord.Embed(
+                title=f"{Emojis.error} No active player found.",
+                description="`＞︿＜`",
+                color= discord.Color.yellow())
+            )
+        if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
+                    color=discord.Color.yellow()
+                )
+            )
+        if not player or current_pos < 1 or target_pos < 1 or current_pos > player.queue.size:
+            return await ctx.reply(embed=discord.Embed(
+                description=f"{Emojis.warning} Invalid position or the queue is empty.",
+                color= discord.Color.yellow()
+            ))
+        track_list = list(player.queue)
+        moved_track = track_list.pop(current_pos - 1)
+        track_list.insert(target_pos - 1, moved_track)
+        player.queue.clear()
+        for track in track_list:
+            player.queue.put(track)
+        await ctx.reply(
+            embed=discord.Embed(
+                description=f"{Emojis.success} Moved **{moved_track.title}** to position `#{target_pos}`.",
+                color= discord.Color.from_rgb(225,225,225)
+            )
+        )
+        
+
 async def setup(bot):
     await bot.add_cog(QueueControls(bot))

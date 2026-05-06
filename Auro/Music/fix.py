@@ -59,6 +59,7 @@ class Fix(commands.Cog):
             new_player.loop = False
             new_player.loop_queue = False
             if current_track:
+                await new_player.channel.edit(status=f"{Emojis.auro} Auro Music !")
                 await new_player.play(current_track, start=position)
         except Exception as e :
             print(f"Fix command error : {e}")

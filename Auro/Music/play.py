@@ -13,13 +13,14 @@ from discord.ext import commands
 import pomice
 import asyncio
 import spotipy
+import os
+import requests
 from util.emojis import Emojis
 from discord import app_commands
 from typing import cast
 from spotipy import SpotifyClientCredentials
 from databases import MusicCache
 from databases import MusicStorage
-import os
 from pathlib import Path
 from Auro.Errors.db_bash import TrackHealer
 from ui.selections import TrackSelectionView
@@ -293,7 +294,7 @@ class Music(commands.Cog):
                 )
             )
         if not ctx.author.voice:
-            return await ctx.reply(f"{Emojis.warning} You must be in a VC!")
+            return await ctx.reply(f"{Emojis.warning} You must be in a VC!", delete_after=5)
         if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -317,6 +318,17 @@ class Music(commands.Cog):
                     color= discord.Colour.yellow()
                 )
             )
+        if player.queue.size >=30:
+            return await ctx.reply(
+                embed= discord.Embed(
+                    title=f"{Emojis.warning} **Queue Capacity Reached (30/30)**",
+                    description=(
+                        "To maintain optimal performance, the queue is capped at 30 tracks.\n"
+                        f"*Please wait for songs to finish to add more!* {Emojis.alien}"
+                    ),
+                    color= discord.Color.yellow()
+                ) , delete_after=30
+            )
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
@@ -333,6 +345,14 @@ class Music(commands.Cog):
                     )
                 )
                 return
+            except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
+                return await ctx.reply(
+                    embed=discord.Embed(
+                        title=f"{Emojis.warning} **Connection Error**",
+                        description="Spotify took too long to respond. Please try again in a moment!",
+                        color= discord.Color.yellow()
+                    ) , delete_after=15
+                )
             query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
             results = await self.get_or_search_track(ctx,player, query, "spotify")
 
@@ -373,7 +393,6 @@ class Music(commands.Cog):
                 embed=not_supported,
                 delete_after=20
             )
-
         valid_track = None
         for t in results:
             if self.is_valid(t):
@@ -381,8 +400,12 @@ class Music(commands.Cog):
                 break
 
         if not valid_track:
-            return
-
+            return await ctx.reply(
+                embed= discord.Embed(
+                    description=f"{Emojis.error} No valid tracks found (too long or is a stream).",
+                    color= discord.Color.red()
+                ) , delete_after=20
+            )
         valid_track.requester = ctx.author
         if player.is_playing:
             player.queue.put(valid_track)
@@ -397,7 +420,7 @@ class Music(commands.Cog):
                 await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
             except:
                 pass
-            await ctx.send(f"{Emojis.success} Playing: **{valid_track.title}**")
+            await ctx.send(f"{Emojis.success} Playing: **{valid_track.title}**",delete_after=5)
 
     @commands.hybrid_command(
         name="skip", description="⏭️ Skips the current song and plays the next one."

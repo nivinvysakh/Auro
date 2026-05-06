@@ -10,46 +10,51 @@ class Stopvc(commands.Cog):
         self.bot = bot
         self.maintenance_lock = False
 
-    @commands.command(
-        name="forcestop",
-        aliases=["fs", "maintenance"]
-    )
+    @commands.command(name="forcestop",aliases=["fs","maintenance"])
     @commands.is_owner()
-    @commands.guild_only()
-    async def forcestop(self, ctx:commands.Context):
-        total_players = len(self.bot.voice_clients)
-        if not total_players:
+    async def forcestop(self, ctx: commands.Context):
+        
+        active_clients = list(self.bot.voice_clients)
+        total_players = len(active_clients)
+
+        if total_players == 0:
             return await ctx.reply(
-                embed= discord.Embed(
+                embed=discord.Embed(
                     description=f"{Emojis.success} No active sessions found. Safe to update.",
                     color=discord.Color.green()
                 )
             )
-        for player in list(self.bot.voice_clients):
-            player = cast(Player, ctx.voice_client)
-            try :
-                await player.controller.send(
-                    embed=discord.Embed(
-                        title=f"{Emojis.warning} **Auro Maintenance Alert**",
-                        description=(
-                            "An upcoming update is going to happen in few mins. \n"
-                            "To prevent ghost sessions I have stopped playing in this VC."
-                        ),
-                        color= discord.Color.red()
+
+        for player in active_clients:
+            try:
+                controller = getattr(player, 'controller', None)
+                
+                if controller:
+                    await controller.send(
+                        embed=discord.Embed(
+                            title=f"{Emojis.warning} **Auro Maintenance Alert**",
+                            description=(
+                                "An upcoming update is scheduled. \n"
+                                "To prevent ghost sessions, I have stopped playing in this VC."
+                            ),
+                            color=discord.Color.red()
+                        )
                     )
-                )
                 await player.channel.edit(status=None)
                 await player.stop()
                 await player.destroy()
-            except Exception:
+                
+            except Exception as e:
+                print(f"Error ejecting session: {e}")
                 continue
 
-            await ctx.reply(
-                embed=discord.Embed(
-                    title=f"{Emojis.success} Force stop complete.",
-                    description=f"{total_players} sessions ejected."
-                )
+        await ctx.reply(
+            embed=discord.Embed(
+                title=f"{Emojis.success} Force stop complete.",
+                description=f"**{total_players}** sessions successfully ejected.",
+                color= discord.Color.green()
             )
+        )
     @commands.command(
         name="lock",
         aliases=["lvc"]
