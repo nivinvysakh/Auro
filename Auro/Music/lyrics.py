@@ -3,6 +3,7 @@ from discord.ext import commands
 import syncedlyrics
 import re
 import asyncio
+import requests
 from Auro.Music.play import Player
 from typing import cast
 from util.emojis import Emojis
@@ -175,8 +176,10 @@ class Lyrics(commands.Cog):
             await ctx.defer()
         track = player.current
         search_query = f"{track.title} {track.author}"
-        lrc_data = await asyncio.to_thread(syncedlyrics.search, search_query)
-
+        try :
+            lrc_data = await asyncio.to_thread(syncedlyrics.search, search_query)
+        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
+            pass
         if not lrc_data:
             return await ctx.reply(
                 f"{Emojis.error} No synced lyrics found for **{track.title}**."

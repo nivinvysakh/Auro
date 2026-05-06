@@ -13,15 +13,17 @@ from discord.ext import commands
 import pomice
 import asyncio
 import spotipy
+import os
+import requests
 from util.emojis import Emojis
 from discord import app_commands
 from typing import cast
 from spotipy import SpotifyClientCredentials
 from databases import MusicCache
 from databases import MusicStorage
-import os
 from pathlib import Path
 from Auro.Errors.db_bash import TrackHealer
+from ui.selections import TrackSelectionView
 
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
@@ -79,7 +81,7 @@ class Music(commands.Cog):
 
     # --- Helper Method for Track Retrieval and Caching ---
     async def get_or_search_track(
-        self, player: Player, query: str, search_type: str = "query"
+        self, ctx: commands.Context, player: Player, query: str, search_type: str = "query" 
     ) -> list:
         use_loop_cache = player.loop or player.loop_queue
         cached = await player.music_storage.get_cached_track(query)
@@ -103,6 +105,23 @@ class Music(commands.Cog):
         if isinstance(results, pomice.Playlist):
             return results
         if not results:
+            return []
+        if len(results) > 1 :
+            view = TrackSelectionView(results[:5])
+            msg = await ctx.send(content=f"🔎 {ctx.author.mention}, multiple results found. Select the correct version:", view=view )
+            await view.wait()
+            await msg.delete()
+            if view.selected_track:
+                track_hash = getattr(view.selected_track, "track_id", None) or view.selected_track.info.get("track")
+                await player.music_storage.save_to_storage(
+                    query=query, 
+                    track_hash=track_hash, 
+                    title=view.selected_track.title, 
+                    source=source
+                )
+                return [view.selected_track]
+            await player.destroy()
+            await ctx.reply(f"{ctx.author.mention} No Choice is selected.",delete_after=5)
             return []
         if results:
             track_hash = getattr(results[0], "track_id", None) or results[0].info.get(
@@ -275,7 +294,7 @@ class Music(commands.Cog):
                 )
             )
         if not ctx.author.voice:
-            return await ctx.reply(f"{Emojis.warning} You must be in a VC!")
+            return await ctx.reply(f"{Emojis.warning} You must be in a VC!", delete_after=5)
         if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -299,6 +318,17 @@ class Music(commands.Cog):
                     color= discord.Colour.yellow()
                 )
             )
+        if player.queue.size >=30:
+            return await ctx.reply(
+                embed= discord.Embed(
+                    title=f"{Emojis.warning} **Queue Capacity Reached (30/30)**",
+                    description=(
+                        "To maintain optimal performance, the queue is capped at 30 tracks.\n"
+                        f"*Please wait for songs to finish to add more!* {Emojis.alien}"
+                    ),
+                    color= discord.Color.yellow()
+                ) , delete_after=30
+            )
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
@@ -315,13 +345,21 @@ class Music(commands.Cog):
                     )
                 )
                 return
+            except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
+                return await ctx.reply(
+                    embed=discord.Embed(
+                        title=f"{Emojis.warning} **Connection Error**",
+                        description="Spotify took too long to respond. Please try again in a moment!",
+                        color= discord.Color.yellow()
+                    ) , delete_after=15
+                )
             query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
-            results = await self.get_or_search_track(player, query, "spotify")
+            results = await self.get_or_search_track(ctx,player, query, "spotify")
 
         elif search.startswith(("http", "www")):
-            results = await self.get_or_search_track(player, search, "url")
+            results = await self.get_or_search_track(ctx,player, search, "url")
         else:
-            results = await self.get_or_search_track(player, search, "search")
+            results = await self.get_or_search_track(ctx,player, search, "search")
         if isinstance(results, pomice.Playlist):
             await player.destroy()
             not_supported = discord.Embed(
@@ -355,7 +393,6 @@ class Music(commands.Cog):
                 embed=not_supported,
                 delete_after=20
             )
-
         valid_track = None
         for t in results:
             if self.is_valid(t):
@@ -363,10 +400,12 @@ class Music(commands.Cog):
                 break
 
         if not valid_track:
-            return await ctx.send(
-                f"{Emojis.warning} That track was filtered (Live/Too long/Too short)."
+            return await ctx.reply(
+                embed= discord.Embed(
+                    description=f"{Emojis.error} No valid tracks found (too long or is a stream).",
+                    color= discord.Color.red()
+                ) , delete_after=20
             )
-
         valid_track.requester = ctx.author
         if player.is_playing:
             player.queue.put(valid_track)
@@ -381,7 +420,7 @@ class Music(commands.Cog):
                 await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
             except:
                 pass
-            await ctx.send(f"{Emojis.success} Playing: **{valid_track.title}**")
+            await ctx.send(f"{Emojis.success} Playing: **{valid_track.title}**",delete_after=5)
 
     @commands.hybrid_command(
         name="skip", description="⏭️ Skips the current song and plays the next one."

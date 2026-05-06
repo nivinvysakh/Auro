@@ -74,6 +74,10 @@ class HelpView(discord.ui.View):
                     f"**{Emojis.dot} Fix** — Hard-resets the Auro Engine to fix 'Ghost Audio' issues.\n"
                     f"**{Emojis.dot} Radio** — Tune into stable, 24/7 high-quality streams.\n"
                     f"**{Emojis.dot} track_details** — Get the details of currently playing song.\n"
+                    f"**{Emojis.dot} queue_clr** — Wipe all tracks from the current Auro Engine queue.\n"
+                    f"**{Emojis.dot} queue_pop** — Remove the last track added to the Auro Engine queue.\n"
+                    f"**{Emojis.dot} queue_rmtrack** — Remove a specific track from the queue by its name.\n"
+                    f"**{Emojis.dot} queue_move** — Move a track to a specific position in the queue.\n"
                 ),
                 inline=False,
             )
