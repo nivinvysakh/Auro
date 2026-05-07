@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
-import pomice
 import syncedlyrics
 import re
 import asyncio
+import requests
+from Auro.Music.play import Player
 from typing import cast
 from util.emojis import Emojis
 from discord import app_commands
@@ -140,7 +141,7 @@ class Lyrics(commands.Cog):
     )
     @commands.guild_only()
     async def lyrics(self, ctx: commands.Context):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
 
         if not player :
             return await ctx.reply(
@@ -157,14 +158,30 @@ class Lyrics(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} `Lyrics` is not available for Radio",
+                    color= discord.Color.yellow()
+                )
+            )
+        if (player.current.title).startswith("Auro"):
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} No Lyrics for Custom_play audio",
+                    color= discord.Color.yellow()
+                )
+            )
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.defer()
         track = player.current
         search_query = f"{track.title} {track.author}"
-        lrc_data = await asyncio.to_thread(syncedlyrics.search, search_query)
-
+        try :
+            lrc_data = await asyncio.to_thread(syncedlyrics.search, search_query)
+        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
+            pass
         if not lrc_data:
-            return await ctx.send(
+            return await ctx.reply(
                 f"{Emojis.error} No synced lyrics found for **{track.title}**."
             )
 
@@ -209,7 +226,7 @@ class Lyrics(commands.Cog):
     @commands.guild_only()
     @app_commands.describe(time="✨ Time to seek to (mm:ss or hh:mm:ss)")
     async def seek(self, ctx: commands.Context, time: str):
-        player = cast(pomice.Player, ctx.voice_client)
+        player = cast(Player, ctx.voice_client)
 
         if not player :
             return await ctx.reply(
@@ -226,7 +243,13 @@ class Lyrics(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
-        
+        if player.current.is_stream:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} `Seek` is not available for Radio",
+                    color= discord.Color.yellow()
+                )
+            )
         if not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(

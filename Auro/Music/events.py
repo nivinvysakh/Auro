@@ -1,26 +1,9 @@
 import discord
 from discord.ext import commands
-import pomice
 import asyncio
 from util.emojis import Emojis
 from typing import cast
-
-
-class Player(pomice.Player):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.queue = pomice.Queue()
-        self.controller = None
-
-    async def do_next(self):
-        if self.is_playing or self.queue.is_empty:
-            return
-
-        try:
-            track = self.queue.get()
-            await self.play(track)
-        except Exception:
-            pass
+from Auro.Music.play import Player
 
 
 class Inactivity(commands.Cog):
@@ -57,6 +40,7 @@ class Inactivity(commands.Cog):
             if not before.mute and after.mute:
                 if not player.is_paused:
                     await player.set_pause(True)
+                    player.manual_pause = False
                     if player.controller:
                         embed = discord.Embed(
                             title=f"{Emojis.warning} **Paused:** Auro is Muted",
@@ -69,7 +53,7 @@ class Inactivity(commands.Cog):
                 return
 
             elif before.mute and not after.mute:
-                if player.is_paused:
+                if player.is_paused and not player.manual_pause:
                     await player.set_pause(False)
                     if player.controller:
                         await player.controller.send(
@@ -101,7 +85,7 @@ class Inactivity(commands.Cog):
 
         else:
 
-            if player.is_paused and not member.guild.me.voice.mute:
+            if player.is_paused and not player.manual_pause and not member.guild.me.voice.mute:
                 await player.set_pause(False)
 
     @commands.Cog.listener()

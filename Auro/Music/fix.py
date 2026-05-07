@@ -52,6 +52,7 @@ class Fix(commands.Cog):
         try:
             await player.music_cache.clear_guild_cache(ctx.guild.id)
             await player.music_cache.clear_loop_queue(ctx.guild.id)
+            await player.channel.edit(status=None)
             await player.destroy()
             await asyncio.sleep(2)
             new_player = cast(Player, await vc_channel.connect(cls=Player))
@@ -59,6 +60,7 @@ class Fix(commands.Cog):
             new_player.loop = False
             new_player.loop_queue = False
             if current_track:
+                await new_player.channel.edit(status=f"{Emojis.auro} Auro Music !")
                 await new_player.play(current_track, start=position)
         except Exception as e :
             print(f"Fix command error : {e}")
