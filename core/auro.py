@@ -46,7 +46,7 @@ class Auro(commands.AutoShardedBot):
 
         self.loop.create_task(pomice_setup())
 
-        feature_folders = ["Auro/Gen", "Auro/Music", "Auro/dev", "Auro/Errors","Auro/Server","Auro/Events"]
+        feature_folders = ["Auro/Gen", "Auro/Music", "Auro/dev", "Auro/Errors","Auro/Server","Auro/Events","Auro/Website"]
 
         for folder in feature_folders:
             if not os.path.isdir(folder):
