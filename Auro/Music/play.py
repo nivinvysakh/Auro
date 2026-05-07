@@ -400,12 +400,7 @@ class Music(commands.Cog):
                 break
 
         if not valid_track:
-            return await ctx.reply(
-                embed= discord.Embed(
-                    description=f"{Emojis.error} No valid tracks found (too long or is a stream).",
-                    color= discord.Color.red()
-                ) , delete_after=20
-            )
+            return
         valid_track.requester = ctx.author
         if player.is_playing:
             player.queue.put(valid_track)
