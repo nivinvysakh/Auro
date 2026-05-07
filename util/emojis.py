@@ -32,6 +32,7 @@ class Emojis:
     wave = "<a:wave:1499328046862176332>"
     music_help = "<:music1:1500731504911847454>"
     alien = "<a:alien:1500731923033755820>"
+    star_animate = "<a:star:1501920032899465288>"
 
 
 class BadgesIcon:
