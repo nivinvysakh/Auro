@@ -120,7 +120,6 @@ class Music(commands.Cog):
                     source=source
                 )
                 return [view.selected_track]
-            await player.destroy()
             await ctx.reply(f"{ctx.author.mention} No Choice is selected.",delete_after=5)
             return []
         if results:
