@@ -32,7 +32,6 @@ class StatusCog(commands.Cog):
             activity=status_item
         )
         
-        print(f"{self.bot.get_time()} | SUCCESS   | Status Rotated: {status_item.name if hasattr(status_item, 'name') else status_item.state}")
 
     @status_loop.before_loop
     async def before_status_loop(self):
