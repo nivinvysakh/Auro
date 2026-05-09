@@ -46,7 +46,7 @@ class Auro(commands.AutoShardedBot):
 
         self.loop.create_task(pomice_setup())
 
-        feature_folders = ["Auro/Gen", "Auro/Music", "Auro/dev", "Auro/Errors","Auro/Server","Auro/Events","Auro/Website"]
+        feature_folders = ["Auro/Gen", "Auro/Music", "Auro/dev", "Auro/Errors","Auro/Server","Auro/Events","Auro/Website","Auro/status"]
 
         for folder in feature_folders:
             if not os.path.isdir(folder):
@@ -86,12 +86,6 @@ class Auro(commands.AutoShardedBot):
             print(f"Connection Error : {e}")
 
     async def on_ready(self):
-        await self.change_presence(
-            status=discord.Status.idle,
-            activity=discord.Activity(
-                type=discord.ActivityType.custom, name="Auro", state="🍃"
-            ),
-        )
         print(f"{self.get_time()} | INFO      | Auro is Live | User: {self.user}")
         print(
             f"{self.get_time()} | INFO      | Shard Topology: {self.shard_count} active shard(s)"
