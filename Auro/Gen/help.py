@@ -1,5 +1,4 @@
 import discord
-import asyncio
 from discord import ui
 from discord.ext import commands
 from util.emojis import Emojis, ButtonEmojis
