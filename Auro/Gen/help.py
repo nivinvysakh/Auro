@@ -1,8 +1,9 @@
 import discord
+import asyncio
+from discord import ui
 from discord.ext import commands
 from util.emojis import Emojis, ButtonEmojis
 import aiohttp
-
 
 async def get_latest_version():
     url = "https://api.github.com/repos/ilynivin/Auro/releases/latest"
@@ -13,145 +14,117 @@ async def get_latest_version():
                 return data.get("tag_name", "Unknown")
             return "v1.0.0"
 
-class HelpView(discord.ui.View):
+class HelpLayoutView(ui.LayoutView):
     def __init__(self, bot, author, version):
-        super().__init__(timeout=60)
+        super().__init__(timeout=300) 
         self.bot = bot
         self.author = author
         self.version = version
-        self.current_page = 1
-        self.message = None
-        self.add_item(
-            discord.ui.Button(
-                label="Github_Link",
-                url="https://github.com/ilynivin/Auro",
-                style=discord.ButtonStyle.link,
-                emoji=ButtonEmojis.github,
-            )
-        )
-        self.add_item(
-            discord.ui.Button(
-                label="Server_link",
-                style=discord.ButtonStyle.link,
-                url="https://discord.gg/gRJjC3H6aA",
-                emoji=ButtonEmojis.server,
-            )
-        )
+        self.bot_icon = bot.user.display_avatar.url
+        self.message = None 
+        self.show_page("Home")
 
-    def create_embed(self):
-        embed = discord.Embed(
-            color=discord.Color.blurple(), title=f"{Emojis.auro} Auro Infrastructure"
-        )
-        embed.set_image(url="https://i.pinimg.com/originals/5a/24/39/5a24398389aacad9095f240abeca30b8.gif")
-        embed.set_footer(
-            text=f"Auro {self.version} | Page {self.current_page}/2",
-            icon_url=self.bot.user.avatar.url,
-        )
+    def create_base_container(self, color):
+        container = ui.Container(accent_color=color)
+        container.add_item(ui.Section(
+            ui.TextDisplay(f"# Auro 🌛 \n*A high-fidelity music engine for Discord.*\n > This menu Expires in 5 Minutes."),
+            accessory=ui.Thumbnail(self.bot_icon)
+        ))
+        container.add_item(ui.Separator())
+        return container
 
-        embed.set_thumbnail(url=self.bot.user.avatar.url)
+    def show_page(self, page_name):
+        self.clear_items()
+        
+        if page_name == "Home":
+            container = self.create_base_container(discord.Color.gold())
+            container.add_item(ui.TextDisplay(
+                f"### Welcome to Auro {self.version}\n"
+                f"Crystal-clear audio, live synced lyrics, and cinematic filters.\n\n"
+                f"**Modules Available:**\n\n"
+                f"{Emojis.dot} {Emojis.alien} **General Module**\n"
+                f"{Emojis.dot} {Emojis.music_help} **Music Module**\n"
+            ))
+            container.add_item(ui.Separator())
 
-        if self.current_page == 1:
-            embed.add_field(
-                name=f"{Emojis.alien} General Module",
-                value=(
-                    f"**{Emojis.dot} status** — View system latency\n"
-                    f"**{Emojis.dot} profile** — User information card\n"
-                    f"**{Emojis.dot} clearmsg** — Purge channel history\n"
-                    f"**{Emojis.dot} contribute** — Support development\n"
-                    f"**{Emojis.dot} help** — Show this menu"
-                ),
-                inline=False,
-            )
-        else:
-            embed.add_field(
-                name=f"{Emojis.music_help} Music Module",
-                value=(
-                    f"**{Emojis.dot} play** — Stream high-quality audio\n"
-                    f"**{Emojis.dot} lyrics** — Fetch real-time song text\n"
-                    f"**{Emojis.dot} filters** — Audio enhancement toggles\n"
-                    f"**{Emojis.dot} stop/skip** — Queue control\n"
-                    f"**{Emojis.dot} loop/loopqueue** — Track/Queue repeat toggles\n"
-                    f"**{Emojis.dot} Fix** — Hard-resets the Auro Engine to fix 'Ghost Audio' issues.\n"
-                    f"**{Emojis.dot} Radio** — Tune into stable, 24/7 high-quality streams.\n"
-                    f"**{Emojis.dot} track_details** — Get the details of currently playing song.\n"
-                    f"**{Emojis.dot} queue_clr** — Wipe all tracks from the current Auro Engine queue.\n"
-                    f"**{Emojis.dot} queue_pop** — Remove the last track added to the Auro Engine queue.\n"
-                    f"**{Emojis.dot} queue_rmtrack** — Remove a specific track from the queue by its name.\n"
-                    f"**{Emojis.dot} queue_move** — Move a track to a specific position in the queue.\n"
-                ),
-                inline=False,
-            )
-        return embed
+        elif page_name == "General":
+            container = self.create_base_container(discord.Color.purple())
+            container.add_item(ui.TextDisplay(
+                f"## {Emojis.alien} General Module\n\n"
+                f"**{Emojis.dot} status** — View system latency\n"
+                f"**{Emojis.dot} profile** — User information card\n"
+                f"**{Emojis.dot} clearmsg** — Purge channel history\n"
+                f"**{Emojis.dot} contribute** — Support development\n"
+                f"**{Emojis.dot} clearbot** — Clean up all bot responses in the channel!\n"
+                f"**{Emojis.dot} help** — Show this menu"
+            ))
+            container.add_item(ui.Separator())
+
+        elif page_name == "Music":
+            container = self.create_base_container(discord.Color.blurple())
+            container.add_item(ui.TextDisplay(
+                f"## {Emojis.music_help} Music Module\n\n"
+                f"**{Emojis.dot} play** — Stream high-quality audio\n"
+                f"**{Emojis.dot} lyrics** — Fetch real-time song text\n"
+                f"**{Emojis.dot} filters** — Audio enhancement toggles\n"
+                f"**{Emojis.dot} stop/skip** — Queue control\n"
+                f"**{Emojis.dot} loop/loopqueue** — Track/Queue repeat toggles\n"
+                f"**{Emojis.dot} Fix** — Hard-reset the Auro Engine\n"
+                f"**{Emojis.dot} Radio** — 24/7 high-quality streams\n"
+                f"**{Emojis.dot} track_details** — Get the details of currently playing song.\n"
+                f"**{Emojis.dot} queue_clr** — Wipe all tracks from the current Auro Engine queue.\n"
+                f"**{Emojis.dot} queue_pop** — Remove the last track added to the Auro Engine queue.\n"
+                f"**{Emojis.dot} queue_rmtrack** — Remove a specific track from the queue by its name.\n"
+                f"**{Emojis.dot} queue_move** — Move a track to a specific position in the queue.\n"
+            ))
+
+        self.add_item(container)
+
+        select_row = ui.ActionRow()
+        select_row.add_item(ModuleSelector())
+        self.add_item(select_row)
+
+        button_row = ui.ActionRow()
+        button_row.add_item(ui.Button(label="Github", url="https://github.com/ilynivin/Auro", style=discord.ButtonStyle.link, emoji=ButtonEmojis.github))
+        button_row.add_item(ui.Button(label="Support", url="https://discord.gg/gRJjC3H6aA", style=discord.ButtonStyle.link, emoji=ButtonEmojis.server))
+        self.add_item(button_row)
 
     async def on_timeout(self):
-
-        for item in self.children:
-            item.disabled = True
-
         if self.message:
             try:
-                await self.message.edit(view=self)
-            except discord.NotFound:
+                await self.message.delete()
+            except (discord.HTTPException, discord.Forbidden, discord.NotFound):
                 pass
-
-    @discord.ui.button(
-        label="Back",
-        style=discord.ButtonStyle.blurple,
-        disabled=True,
-        emoji=Emojis.left_arrow,
-    )
-    async def back_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
-        self.current_page = 1
-        button.disabled = True
-        self.children[1].disabled = False
-        await interaction.response.edit_message(embed=self.create_embed(), view=self)
-
-    @discord.ui.button(
-        label="Next", style=discord.ButtonStyle.blurple, emoji=Emojis.right_arrow
-    )
-    async def next_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
-        self.current_page = 2
-        button.disabled = True
-        self.children[0].disabled = False
-        await interaction.response.edit_message(embed=self.create_embed(), view=self)
-    
-    @discord.ui.button(
-            label="delete",
-            style= discord.ButtonStyle.gray,
-            emoji=f"{Emojis.error}"
-    )
-    async def delete(self, intraction: discord.Interaction , button: discord.ui.button):
-        await intraction.message.delete()
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-
         if interaction.user != self.author:
-            await interaction.response.send_message(
-                "This menu is managed by the command author.", ephemeral=True
-            )
+            await interaction.response.send_message(f"{Emojis.error} This menu is managed by the command author.", ephemeral=True)
             return False
         return True
 
+class ModuleSelector(ui.Select):
+    def __init__(self):
+        options = [
+            discord.SelectOption(label="Home", emoji=ButtonEmojis.home, description="Go back to the overview"),
+            discord.SelectOption(label="General", emoji=Emojis.alien, description="Utility and system commands"),
+            discord.SelectOption(label="Music", emoji=Emojis.music_help, description="Audio engine and queue commands"),
+        ]
+        super().__init__(placeholder="Select a Cog to view info...", min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        view: HelpLayoutView = self.view
+        view.show_page(self.values[0])
+        await interaction.response.edit_message(view=view)
 
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.hybrid_command(
-        name="help", aliases=["h"], description="💝 View the Auro command directory."
-    )
+    @commands.hybrid_command(name="help", aliases=["h"], description="💝 View the Auro command directory.")
     @commands.guild_only()
     async def help(self, ctx: commands.Context):
         version = await get_latest_version()
-        view = HelpView(self.bot, ctx.author , version)
-        embed = view.create_embed()
-
-        message = await ctx.reply(embed=embed, view=view)
-        view.message = message
-
+        view = HelpLayoutView(self.bot, ctx.author, version)
+        view.message = await ctx.reply(content=None, view=view)
 
 async def setup(bot):
     await bot.add_cog(Help(bot))

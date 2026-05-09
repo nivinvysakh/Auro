@@ -251,7 +251,7 @@ class ProfileButtons(discord.ui.View):
             )
             embed.add_field(name="Global Badges", value=display, inline=False)
         else:
-            embed.description = f"{emojis.error} *No badges earned yet!*"
+            embed.description = f"{emojis.error} *No badges earned yet!*\n"
 
         await self.apply_tiered_theme(embed, "badges")
         await interaction.edit_original_response(embed=embed, view=self)
