@@ -1,5 +1,4 @@
 import discord
-import asyncio
 from discord import ui
 from discord.ext import commands
 from util.emojis import Emojis, ButtonEmojis
@@ -77,7 +76,8 @@ class HelpLayoutView(ui.LayoutView):
                 f"**{Emojis.dot} queue_rmtrack** — Remove a specific track from the queue by its name.\n"
                 f"**{Emojis.dot} queue_move** — Move a track to a specific position in the queue.\n"
             ))
-
+            container.add_item(ui.Separator())
+        
         self.add_item(container)
 
         select_row = ui.ActionRow()
