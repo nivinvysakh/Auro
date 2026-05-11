@@ -1,7 +1,7 @@
 import discord
 from discord import ui
 from discord.ext import commands
-from util.emojis import Emojis, ButtonEmojis
+from util.emojis import Emojis, ButtonEmojis , BadgesIcon
 import aiohttp
 
 async def get_latest_version():
@@ -43,6 +43,7 @@ class HelpLayoutView(ui.LayoutView):
                 f"**Modules Available:**\n\n"
                 f"{Emojis.dot} {Emojis.alien} **General Module**\n"
                 f"{Emojis.dot} {Emojis.music_help} **Music Module**\n"
+                f"{Emojis.dot} {Emojis.heart} **Contributors**\n"
             ))
             container.add_item(ui.Separator())
 
@@ -77,6 +78,38 @@ class HelpLayoutView(ui.LayoutView):
                 f"**{Emojis.dot} queue_move** — Move a track to a specific position in the queue.\n"
             ))
             container.add_item(ui.Separator())
+        elif page_name == "Contributors":
+            container = self.create_base_container(discord.Color.red())
+            container.add_item(ui.TextDisplay(
+                f"## {Emojis.star_animate} Open Source project.\n"
+                "Auro is a community-driven project. Our source code is public and open for contributions.\n"
+                "**GitHub:** [ilynivin/Auro](https://github.com/ilynivin/Auro)"
+            ))
+            container.add_item(ui.Separator())
+            container.add_item(ui.TextDisplay(
+                f"### {Emojis.heart} Join the Project\n"
+                f"**Lead Maintainer:** `eclipse`\n"
+                "We welcome Pull Requests! Whether it's fixing a loop cache bug or optimizing Lavalink nodes, your help makes Auro better."
+            ))
+            container.add_item(ui.Separator())
+            container.add_item(ui.TextDisplay(
+                "### 📜 License AGPLv3\n"
+                "Auro is licensed under the **GNU Affero General Public License v3**.\n"
+                "* **Copyleft:** Any modifications hosted publicly must also be open-sourced.\n"
+                "* **Freedom:** You are free to study, change, and distribute the code."
+            ))
+            container.add_item(ui.Separator())
+            container.add_item(ui.TextDisplay(
+                "### ✨ Wall of Fame\n"
+                "Check out our [Contributors Registry](https://github.com/ilynivin/Auro/blob/Main/contributors.md) "
+                "to see the legends helping Auro grow.\n\n"
+                "*Every pull request, bug report, and logic fix helps us reach audio perfection.*"
+            ))
+            container.add_item(ui.Separator())
+            invisible_space = "\u2800"
+            container.add_item(ui.TextDisplay(
+                f"{invisible_space * 22} **<————— x —————>**"
+            ))
         
         self.add_item(container)
 
@@ -107,6 +140,7 @@ class ModuleSelector(ui.Select):
             discord.SelectOption(label="Home", emoji=ButtonEmojis.home, description="Go back to the overview"),
             discord.SelectOption(label="General", emoji=Emojis.alien, description="Utility and system commands"),
             discord.SelectOption(label="Music", emoji=Emojis.music_help, description="Audio engine and queue commands"),
+            discord.SelectOption(label="Contributors",emoji=Emojis.heart, description="See the Contributors behind me")
         ]
         super().__init__(placeholder="Select a Cog to view info...", min_values=1, max_values=1, options=options)
 
