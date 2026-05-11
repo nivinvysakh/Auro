@@ -27,6 +27,7 @@ class StatusCog(commands.Cog):
             discord.Activity(type=discord.ActivityType.listening, name="Ransom 🔏"),
             discord.Activity(type=discord.ActivityType.listening, name="Good For You x One Of the Girls 🎧"),
             discord.Activity(type=discord.ActivityType.listening, name="After Dark 🌕"),
+            discord.Activity(type=discord.ActivityType.listening, name="Fairytale 🪽"),
             discord.Activity(type=discord.ActivityType.custom, name="Auro", state="🍃"),
             discord.Activity(type=discord.ActivityType.custom, name="Auro", state="🌛")
         ]
