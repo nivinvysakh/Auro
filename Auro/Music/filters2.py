@@ -53,6 +53,8 @@ class Filter2(commands.Cog):
             embed=discord.Embed(
                 description=f"{Emojis.success} **Dynamic EQ Enabled!**",
                 color= discord.Color.blurple()
+            ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(
+                text="💝", icon_url=self.bot.user.avatar.url
             )
         )
     @commands.hybrid_command(
@@ -95,6 +97,8 @@ class Filter2(commands.Cog):
             embed= discord.Embed(
                 description="🌙 **Smooth EQ Active**",
                 color= discord.Color.blurple()
+            ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(
+                text="💝", icon_url=self.bot.user.avatar.url
             )
         )
     @commands.hybrid_command(
@@ -146,6 +150,8 @@ class Filter2(commands.Cog):
                 title=msg,
                 description=f"Frequency: `{frequency}Hz` | Depth: `{depth}`",
                 color= discord.Color.green() if depth < 0.8 else discord.Color.gold()
+            ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(
+                text="💝", icon_url=self.bot.user.avatar.url
             )
         )        
 

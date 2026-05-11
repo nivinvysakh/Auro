@@ -387,7 +387,7 @@ class Filters(commands.Cog):
                 description="\n".join([f"Band {b} → `{g}`" for b, g in filter_data]),
                 color=discord.Color.blurple(),
             )
-
+            embed.set_thumbnail(url=player.current.thumbnail)
             embed.set_footer(
                 text="Auro Tuning System | Settings applied",
                 icon_url=self.bot.user.display_avatar.url,
