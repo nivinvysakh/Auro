@@ -38,6 +38,8 @@ A minimalist, high-performance music engine for Discord.
     Create a `.env` file with your Discord bot token.
     ```env
     TOKEN=your_discord_bot_token_here
+    client_id="Spotify client_id"
+    client_secret="Spotify client_secret"
     ```
 3. **Lavalink Server Configuration**:
     Go to `core/auro.py` and update the lavalink server details the place where you edit the Node connection is given below:
@@ -49,7 +51,19 @@ A minimalist, high-performance music engine for Discord.
         secure = False
     )
     ```
-4. **Run the bot**:
+
+> [!note]
+> **Firestore Integration (Optional)** : This module pushes the bot's live status to a Firestore database every 60 seconds to power an external bot landing page.
+>
+>Place your Firebase service account credentials in the root directory as `firebase_key.json`.
+>
+> If you do not require a web-based status display, you can ignore the `Auro/Status` folder. The bot will function perfectly as a standalone music player without it.
+&nbsp;
+
+> [!CAUTION]
+> - **Spotify Support:** You must provide Spotify credentials for the bot to parse Spotify URLs. If these variables are missing, the bot will return an error when attempting to play Spotify tracks and will only support direct YouTube or SoundCloud links.
+&nbsp;
+1. **Run the bot**:
     ```bash
     python main.py
     ```
