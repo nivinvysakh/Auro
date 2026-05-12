@@ -159,9 +159,8 @@ class Music(commands.Cog):
                     await player.controller.send(
                         f"{Emojis.warning} I need speaker permissions!"
                     )
-        if player.loop:
+        if player.loop or player.loop_queue:
             return
-
         thumbnail = (
             getattr(track, "thumbnail", None)
             or track.info.get("thumbnail")
