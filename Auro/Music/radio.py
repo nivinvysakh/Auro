@@ -41,7 +41,14 @@ class Radio(commands.Cog):
             player: Player = await interaction.user.voice.channel.connect(cls=Player)
         else:
             player: Player = cast(Player, interaction.guild.voice_client)
-
+        if player.current and player.is_playing:
+            if player.music_cache:
+                guild_id = interaction.guild.id
+                await player.music_cache.clear_all_guild_cache(guild_id)
+                player.loop = False
+                player.loop_queue = False
+                await player.stop()
+            
         try:
             player.queue.clear()
             results = await player.node.get_tracks(self.stations[genre.value])
