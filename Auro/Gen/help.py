@@ -76,6 +76,7 @@ class HelpLayoutView(ui.LayoutView):
                 f"**{Emojis.dot} queue_pop** — Remove the last track added to the Auro Engine queue.\n"
                 f"**{Emojis.dot} queue_rmtrack** — Remove a specific track from the queue by its name.\n"
                 f"**{Emojis.dot} queue_move** — Move a track to a specific position in the queue.\n"
+                f"**{Emojis.dot} history** — View the last 10 tracks played in this session.\n"
             ))
             container.add_item(ui.Separator())
         elif page_name == "Contributors":

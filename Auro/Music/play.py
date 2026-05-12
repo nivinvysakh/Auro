@@ -24,6 +24,7 @@ from databases import MusicStorage
 from pathlib import Path
 from Auro.Errors.db_bash import TrackHealer
 from ui.selections import TrackSelectionView
+from collections import deque
 
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
@@ -41,6 +42,7 @@ sp = spotipy.Spotify(
 class Player(pomice.Player):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.history = deque(maxlen=10)
         self.queue = pomice.Queue()
         self.music_cache = MusicCache()
         self.music_storage = MusicStorage()
@@ -168,6 +170,7 @@ class Music(commands.Cog):
         )
         source = track.info.get("sourceName", "Unknown").capitalize()
         if player.controller:
+            player.history.append(track.title)
             embed = (
                 discord.Embed(
                     title=f"{Emojis.musicplaying} **Now Playing:**",
