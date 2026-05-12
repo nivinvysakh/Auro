@@ -405,7 +405,7 @@ class Music(commands.Cog):
         valid_track.requester = ctx.author
         if player.is_playing:
             player.queue.put(valid_track)
-            await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**")
+            await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**",delete_after=10)
         else:
             try:
                 await player.play(valid_track)
