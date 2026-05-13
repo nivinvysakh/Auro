@@ -63,11 +63,23 @@ class StatusCog(commands.Cog):
             await self.bot.change_presence(
                 status=discord.Status.idle,
                 activity=discord.Activity(
-                    type=discord.ActivityType.listening,
+                    type=discord.ActivityType.watching,
                     name="Happy New Year 🎉"
                 )
             )
-            print(f"{self.bot.get_time()} | EVENT     | New Year Eve Triggered .")      
+            print(f"{self.bot.get_time()} | EVENT     | New Year Eve Triggered .")
+        elif now_date.month == 11 and now_date.day == 19 :
+            if self.status_loop.is_running():
+                self.status_loop.stop()
+                await asyncio.sleep(10)
+            await self.bot.change_presence(
+                status=discord.Status.dnd,
+                activity= discord.Activity(
+                    type= discord.ActivityType.watching,
+                    name = "Eclipse 🎂"
+                )
+            )
+            print(f"{self.bot.get_time()} | EVENT     | Bday Triggered .")
         else :
             if not self.status_loop.is_running():
                 self.status_loop.start()
