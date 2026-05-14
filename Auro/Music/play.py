@@ -333,6 +333,17 @@ class Music(commands.Cog):
                     color= discord.Color.yellow()
                 ) , delete_after=30
             )
+        if player.channel.permissions_for(ctx.guild.me).manage_channels:
+            max_bit = ctx.guild.bitrate_limit
+            if player.channel.bitrate < max_bit:
+                try :
+                    await player.channel.edit(
+                        bitrate=max_bit,
+                        reason="Auro Audio Optimization"
+
+                    )
+                except Exception :
+                    pass
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
@@ -411,11 +422,15 @@ class Music(commands.Cog):
             await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**",delete_after=10)
         else:
             try:
+                await player.channel.edit(status=None)
+                await asyncio.sleep(5)
+            except Exception :
+                pass
+            try:
                 await player.play(valid_track)
             except Exception as e:
                 self.bot.dispatch("pomice_track_exception", player, valid_track, e)
             try:
-
                 await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
             except:
                 pass
@@ -716,7 +731,7 @@ class Music(commands.Cog):
         await ctx.reply(
             embed=discord.Embed(
                 description=f"{Emojis.success} Paused", color=discord.Color.blurple()
-            ).set_thumbnail(url=player.current.thumbnail)
+            )
         )
 
     @commands.hybrid_command(name="resume", description="▶️ Resumes a paused track.")
@@ -757,7 +772,7 @@ class Music(commands.Cog):
         await ctx.reply(
             embed=discord.Embed(
                 description=f"{Emojis.success} Resumed", color=discord.Color.blurple()
-            ).set_thumbnail(url=player.current.thumbnail)
+            )
         )
 
 
