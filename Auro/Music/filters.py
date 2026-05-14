@@ -85,7 +85,7 @@ class Filters(commands.Cog):
             )
             return await ctx.reply(embed=embed)
         embed = discord.Embed(
-            title=f"🌙 **Nightcore mode enabled!**", color=discord.Color.blurple()
+            description=f"🌙 **Nightcore mode enabled!**", color=discord.Color.blurple()
         ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         await ctx.reply(embed=embed)
 
@@ -124,7 +124,7 @@ class Filters(commands.Cog):
             )
             return await ctx.reply(embed=embed)
         embed = discord.Embed(
-            title=f"💨 **Vaporwave mode enabled!**", color=discord.Color.blurple()
+            description=f"💨 **Vaporwave mode enabled!**", color=discord.Color.blurple()
         ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         await ctx.reply(embed=embed)
 
@@ -162,11 +162,9 @@ class Filters(commands.Cog):
             return await ctx.reply(embed=embed)
         embed = (
             discord.Embed(
-                title="Bassboost Enabled",
-                description="🔊 Heavy bass frequencies have been boosted for maximum thump!",
+                description=f"{Emojis.success} Bassboost Enabled",
                 color=discord.Color.blurple(),
             )
-            .set_thumbnail(url=self.bot.user.avatar.url)
             .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         )
         await ctx.reply(embed=embed)
@@ -205,12 +203,9 @@ class Filters(commands.Cog):
             return ctx.reply(embed=embed)
         embed = (
             discord.Embed(
-                title="Equalizer Flattened",
-                description="🎚️ All frequencies have been balanced to neutral settings.",
+                description=f"{Emojis.success} Equalizer Flattened",
                 color=discord.Color.blurple(),
-            )
-            .set_thumbnail(url=self.bot.user.avatar.url)
-            .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+            ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         )
         await ctx.reply(embed=embed)
 
@@ -248,11 +243,10 @@ class Filters(commands.Cog):
             return ctx.reply(embed=embed)
         embed = (
             discord.Embed(
-                title="Metal Equalizer Enabled",
-                description="🎸 Mid frequencies enhanced for that aggressive metal sound!",
+                description=f"{Emojis.success} Metal Equalizer Enabled",
                 color=discord.Color.blurple(),
             )
-            .set_thumbnail(url=self.bot.user.avatar.url)
+            
             .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         )
         await ctx.reply(embed=embed)
@@ -291,12 +285,9 @@ class Filters(commands.Cog):
             return ctx.reply(embed=embed)
         embed = (
             discord.Embed(
-                title="Piano Equalizer Enabled",
-                description="🎹 High frequencies enhanced for crystal clear piano notes!",
+                description=f"{Emojis.success} Piano Equalizer Enabled",
                 color=discord.Color.blurple(),
-            )
-            .set_thumbnail(url=self.bot.user.avatar.url)
-            .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
+            ).set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         )
         await ctx.reply(embed=embed)
 
@@ -306,7 +297,10 @@ class Filters(commands.Cog):
         aliases=["8d_audio", "enable_8d"],
     )
     @commands.guild_only()
-    async def audio_8d(self, ctx: commands.Context):
+    @app_commands.describe(
+        hz= "✨ Speed of the rotation (Suggested: 0.002 - 0.05)"
+    )
+    async def audio_8d(self, ctx: commands.Context, hz : float = 0.002):
         player = cast(Player, ctx.voice_client)
         if not player:
             embed = discord.Embed(
@@ -322,8 +316,14 @@ class Filters(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
+        if not (0.002 <= hz <= 0.05):
+            embed = discord.Embed(
+            description=f"{Emojis.warning} **Invalid Range:** Speed must be between `0.002` and `0.05` Hz.",
+            color=discord.Color.yellow()
+            )
+            return await ctx.reply(embed=embed, ephemeral=True)
 
-        filter_data = pomice.filters.Rotation(tag="8d", rotation_hertz=0.2)
+        filter_data = pomice.filters.Rotation(tag="8d", rotation_hertz=hz)
         try:
             await player.add_filter(filter_data)
         except FilterTagAlreadyInUse:
@@ -335,11 +335,9 @@ class Filters(commands.Cog):
             return await ctx.reply(embed=embed)
         embed = (
             discord.Embed(
-                title="8D Audio Effect Enabled",
-                description="🔊 Immersive 3D spatial audio activated!",
+                description=f"{Emojis.success} 8D Audio Effect Enabled",
                 color=discord.Color.blurple(),
             )
-            .set_thumbnail(url=self.bot.user.avatar.url)
             .set_footer(text="💝", icon_url=self.bot.user.avatar.url)
         )
         await ctx.reply(embed=embed)
@@ -488,10 +486,9 @@ class Filters(commands.Cog):
             )
         await ctx.reply(
             embed= discord.Embed(
-                title=f"{Emojis.success} Treble Boost Enabled!",
-                description="✨ High frequencies have been boosted for extra sparkle!",
+                description=f"{Emojis.success} Treble Boost Enabled!",
                 color= discord.Color.blurple()
-            ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(
+            ).set_footer(
                 text="💝", icon_url=self.bot.user.avatar.url
             )
         )

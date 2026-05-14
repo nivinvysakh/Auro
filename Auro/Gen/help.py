@@ -65,7 +65,7 @@ class HelpLayoutView(ui.LayoutView):
             container.add_item(ui.TextDisplay(
                 f"## {Emojis.music_help} Music Module\n\n"
                 f"**{Emojis.dot} play** — Stream high-quality audio\n"
-                f"**{Emojis.dot} playfromstatus** — Sync music from your status or a friend's Spotify.\n"
+                f"**{Emojis.dot} playfromstatus** — Play the music from your status or a friend's Spotify.\n"
                 f"**{Emojis.dot} lyrics** — Fetch real-time song text\n"
                 f"**{Emojis.dot} filters** — Audio enhancement toggles\n"
                 f"**{Emojis.dot} stop/skip** — Queue control\n"

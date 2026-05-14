@@ -112,7 +112,10 @@ class Music(commands.Cog):
             view = TrackSelectionView(results[:5])
             msg = await ctx.send(content=f"🔎 {ctx.author.mention}, multiple results found. Select the correct version:", view=view )
             await view.wait()
-            await msg.delete()
+            try :
+                await msg.delete()
+            except (discord.HTTPException, discord.Forbidden, discord.NotFound):
+                pass
             if view.selected_track:
                 track_hash = getattr(view.selected_track, "track_id", None) or view.selected_track.info.get("track")
                 await player.music_storage.save_to_storage(
@@ -531,9 +534,9 @@ class Music(commands.Cog):
                 )
             )
 
-        embed = discord.Embed(title="🎶 Current Queue", color=discord.Color.blue())
+        embed = discord.Embed(title=f"{Emojis.musicplaying} Current Queue", color=discord.Color.blue())
         if player.is_playing:
-            embed.description = f"**Now Playing:** {player.current.title}\n\n"
+            embed.description = f"{Emojis.music_help} **Now Playing:** \n - {player.current.title}\n\n"
             if (player.current.title).startswith("Auro"):
                 embed.set_thumbnail(url=self.bot.user.avatar.url)
             else :
@@ -543,7 +546,7 @@ class Music(commands.Cog):
         for i, t in enumerate(list(player.queue)[:10], 1):
             queue_text += f"{i}. {t.title}\n"
 
-        embed.add_field(name="Up Next", value=queue_text or "No songs in queue.")
+        embed.add_field(name=f"{Emojis.asterisk} Up Next", value=queue_text or "No songs in queue.")
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
@@ -712,8 +715,8 @@ class Music(commands.Cog):
         player.manual_pause = True
         await ctx.reply(
             embed=discord.Embed(
-                title=f"{Emojis.success} Paused", color=discord.Color.blurple()
-            )
+                description=f"{Emojis.success} Paused", color=discord.Color.blurple()
+            ).set_thumbnail(url=player.current.thumbnail)
         )
 
     @commands.hybrid_command(name="resume", description="▶️ Resumes a paused track.")
@@ -725,6 +728,13 @@ class Music(commands.Cog):
                 embed=discord.Embed(
                     title=f"{Emojis.error} No active player found.",
                     description="`＞︿＜`",
+                    color=discord.Color.yellow()
+                )
+            )
+        if ctx.guild.me.voice and ctx.guild.me.voice.mute:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} I cannot resume while **Server Muted**! Please unmute me first. `(￢_￢)`",
                     color=discord.Color.yellow()
                 )
             )
@@ -746,8 +756,8 @@ class Music(commands.Cog):
         player.manual_pause = False
         await ctx.reply(
             embed=discord.Embed(
-                title=f"{Emojis.success} Resumed", color=discord.Color.blurple()
-            )
+                description=f"{Emojis.success} Resumed", color=discord.Color.blurple()
+            ).set_thumbnail(url=player.current.thumbnail)
         )
 
 
