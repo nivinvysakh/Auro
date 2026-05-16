@@ -126,6 +126,24 @@ class ErrorHandler(commands.Cog):
 
         cmd_name = interaction.command.name if interaction.command else "Unknown"
         print(f"Slash Error in command '{cmd_name}': {error}")
+    
+    @commands.Cog.listener()
+    async def on_interaction(self, interaction: discord.Interaction):
+        if interaction.type == discord.InteractionType.component:
+            if not interaction.message or interaction.message.id not in self.bot._connection._view_store._views:
+                embed = discord.Embed(
+                    title=f"{Emojis.error} Interaction Expired",
+                    description=(
+                                    "This button belongs to an older session and has expired.\n\n"
+                                    "Please run the command again to get a fresh menu!"
+                    ),
+                    color= discord.Color.yellow()
+                ).set_thumbnail(url=self.bot.user.avatar.url)
+                try :
+                    if not interaction.response.is_done():
+                        await interaction.response.send_message(embed=embed, ephemeral=True)
+                except discord.HTTPException:
+                    pass
 
 
 async def setup(bot: commands.AutoShardedBot):

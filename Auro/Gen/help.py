@@ -46,9 +46,6 @@ class HelpLayoutView(ui.LayoutView):
                 f"{Emojis.dot} {Emojis.heart} **Contributors**\n"
             ))
             container.add_item(ui.Separator())
-            gal = ui.MediaGallery()
-            gal.add_item(media="https://i.pinimg.com/originals/5a/24/39/5a24398389aacad9095f240abeca30b8.gif")
-            container.add_item(gal)
 
         elif page_name == "General":
             container = self.create_base_container(discord.Color.purple())
@@ -58,13 +55,12 @@ class HelpLayoutView(ui.LayoutView):
                 f"**{Emojis.dot} profile** — User information card\n"
                 f"**{Emojis.dot} clearmsg** — Purge channel history\n"
                 f"**{Emojis.dot} contribute** — Support development\n"
+                f"**{Emojis.dot} pic** — Shows a user's profile picture.\n"
+                f"**{Emojis.dot} banner** — Shows a user's profile banner.\n"
                 f"**{Emojis.dot} clearbot** — Clean up all bot responses in the channel!\n"
                 f"**{Emojis.dot} help** — Show this menu"
             ))
             container.add_item(ui.Separator())
-            gal = ui.MediaGallery()
-            gal.add_item(media="https://i.pinimg.com/originals/5a/24/39/5a24398389aacad9095f240abeca30b8.gif")
-            container.add_item(gal)
 
         elif page_name == "Music":
             container = self.create_base_container(discord.Color.blurple())

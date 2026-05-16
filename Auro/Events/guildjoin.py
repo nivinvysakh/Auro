@@ -27,7 +27,7 @@ class WelcomeLayout(ui.LayoutView):
             f"### {Emojis.wave} Hola, I am Auro.\n"
             f"Crystal-clear audio and live synced lyrics for your server.\n\n"
             f"**{Emojis.dot} Getting Started:**\n"
-            f"• Use `/help` to view the command directory.\n"
+            f"• Use `/help` or <@1486677271665184798> to view the command directory.\n"
             f"• Join a Voice Channel and use `/play`."
         ))
         container.add_item(ui.Separator())
@@ -40,7 +40,7 @@ class WelcomeLayout(ui.LayoutView):
         ))
         container.add_item(ui.Separator())
         gal = ui.MediaGallery()
-        gal.add_item(media="https://wallpapers-clan.com/wp-content/uploads/2024/04/deku-storm-mha-anime-gif-preview-desktop-wallpaper.gif")
+        gal.add_item(media="https://cdn.pfps.gg/banners/6920-anime-eyes.gif")
         container.add_item(gal)
         
         self.add_item(container)
@@ -91,11 +91,6 @@ class Guild(commands.Cog):
                 await channel.send(content=None,view=view)
                 break
 
-    @commands.hybrid_command(name="testwelcome", description="🧪 Test the Auro welcome containers.")
-    @commands.has_permissions(administrator=True)
-    async def testwelcome(self, ctx):
-        view = WelcomeLayout(self.bot)
-        await ctx.reply(view=view)
 
 async def setup(bot):
     await bot.add_cog(Guild(bot))
