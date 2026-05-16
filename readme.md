@@ -92,6 +92,7 @@ Auro is licensed under the AGPL-3.0 License. See the LICENSE file for more detai
 ![Lavalink](https://img.shields.io/badge/lavalink-757575?style=plastic&logo=cog&logoColor=white)
 ![Discord.py](https://img.shields.io/badge/discord.py-5865F2?style=plastic&logo=discord&logoColor=white)
 ![License](https://img.shields.io/badge/license-AGPL--v3-red?style=plastic)
+![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-brightgreen)
 
 *Made with 💖 by Nivin*
 </p>
