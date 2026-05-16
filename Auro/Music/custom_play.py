@@ -88,5 +88,5 @@ class CustomPlay(commands.Cog):
         except Exception as e :
             return print(f"AURO CUSTOM FILE ERROR : {e}")
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(CustomPlay(bot))

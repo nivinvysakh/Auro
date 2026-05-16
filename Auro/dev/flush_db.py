@@ -175,5 +175,5 @@ class Flush(commands.Cog):
         await ctx.reply(embeds=embeds)
 
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(Flush(bot))

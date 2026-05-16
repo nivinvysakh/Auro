@@ -33,6 +33,7 @@ class Emojis:
     music_help = "<:music1:1500731504911847454>"
     alien = "<a:alien:1500731923033755820>"
     star_animate = "<a:star:1501920032899465288>"
+    asterisk = "<:asterisk:1504357073096278047>"
 
 
 class BadgesIcon:

@@ -67,5 +67,5 @@ class PurgeBot(commands.Cog):
         await ctx.interaction.edit_original_response(content="✅ Messages Cleared!")
 
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(PurgeBot(bot))

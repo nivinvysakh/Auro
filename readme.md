@@ -26,6 +26,7 @@ A minimalist, high-performance music engine for Discord.
 - **Lyrics** — Real-time synced LRC lyrics with position tracking.
 - **Filters** — Built-in Nightcore, 8D Rotation, and Vaporwave.
 - **Control** — Precision seeking (`mm:ss`) and smooth playback.
+- **Pfs** - Play a song from a user's spotify activity on discord.
 
 <br clear="right"/>
 
@@ -61,7 +62,7 @@ A minimalist, high-performance music engine for Discord.
 &nbsp;
 
 > [!CAUTION]
-> - **Spotify Support:** You must provide Spotify credentials for the bot to parse Spotify URLs. If these variables are missing, the bot will return an error when attempting to play Spotify tracks and will only support direct YouTube or SoundCloud links.
+> **Spotify Support:** You must provide Spotify credentials for the bot to parse Spotify URLs. If these variables are missing, the bot will return an error when attempting to play Spotify tracks and will only support direct YouTube or SoundCloud links.
 &nbsp;
 1. **Run the bot**:
     ```bash
