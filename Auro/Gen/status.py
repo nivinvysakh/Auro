@@ -116,5 +116,5 @@ class Stats(commands.Cog):
         await ctx.send(embeds=[bot_embed, lava_embed])
 
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(Stats(bot))

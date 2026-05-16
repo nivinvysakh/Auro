@@ -86,5 +86,5 @@ class Fix(commands.Cog):
                 ),delete_after=20
                 )
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(Fix(bot))

@@ -20,5 +20,5 @@ class Mention(commands.Cog):
                 ctx = await self.bot.get_context(message)
                 await ctx.invoke(help_command)
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(Mention(bot))

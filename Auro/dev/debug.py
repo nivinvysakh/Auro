@@ -83,5 +83,5 @@ class Debug(commands.Cog):
         embed.set_footer(text=f"Auro Debug", icon_url=self.bot.user.display_avatar.url)
         await ctx.reply(embed=embed)
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(Debug(bot))
