@@ -55,5 +55,5 @@ class Save(commands.Cog):
                     color= discord.Color.yellow()
                 )
             )
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(Save(bot))

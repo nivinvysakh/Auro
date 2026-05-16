@@ -10,7 +10,7 @@ class StatusPlay(commands.Cog):
     @commands.hybrid_command(
         name="playfromstatus", 
         aliases=["pfs"],
-        description="🎷 Sync music from your status or a friend's Spotify."
+        description="🎷 Play the music from your status or a friend's Spotify."
     )
     @commands.guild_only()
     @discord.app_commands.describe(member="✨ The user whose Spotify you want to sync from")

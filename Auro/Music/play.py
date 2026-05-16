@@ -112,7 +112,10 @@ class Music(commands.Cog):
             view = TrackSelectionView(results[:5])
             msg = await ctx.send(content=f"🔎 {ctx.author.mention}, multiple results found. Select the correct version:", view=view )
             await view.wait()
-            await msg.delete()
+            try :
+                await msg.delete()
+            except (discord.HTTPException, discord.Forbidden, discord.NotFound):
+                pass
             if view.selected_track:
                 track_hash = getattr(view.selected_track, "track_id", None) or view.selected_track.info.get("track")
                 await player.music_storage.save_to_storage(
@@ -330,6 +333,17 @@ class Music(commands.Cog):
                     color= discord.Color.yellow()
                 ) , delete_after=30
             )
+        if player.channel.permissions_for(ctx.guild.me).manage_channels:
+            max_bit = ctx.guild.bitrate_limit
+            if player.channel.bitrate < max_bit:
+                try :
+                    await player.channel.edit(
+                        bitrate=max_bit,
+                        reason="Auro Audio Optimization"
+
+                    )
+                except Exception :
+                    pass
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
@@ -408,11 +422,15 @@ class Music(commands.Cog):
             await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**",delete_after=10)
         else:
             try:
+                await player.channel.edit(status=None)
+                await asyncio.sleep(5)
+            except Exception :
+                pass
+            try:
                 await player.play(valid_track)
             except Exception as e:
                 self.bot.dispatch("pomice_track_exception", player, valid_track, e)
             try:
-
                 await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
             except:
                 pass
@@ -531,9 +549,9 @@ class Music(commands.Cog):
                 )
             )
 
-        embed = discord.Embed(title="🎶 Current Queue", color=discord.Color.blue())
+        embed = discord.Embed(title=f"{Emojis.musicplaying} Current Queue", color=discord.Color.blue())
         if player.is_playing:
-            embed.description = f"**Now Playing:** {player.current.title}\n\n"
+            embed.description = f"{Emojis.music_help} **Now Playing:** \n - {player.current.title}\n\n"
             if (player.current.title).startswith("Auro"):
                 embed.set_thumbnail(url=self.bot.user.avatar.url)
             else :
@@ -543,7 +561,7 @@ class Music(commands.Cog):
         for i, t in enumerate(list(player.queue)[:10], 1):
             queue_text += f"{i}. {t.title}\n"
 
-        embed.add_field(name="Up Next", value=queue_text or "No songs in queue.")
+        embed.add_field(name=f"{Emojis.asterisk} Up Next", value=queue_text or "No songs in queue.")
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(
@@ -712,7 +730,7 @@ class Music(commands.Cog):
         player.manual_pause = True
         await ctx.reply(
             embed=discord.Embed(
-                title=f"{Emojis.success} Paused", color=discord.Color.blurple()
+                description=f"{Emojis.success} Paused", color=discord.Color.blurple()
             )
         )
 
@@ -725,6 +743,13 @@ class Music(commands.Cog):
                 embed=discord.Embed(
                     title=f"{Emojis.error} No active player found.",
                     description="`＞︿＜`",
+                    color=discord.Color.yellow()
+                )
+            )
+        if ctx.guild.me.voice and ctx.guild.me.voice.mute:
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} I cannot resume while **Server Muted**! Please unmute me first. `(￢_￢)`",
                     color=discord.Color.yellow()
                 )
             )
@@ -746,10 +771,10 @@ class Music(commands.Cog):
         player.manual_pause = False
         await ctx.reply(
             embed=discord.Embed(
-                title=f"{Emojis.success} Resumed", color=discord.Color.blurple()
+                description=f"{Emojis.success} Resumed", color=discord.Color.blurple()
             )
         )
 
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Music(bot))

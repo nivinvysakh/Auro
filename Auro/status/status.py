@@ -4,7 +4,7 @@ import random
 import datetime
 import asyncio
 class StatusCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot : commands.Bot):
         self.bot = bot
         self.status_loop.start()
         self.event_check.start()
@@ -87,5 +87,5 @@ class StatusCog(commands.Cog):
     async def before_status_loop(self):
         await self.bot.wait_until_ready()
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(StatusCog(bot))

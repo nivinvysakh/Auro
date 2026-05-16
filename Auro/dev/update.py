@@ -75,5 +75,5 @@ class Update(commands.Cog):
             embed.color = discord.Color.red()
             await msg.edit(embed=embed)
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(Update(bot))

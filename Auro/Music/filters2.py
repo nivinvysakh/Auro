@@ -53,7 +53,7 @@ class Filter2(commands.Cog):
             embed=discord.Embed(
                 description=f"{Emojis.success} **Dynamic EQ Enabled!**",
                 color= discord.Color.blurple()
-            ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(
+            ).set_footer(
                 text="💝", icon_url=self.bot.user.avatar.url
             )
         )
@@ -95,9 +95,9 @@ class Filter2(commands.Cog):
             ))
         await ctx.reply(
             embed= discord.Embed(
-                description="🌙 **Smooth EQ Active**",
+                description=f"{Emojis.success} 🌙 **Smooth EQ Active**",
                 color= discord.Color.blurple()
-            ).set_thumbnail(url=self.bot.user.avatar.url).set_footer(
+            ).set_footer(
                 text="💝", icon_url=self.bot.user.avatar.url
             )
         )
@@ -155,5 +155,5 @@ class Filter2(commands.Cog):
             )
         )        
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(Filter2(bot))

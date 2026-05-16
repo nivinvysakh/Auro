@@ -59,5 +59,5 @@ class Contribute(commands.Cog):
             await ctx.reply(embed=embed)
 
 
-async def setup(bot):
+async def setup(bot : commands.Bot):
     await bot.add_cog(Contribute(bot))
