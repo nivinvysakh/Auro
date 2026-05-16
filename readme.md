@@ -43,7 +43,7 @@ A minimalist, high-performance music engine for Discord.
     <br><br>
 
 > [!note]
-> Make sure you have Java 21 + installed and python 3.10+ to run the bot.
+> Make sure you have **Java 21 +** installed and **python 3.10+** to run the bot.
 > 
 > **Firestore Integration (Optional)** : This module pushes the bot's live status to a Firestore database every 60 seconds to power an external bot landing page.
 >
