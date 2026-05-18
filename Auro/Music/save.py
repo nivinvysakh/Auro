@@ -4,7 +4,7 @@ from util.emojis import Emojis
 from Auro.Music.play import Player
 from typing import cast
 class Save(commands.Cog):
-    def __init__(self,bot):
+    def __init__(self,bot: commands.Bot):
         self.bot = bot
     
     @commands.hybrid_command(

@@ -9,7 +9,7 @@ from util.emojis import Emojis
 from filters.eq_filters import Eq_Presets
 
 class Filters(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.hybrid_command(

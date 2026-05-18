@@ -1,13 +1,12 @@
 import discord
-import pomice
 from discord.ext import commands
 import asyncio
 from typing import cast
 from util.emojis import Emojis
-from .play import Player
+from Auro.Music.play import Player
 
 class Fix(commands.Cog):
-    def __init__(self,bot):
+    def __init__(self,bot: commands.Bot):
         self.bot = bot
     
     @commands.hybrid_command(

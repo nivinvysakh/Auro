@@ -5,7 +5,7 @@ from databases import MusicStorage, MusicCache
 
 
 class Flush(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:commands.Bot):
         self.bot = bot
         self.music_db = MusicStorage()
         self.music_cache = MusicCache()

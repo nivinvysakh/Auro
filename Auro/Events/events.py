@@ -7,7 +7,7 @@ from Auro.Music.play import Player
 
 
 class Inactivity(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.Cog.listener()
@@ -38,7 +38,7 @@ class Inactivity(commands.Cog):
                     return
 
             if not before.mute and after.mute:
-                if not player.is_paused:
+                if player.is_playing and not player.is_paused:
                     await player.set_pause(True)
                     player.manual_pause = False
                     if player.controller:
