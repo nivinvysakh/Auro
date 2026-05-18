@@ -166,26 +166,21 @@ class Music(commands.Cog):
                     )
         if player.loop or player.loop_queue:
             return
-        thumbnail = (
-            getattr(track, "thumbnail", None)
-            or track.info.get("thumbnail")
-            or track.info.get("artworkUrl")
-        )
         source = track.info.get("sourceName", "Unknown").capitalize()
         if player.controller:
             player.history.append(track.title)
             embed = (
                 discord.Embed(
-                    title=f"{Emojis.musicplaying} **Now Playing:**",
+                    title=f"**Now Playing** {Emojis.musicplaying}",
                     description=(
-                        f"{Emojis.dot} : **{track.title}**\n"
-                        f"{Emojis.dot} : `{track.author}` \n"
-                        f"{Emojis.dot} : `{self.format_time(track.length)}` \n"
-                        f"{Emojis.dot} :  [Click Here]({track.uri})\n"
+                        f"{Emojis.dot}  **Title** :  **{track.title}** \n"
+                        f"{Emojis.dot}  **Author** : *{track.author}* \n"
+                        f"{Emojis.dot}  **Position** : `{self.format_time(track.position)}` \\ `{self.format_time(track.length)}` \n"
+                        f"{Emojis.dot}   **Link** : [Watch Video]({track.uri})\n"
                     ),
-                    color=discord.Color.blurple(),
+                    color=discord.Color.green(),
                 )
-                .set_thumbnail(url=thumbnail)
+                .set_thumbnail(url=player.current.thumbnail)
                 .set_footer(
                     text=f"Auro Engine  |  {source}", icon_url=self.bot.user.avatar.url
                 )
@@ -193,10 +188,14 @@ class Music(commands.Cog):
 
             if hasattr(track, "requester"):
                 embed.add_field(
-                    name="Requested by", value=track.requester.mention, inline=False
+                    name=f"{Emojis.star_animate} Requested by", value=f"\n{track.requester.mention}", inline=False
                 )
 
-            await player.controller.send(embed=embed)
+            msg = await player.controller.send(embed=embed)
+            try:
+                await msg.add_reaction("💝")
+            except discord.HTTPException:
+                pass
 
     @commands.Cog.listener()
     async def on_pomice_track_end(self, player: Player, track, reason):
@@ -426,10 +425,7 @@ class Music(commands.Cog):
                 await asyncio.sleep(5)
             except Exception :
                 pass
-            try:
-                await player.play(valid_track)
-            except Exception as e:
-                self.bot.dispatch("pomice_track_exception", player, valid_track, e)
+            await player.play(valid_track)
             try:
                 await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
             except:
@@ -502,7 +498,9 @@ class Music(commands.Cog):
             await player.channel.edit(status=None)
         except:
                 pass
-        await ctx.voice_client.destroy()
+
+        player.queue.clear()
+        await player.destroy()
         embed = discord.Embed(
                 title=f"{Emojis.success} Session Terminated",
                 description="The queue has been cleared and the player has disconnected.",
@@ -730,8 +728,13 @@ class Music(commands.Cog):
         player.manual_pause = True
         await ctx.reply(
             embed=discord.Embed(
-                description=f"{Emojis.success} Paused", color=discord.Color.blurple()
-            )
+                title=f"{Emojis.success} Playback Paused",
+                description=(
+                    f"{Emojis.dot} **Track :** {player.current.title}\n"
+                    f"{Emojis.dot} **Author :** *{player.current.author}*\n"
+                    f"{Emojis.dot} **Pause Position** : `{self.format_time(player.current.position)}` \\ {self.format_time(player.current.length)}\n\n"
+                ), color= discord.Color.yellow()
+            ).set_footer(text="Auro Engine • Player State" , icon_url=self.bot.user.avatar.url).set_thumbnail(url=player.current.thumbnail)
         )
 
     @commands.hybrid_command(name="resume", description="▶️ Resumes a paused track.")
@@ -770,9 +773,14 @@ class Music(commands.Cog):
         await player.set_pause(False)
         player.manual_pause = False
         await ctx.reply(
-            embed=discord.Embed(
-                description=f"{Emojis.success} Resumed", color=discord.Color.blurple()
-            )
+            embed= discord.Embed(
+                title=f"{Emojis.success} Playback Resumed",
+                description=(
+                    f"{Emojis.dot} **Track :** {player.current.title}\n"
+                    f"{Emojis.dot} **Author :** *{player.current.author}*\n"
+                    f"{Emojis.dot} **Resume Position** : `{self.format_time(player.current.position)}` \\ {self.format_time(player.current.length)}\n\n"
+                ), color= discord.Color.dark_gold()
+            ).set_footer(text="Auro Engine • Player State", icon_url=self.bot.user.avatar.url).set_thumbnail(url=player.current.thumbnail), delete_after=10
         )
 
 
