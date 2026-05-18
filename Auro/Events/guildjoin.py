@@ -5,7 +5,7 @@ from util.emojis import Emojis, ButtonEmojis
 import asyncio
 
 class WelcomeLayout(ui.LayoutView):
-    def __init__(self, bot):
+    def __init__(self, bot:commands.Bot):
         super().__init__(timeout=None)
         self.bot = bot
         self.bot_icon = bot.user.display_avatar.url
@@ -78,7 +78,7 @@ class WelcomeLayout(ui.LayoutView):
         self.add_item(button_row)
 
 class Guild(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.Cog.listener()

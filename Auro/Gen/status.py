@@ -6,6 +6,7 @@ import platform
 import pomice
 import subprocess
 from util.emojis import Emojis as emojis
+from util.dbping import get_db_ping
 import aiohttp
 
 
@@ -19,7 +20,7 @@ async def get_latest_version():
             return "v1.0.0"
 
 class Stats(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.start_time = time.time()
     async def get_branch_name(self):
@@ -32,7 +33,8 @@ class Stats(commands.Cog):
         except Exception :
             return "Unknown"
     @commands.hybrid_command(
-        name="stats", description="📊 System and Lavalink Dashboard"
+        name="stats", description="📊 System and Lavalink Dashboard",
+        aliases=["ping"]
     )
     async def stats(self, ctx: commands.Context):
         await ctx.defer()
@@ -41,6 +43,7 @@ class Stats(commands.Cog):
             time.strftime("%Hh %Mm %Ss", time.gmtime(time.time() - self.start_time))
         )
         memory_usage = psutil.Process().memory_info().rss / 1024 / 1024
+        db_value = await get_db_ping()
 
         bot_embed = discord.Embed(
             title="🤖 Auro Bot Core",
@@ -52,9 +55,14 @@ class Stats(commands.Cog):
             value=f"`{round(self.bot.latency * 1000)}ms`",
             inline=True,
         )
+        bot_embed.add_field(
+            name="📂 Database Ping",
+            value=f"`{db_value}`ms",
+            inline=False
+        )
         bot_embed.add_field(name="⏳ Uptime", value=f"`{uptime}`", inline=True)
         bot_embed.add_field(
-            name="🧠 Memory", value=f"`{memory_usage:.2f} MB`", inline=True
+            name="🧠 Memory", value=f"`{memory_usage:.2f} MB`", inline=False
         )
         bot_embed.add_field(
             name="⚙️ Environment",

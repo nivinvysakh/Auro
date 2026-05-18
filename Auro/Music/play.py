@@ -63,7 +63,7 @@ class Player(pomice.Player):
 
 
 class Music(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     # -- Utility Method for Formatting Time ---

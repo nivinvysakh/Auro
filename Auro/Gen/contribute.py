@@ -14,7 +14,7 @@ async def get_latest_version():
             return "v1.0.0"
 
 class Contribute(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.hybrid_command(

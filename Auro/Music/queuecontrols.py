@@ -6,7 +6,7 @@ from Auro.Music.play import Player
 from discord import app_commands
 
 class QueueControls(commands.Cog):
-    def __init__(self,bot):
+    def __init__(self,bot: commands.Bot):
         self.bot = bot
     
     @commands.hybrid_command(

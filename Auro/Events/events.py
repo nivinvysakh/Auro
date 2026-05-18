@@ -7,7 +7,7 @@ from Auro.Music.play import Player
 
 
 class Inactivity(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.Cog.listener()

@@ -112,7 +112,7 @@ class LyricsView(discord.ui.View):
 
 
 class Lyrics(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     def format_time(self, ms: int) -> str:
