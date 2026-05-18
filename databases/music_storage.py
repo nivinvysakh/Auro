@@ -106,3 +106,17 @@ class MusicStorage:
                 "SELECT search_query, track_hash, track_title, source FROM global_cache ORDER BY created_at DESC"
             ) as cursor:
                 return await cursor.fetchall()
+    async def delete_by_title(self, song_name: str) -> int:
+        async with aiosqlite.connect(self.path) as db:
+            await db.execute("PRAGMA synchronous=NORMAL;")
+            clean_name = song_name.strip().lower()
+            
+            async with db.execute(
+                "DELETE FROM global_cache WHERE LOWER(track_title) LIKE ? OR search_query LIKE ?",
+                (f"%{clean_name}%", f"%{clean_name}%")
+            ) as cursor:
+                changes = cursor.rowcount
+                
+            await db.commit()
+            await db.execute("VACUUM")
+            return changes
