@@ -181,8 +181,12 @@ class Lyrics(commands.Cog):
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
             pass
         if not lrc_data:
+            embed = discord.Embed(
+                description=f"{Emojis.error} No synced lyrics found for **{track.title}**.",
+                color= discord.Color.yellow()
+            )
             return await ctx.reply(
-                f"{Emojis.error} No synced lyrics found for **{track.title}**."
+                embed=embed,ephemeral=True,delete_after=6
             )
 
         lines = lrc_data.split("\n")
@@ -262,7 +266,8 @@ class Lyrics(commands.Cog):
 
         if seek_ms < 0:
             return await ctx.reply(
-                f"{Emojis.error} Invalid format. Use `mm:ss` or `hh:mm:ss`."
+                f"{Emojis.error} Invalid format. Use `mm:ss` or `hh:mm:ss`.",
+                delete_after=5
             )
         if seek_ms > player.current.length:
             return await ctx.reply(
