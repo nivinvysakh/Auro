@@ -2,12 +2,12 @@ import discord
 from discord.ext import commands
 auth_users = [957196694393614367,1464578808202919998]
 def is_auth():
-    async def predicate(ctx):
+    async def predicate(ctx: commands.Context):
         is_owner = await ctx.bot.is_owner(ctx.author)
         return is_owner or ctx.author.id in auth_users
     return commands.check(predicate)
 class Rules_send(commands.Cog):
-    def __init__(self,bot):
+    def __init__(self,bot: commands.Bot):
         self.bot = bot
     
     @commands.command(
@@ -129,5 +129,5 @@ class Rules_send(commands.Cog):
 
 
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Rules_send(bot))

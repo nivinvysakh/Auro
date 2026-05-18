@@ -3,7 +3,7 @@ from firebase_admin import credentials, firestore
 from discord.ext import commands, tasks
 
 class FirestoreStats(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         cred = credentials.Certificate("firebase_key.json")
         firebase_admin.initialize_app(cred)
@@ -24,5 +24,5 @@ class FirestoreStats(commands.Cog):
         
         self.db.collection("bot").document("stats").set(stats)
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(FirestoreStats(bot))

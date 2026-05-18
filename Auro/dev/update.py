@@ -6,7 +6,7 @@ import platform
 from util.emojis import Emojis
 
 class Update(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(name="update")
@@ -18,6 +18,7 @@ class Update(commands.Cog):
             description=f"{Emojis.loading} Checking remote repository status...",
             color=discord.Color.blurple()
         )
+        embed.set_thumbnail(url=self.bot.user.avatar.url)
         msg = await ctx.reply(embed=embed)
 
         try:

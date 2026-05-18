@@ -8,7 +8,7 @@ from util.emojis import Emojis
 from Auro.Music.play import Player
 
 class Debug(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.start_time = time.time()
 

@@ -14,7 +14,7 @@ async def get_latest_version():
             return "v1.0.0"
 
 class HelpLayoutView(ui.LayoutView):
-    def __init__(self, bot, author, version):
+    def __init__(self, bot: commands.Bot, author, version):
         super().__init__(timeout=300) 
         self.bot = bot
         self.author = author
@@ -155,7 +155,7 @@ class ModuleSelector(ui.Select):
         await interaction.response.edit_message(view=view)
 
 class Help(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.hybrid_command(name="help", aliases=["h"], description="💝 View the Auro command directory.")

@@ -6,7 +6,7 @@ from Auro.Music.play import Player
 from typing import cast
 
 class Stopvc(commands.Cog):
-    def __init__(self,bot):
+    def __init__(self,bot: commands.Bot):
         self.bot = bot
         self.maintenance_lock = False
 
