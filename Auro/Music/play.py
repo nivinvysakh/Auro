@@ -724,6 +724,7 @@ class Music(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
+        current_position_ms = player.position
         await player.set_pause(True)
         player.manual_pause = True
         await ctx.reply(
@@ -732,7 +733,7 @@ class Music(commands.Cog):
                 description=(
                     f"{Emojis.dot} **Track :** {player.current.title}\n"
                     f"{Emojis.dot} **Author :** *{player.current.author}*\n"
-                    f"{Emojis.dot} **Pause Position** : `{self.format_time(player.current.position)}` \\ {self.format_time(player.current.length)}\n\n"
+                    f"{Emojis.dot} **Pause Position** : `{self.format_time(current_position_ms)}` \\ {self.format_time(player.current.length)}\n\n"
                 ), color= discord.Color.yellow()
             ).set_footer(text="Auro Engine • Player State" , icon_url=self.bot.user.avatar.url).set_thumbnail(url=player.current.thumbnail)
         )
