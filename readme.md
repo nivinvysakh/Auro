@@ -1,20 +1,3 @@
-<div align="center">
-
-![Python](https://img.shields.io/badge/python-3776AB?style=plastic&logo=python&logoColor=white)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-![Lavalink](https://img.shields.io/badge/lavalink-757575?style=plastic&logo=cog&logoColor=white)
-![Discord.py](https://img.shields.io/badge/discord.py-5865F2?style=plastic&logo=discord&logoColor=white)
-![License](https://img.shields.io/badge/license-AGPL--v3-red?style=plastic)
-
-
-</div>
-
-&nbsp;
-> [!NOTE]
-> Make sure you have Java 21 + installed and python 3.10+ to run the bot.
-
-&nbsp;
-
 # Auro 🌙
 
 <img align="right" src="/img/auro.svg" width=200 alt="Auro Bot Icon"/>
@@ -26,21 +9,29 @@ A minimalist, high-performance music engine for Discord.
 - **Lyrics** — Real-time synced LRC lyrics with position tracking.
 - **Filters** — Built-in Nightcore, 8D Rotation, and Vaporwave.
 - **Control** — Precision seeking (`mm:ss`) and smooth playback.
+- **Pfs** - Play a song from a user's spotify activity on discord.
 
 <br clear="right"/>
 
 ## 🛠️ Setup
 1. **Install dependencies**:
+   <br><br>
    ```bash
    pip install -r requirements.txt
    ```
+   <br><br>
 2. **Configure environment**:
     Create a `.env` file with your Discord bot token.
+    <br><br>
     ```env
     TOKEN=your_discord_bot_token_here
+    client_id="Spotify client_id"
+    client_secret="Spotify client_secret"
     ```
+    <br><br>
 3. **Lavalink Server Configuration**:
     Go to `core/auro.py` and update the lavalink server details the place where you edit the Node connection is given below:
+    <br><br>
     ```python
     await pomice.NodePool.create_node(
         host='localhost',
@@ -49,15 +40,26 @@ A minimalist, high-performance music engine for Discord.
         secure = False
     )
     ```
-4. **Run the bot**:
-    ```bash
-    python main.py
-    ```
-    or 
-    ```bash
-    py main.py
-    ```
+    <br><br>
 
+> [!note]
+> Make sure you have **Java 21 +** installed and **python 3.10+** to run the bot.
+> 
+> **Firestore Integration (Optional)** : This module pushes the bot's live status to a Firestore database every 60 seconds to power an external bot landing page.
+>
+>Place your Firebase service account credentials in the root directory as `firebase_key.json`.
+>
+> If you do not require a web-based status display, you can ignore the `Auro/Status` folder. The bot will function perfectly as a standalone music player without it.
+&nbsp;
+
+> [!CAUTION]
+> **Spotify Support:** You must provide Spotify credentials for the bot to parse Spotify URLs. If these variables are missing, the bot will return an error when attempting to play Spotify tracks and will only support direct YouTube or SoundCloud links.
+&nbsp;
+1. **Run the bot**:
+   <br><br>
+    ```bash
+    python main.py or py main.py
+    ```
 > [!important]
 > Make sure your Lavalink server is running before starting the bot.
 &nbsp;
@@ -81,8 +83,16 @@ Auro is an open-source project. Contributions are welcome! Please fork the repos
 ## 🎶 License
 Auro is licensed under the AGPL-3.0 License. See the LICENSE file for more details.
 
----
 
-<p align="center">
-Made with 💖 by Nivin
+
+<p align="left">
+
+![Python](https://img.shields.io/badge/python-3776AB?style=plastic&logo=python&logoColor=white)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Lavalink](https://img.shields.io/badge/lavalink-757575?style=plastic&logo=cog&logoColor=white)
+![Discord.py](https://img.shields.io/badge/discord.py-5865F2?style=plastic&logo=discord&logoColor=white)
+![License](https://img.shields.io/badge/license-AGPL--v3-red?style=plastic)
+![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-brightgreen)
+
+*Made with 💖 by Nivin*
 </p>
