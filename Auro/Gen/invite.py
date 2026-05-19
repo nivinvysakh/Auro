@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ui import Button , View
 from util.emojis import Emojis
 
 class invite(commands.Cog):
@@ -11,17 +12,31 @@ class invite(commands.Cog):
         aliases=["link","add"],
         description="🔗 Get the official invite link"
     )
-    async def invite(self,ctx: commands.Context):
+    async def invite_cmd(self,ctx: commands.Context):
         embed = discord.Embed(
-            title=f"{Emojis.auro} Invite Auro to your Server ",
-            description=(
-                "[Invite Me](https://aurobot.netlify.app/)"
-            ),
-            color= discord.Color.blurple()
+            title=f"{Emojis.auro} Invite Auro to your Server",
+            description="Thank you for choosing Auro! Click the button below or the link to add the bot to your server.",
+            color= discord.Color.gold()
         )
-        embed.set_thumbnail(url=self.bot.user.avatar.url)
+        embed.add_field(
+            name="🔗 Direct Link",
+            value="[Click Here to Invite](https://aurobot.netlify.app/)",
+            inline= False
+        )
+        avatar_url = self.bot.user.avatar.url if self.bot.user.avatar else self.bot.user.default_avatar.url
+        embed.set_thumbnail(url=avatar_url)
+        embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=avatar_url)
+        
+        button = Button(
+            label="Invite Auro",
+            url="https://aurobot.netlify.app/",
+            emoji= "🔗"
+        )
+        view = View()
+        view.add_item(button)
+
         await ctx.reply(
-            embed=embed
+            embed=embed , view=view
         )
 
 async def setup(bot : commands.Bot):
