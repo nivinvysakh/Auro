@@ -547,7 +547,7 @@ class Music(commands.Cog):
                 )
             )
 
-        embed = discord.Embed(title=f"{Emojis.musicplaying} Current Queue", color=discord.Color.blue())
+        embed = discord.Embed(title=f"Current Queue {Emojis.musicplaying}", color=discord.Color.blue())
         if player.is_playing:
             embed.description = f"{Emojis.music_help} **Now Playing:** \n - {player.current.title}\n\n"
             if (player.current.title).startswith("Auro"):
@@ -559,7 +559,7 @@ class Music(commands.Cog):
         for i, t in enumerate(list(player.queue)[:10], 1):
             queue_text += f"{i}. {t.title}\n"
 
-        embed.add_field(name=f"{Emojis.asterisk} Up Next", value=queue_text or "No songs in queue.")
+        embed.add_field(name=f"{Emojis.asterisk} Up Next : ", value=queue_text or "No songs in queue.")
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(

@@ -306,11 +306,21 @@ class CustomPlaylists(commands.Cog):
                         pass
 
         if added_to_queue_count > 0:
-            embed = discord.Embed(
-                description=f"{Emojis.success} Added **{added_to_queue_count}** tracks from `{playlist_name}` into the player queue.",
-                color=discord.Color.green()
-            )
-            await ctx.send(embed=embed, delete_after=10)
+            if len(player.queue) > added_to_queue_count :
+                embed = discord.Embed(
+                    description=f"{Emojis.success} Added **{added_to_queue_count}** tracks from `{playlist_name}` at the end of the queue.",
+                    color= discord.Color.green()
+                )
+                await ctx.send(
+                    embed= embed,
+                    delete_after=10
+                )
+            else :
+                embed = discord.Embed(
+                    description=f"{Emojis.success} Added **{added_to_queue_count}** tracks from `{playlist_name}` into the player queue.",
+                    color=discord.Color.green()
+                )
+                await ctx.send(embed=embed, delete_after=10)
 
     @myplaylist.command(
         name="view", 
