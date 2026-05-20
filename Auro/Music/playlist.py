@@ -19,6 +19,7 @@ class PlaylistPagination(discord.ui.View):
         self.current_page = 0
         self.per_page = 5
         self.max_pages = (len(tracks) - 1) // self.per_page + 1
+        self.message: Optional[discord.Message] = None
 
     def get_page_embed(self) -> discord.Embed:
         start = self.current_page * self.per_page
@@ -31,7 +32,7 @@ class PlaylistPagination(discord.ui.View):
         )
         
         description = ""
-        for index, (track_hash, track_title) in enumerate(page_tracks, start=start + 1):
+        for index, (_, track_title) in enumerate(page_tracks, start=start + 1):
             description += f"`{index:02d}.` **{track_title}**\n"
             
         embed.description = description or "*This playlist is currently empty.*"
@@ -58,7 +59,8 @@ class PlaylistPagination(discord.ui.View):
             if isinstance(item, discord.ui.Button):
                 item.disabled = True
         try:
-            await self.message.edit(view=self)
+            if self.message:
+                await self.message.edit(view=self)
         except Exception:
             pass
 
@@ -84,69 +86,45 @@ class CustomPlaylists(commands.Cog):
         name="myplaylist", 
         description="📂 Manage your personal saved Auro playlists."
     )
-    @app_commands.describe(
-        playlist_name = "✨ The name of the Playlist."
-    )
     @commands.guild_only()
     async def myplaylist(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
-            await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} Invalid usage! Use `/myplaylist save`, `/myplaylist load`, `/myplaylist view`, or `/myplaylist list`.",
-                    color=discord.Color.yellow()
-                ), delete_after=5
+            embed = discord.Embed(
+                description=f"{Emojis.warning} **Invalid usage!** Use matching subcommands:\n"
+                            f"🎨 `/myplaylist save` • `/myplaylist load` • `/myplaylist view` • `/myplaylist list` • `/myplaylist delete`",
+                color=discord.Color.yellow()
             )
+            await ctx.reply(embed=embed, delete_after=7)
 
     @myplaylist.command(
         name="save", 
         description="💾 Save the currently playing song to a custom personal playlist."
     )
-    @app_commands.describe(
-        playlist_name = "✨ The name of the Playlist."
-    )
+    @app_commands.describe(playlist_name="✨ Name layout for your playlist target")
     async def save_track(self, ctx: commands.Context, playlist_name: str):
         if not ctx.author.voice:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} You must be connected to a voice channel to save tracks!",
-                    color=discord.Color.yellow()
-                ), delete_after=5
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} You must be connected to a voice channel to save tracks!", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
         
         player = cast(Player, ctx.voice_client)
         if not player or not player.current:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} Nothing is playing right now to save!",
-                    color=discord.Color.yellow()
-                ), delete_after=5
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} There is no music actively playing to save!", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
+            
         if player.current.is_stream:
-            embed = discord.Embed(
-                description=f"{Emojis.warning} Radio live streams cannot be saved to personal playlists!",
-                color=discord.Color.yellow()
-            )
-            return await ctx.reply(
-                embed=embed, ephemeral=True, delete_after=15
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} Radio live streams cannot be tracked inside personal lists!", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=10)
         
         track = player.current
         track_hash = getattr(track, "track_id", None) or track.info.get("track")
         
         if not track_hash:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.error} Failed to extract track data identifier.",
-                    color=discord.Color.red()
-                ), delete_after=5
-            )
+            embed = discord.Embed(description=f"{Emojis.error} Failed to parse safe system identifiers for track structure.", color=discord.Color.red())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
+            
         if not re.match(r"^[a-zA-Z0-9 ]+$", playlist_name):
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} Playlist names can only contain alphabetic letters and spaces!",
-                    color=discord.Color.yellow()
-                ), delete_after=5
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} Playlist names are locked to letters, digits, and standard spaces!", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
 
         raw_input_name = playlist_name.strip()
         normalized_input = raw_input_name.replace(" ", "").lower()
@@ -158,99 +136,73 @@ class CustomPlaylists(commands.Cog):
             escaped_existing = re.escape(existing_name.replace(" ", "").lower())
             if re.match(f"^{escaped_existing}$", normalized_input):
                 if existing_name.lower() != raw_input_name.lower():
-                    return await ctx.reply(
-                        embed=discord.Embed(
-                            description=f"{Emojis.warning} You already have a playlist named `{existing_name}`! Please use the exact name layout or choose a different one to avoid duplicates.",
-                            color=discord.Color.yellow()
-                        ), delete_after=10
-                    )
+                    embed = discord.Embed(description=f"{Emojis.warning} You already own a playlist called `{existing_name}`! Use that layout variant to expand it.", color=discord.Color.yellow())
+                    return await ctx.reply(embed=embed, ephemeral=True, delete_after=10)
 
         final_playlist_name = raw_input_name.lower()
         
         if final_playlist_name not in [n.lower() for n in existing_names] and len(user_playlists) >= 5:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} You have reached your limit of **5** personal playlists! Delete one before creating a new one.",
-                    color=discord.Color.yellow()
-                ), delete_after=10
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} Storage limit reached! You are limited to **5** playlists custom allocations.", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=10)
 
         count = await self.db.get_playlist_track_count(ctx.author.id, final_playlist_name)
         if count >= 30:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} Personal custom playlists are capped at 30 tracks max!",
-                    color=discord.Color.yellow()
-                ), delete_after=10
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} This playlist is locked! Custom collections max out at **30** tracks.", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=10)
 
         success = await self.db.add_to_playlist(ctx.author.id, final_playlist_name, track_hash, track.title)
-        
         if not success:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} **{track.title}** is already inside playlist `{final_playlist_name}`!",
-                    color=discord.Color.yellow()
-                ), delete_after=5
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} **{track.title}** is already inside your `{final_playlist_name}` folder!", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
 
         embed = discord.Embed(
-            description=f"{Emojis.success} Saved **{track.title}** into your personal playlist `{final_playlist_name}`!",
+            description=f"{Emojis.success} Appended **{track.title}** safely inside playlist folder `{final_playlist_name}`!",
             color=discord.Color.green()
         )
-        await ctx.reply(embed=embed, delete_after=10)
+        await ctx.reply(embed=embed)
 
     @myplaylist.command(
         name="load", 
         description="🎶 Load and play all songs from one of your personal playlists."
     )
-    @app_commands.describe(
-        playlist_name = "✨ The name of the Playlist."
-    )
+    @app_commands.describe(playlist_name="✨ Name of target playlist storage file")
     async def load_playlist(self, ctx: commands.Context, playlist_name: str):
         if not ctx.author.voice:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} You must be in a VC!",
-                    color=discord.Color.yellow()
-                ), delete_after=5
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} You must join a voice channel to run queue loads!", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
 
         if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"╮(￣ω￣;)╭ You're not in {ctx.voice_client.channel.mention if ctx.voice_client else 'my channel'}!",
-                    color=discord.Color.yellow()
-                )
-            )
+            embed = discord.Embed(description=f"╮(￣ω￣;)╭ You are not connected inside {ctx.voice_client.channel.mention} with me!", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True)
 
         music_cog = self.bot.get_cog("Music")
         if not music_cog:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.error} Music core engine not found.",
-                    color=discord.Color.red()
-                ), delete_after=5
-            )
+            embed = discord.Embed(description=f"{Emojis.error} Music runtime routing framework is dead or unavailable.", color=discord.Color.red())
+            return await ctx.reply(embed=embed, ephemeral=True)
+
+        
+        await ctx.defer(ephemeral=False)
 
         playlist_name = playlist_name.lower().strip()
         tracks = await self.db.get_user_playlist(ctx.author.id, playlist_name)
         
         if not tracks:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} No personal playlist found matching the name `{playlist_name}`!",
-                    color=discord.Color.yellow()
-                ), delete_after=10
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} Could not find any personal playlists registered as `{playlist_name}`!", color=discord.Color.yellow())
+            return await ctx.interaction.followup.send(embed=embed)
 
-        await ctx.reply(
-            embed=discord.Embed(
-                description=f"📂 Loading `{len(tracks)}` tracks from your personal layout `{playlist_name}`...",
-                color=discord.Color.blurple()
-            ), delete_after=10
+        embed_loading = discord.Embed(
+            description=f"📂 Compiling `{len(tracks)}` database tracks into queue from folder `{playlist_name}`...",
+            color=discord.Color.blurple()
         )
+        
+        
+        loading_msg = await ctx.interaction.followup.send(embed=embed_loading)
+        try:
+            await loading_msg.delete(delay=10)
+        except Exception:
+            pass
 
+        
         if not ctx.voice_client:
             player = await ctx.author.voice.channel.connect(cls=Player, self_deaf=True)
             await player.reset_filters(fast_apply=True)
@@ -262,26 +214,24 @@ class CustomPlaylists(commands.Cog):
 
         for track_hash, track_title in tracks:
             if player.queue.size >= 30:
-                await ctx.send(
-                    embed=discord.Embed(
-                        description="⚠️ *Queue capped out at 30 items. Remaining playlist skipped.*",
-                        color=discord.Color.orange()
-                    ), delete_after=10
-                )
+                embed_cap = discord.Embed(description="⚠️ *Active bot music queue capped at 30 items. Leftover sequence skipped.*", color=discord.Color.orange())
+                await ctx.channel.send(embed=embed_cap, delete_after=10)
                 break
                 
+            valid_track = None
             try:
                 valid_track = await player.build_track(track_hash)
             except Exception:
-                valid_track = None
+                pass
 
-            if not valid_track or not music_cog.is_valid(valid_track):
-                results = await music_cog.get_or_search_track(ctx, player, track_title, "search")
-                if results and not isinstance(results, pomice.Playlist):
-                    for t in results:
-                        if music_cog.is_valid(t):
-                            valid_track = t
-                            break
+            if not valid_track or not getattr(music_cog, 'is_valid', lambda t: True)(valid_track):
+                if hasattr(music_cog, 'get_or_search_track'):
+                    results = await music_cog.get_or_search_track(ctx, player, track_title, "search")
+                    if results and not isinstance(results, pomice.Playlist):
+                        for t in results:
+                            if getattr(music_cog, 'is_valid', lambda x: True)(t):
+                                valid_track = t
+                                break
 
             if valid_track:
                 valid_track.requester = ctx.author
@@ -292,7 +242,7 @@ class CustomPlaylists(commands.Cog):
                 else:
                     try:
                         await player.channel.edit(status=None)
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(0.5)
                     except Exception:
                         pass
                     
@@ -306,40 +256,25 @@ class CustomPlaylists(commands.Cog):
                         pass
 
         if added_to_queue_count > 0:
-            if len(player.queue) > added_to_queue_count :
-                embed = discord.Embed(
-                    description=f"{Emojis.success} Added **{added_to_queue_count}** tracks from `{playlist_name}` at the end of the queue.",
-                    color= discord.Color.green()
-                )
-                await ctx.send(
-                    embed= embed,
-                    delete_after=10
-                )
-            else :
-                embed = discord.Embed(
-                    description=f"{Emojis.success} Added **{added_to_queue_count}** tracks from `{playlist_name}` into the player queue.",
-                    color=discord.Color.green()
-                )
-                await ctx.send(embed=embed, delete_after=10)
+            desc = f"{Emojis.success} Injected **{added_to_queue_count}** playlist tracks into your streaming player!"
+            if len(player.queue) > added_to_queue_count:
+                desc = f"{Emojis.success} Appended **{added_to_queue_count}** tracks from storage library `{playlist_name}` to the end of the queue line."
+                
+            embed_done = discord.Embed(description=desc, color=discord.Color.green())
+            await ctx.channel.send(embed=embed_done, delete_after=10)
 
     @myplaylist.command(
         name="view", 
         description="👁️ View all the tracks saved inside one of your custom playlists."
     )
-    @app_commands.describe(
-        playlist_name = "✨ The name of the Playlist."
-    )
+    @app_commands.describe(playlist_name="✨ Match targeted configuration layout folder name")
     async def view_playlist(self, ctx: commands.Context, playlist_name: str):
         playlist_name = playlist_name.lower().strip()
         tracks = await self.db.get_user_playlist(ctx.author.id, playlist_name)
         
         if not tracks:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} No personal playlist found matching the name `{playlist_name}`!",
-                    color=discord.Color.yellow()
-                ), delete_after=10
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} Storage profile records are empty or no layout matches `{playlist_name}`!", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=10)
 
         pagination_view = PlaylistPagination(ctx.author, playlist_name, tracks)
         pagination_view.update_buttons()
@@ -358,12 +293,8 @@ class CustomPlaylists(commands.Cog):
         rows = await self.db.get_all_user_playlists(ctx.author.id)
 
         if not rows:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} You haven't created any custom playlists yet! Use `/myplaylist save [name]` to start one.",
-                    color=discord.Color.yellow()
-                ), delete_after=10
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} You haven't initialized storage data files yet! Use `/myplaylist save` to deploy one.", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=10)
 
         embed = discord.Embed(
             title=f"📋 Your Saved Playlists ({len(rows)}/5)",
@@ -373,8 +304,11 @@ class CustomPlaylists(commands.Cog):
         description = ""
         for index, row in enumerate(rows, start=1):
             name = row[0]
-            track_count = len(json.loads(row[1]))
-            description += f"`{index:02d}.` **{name.title()}** Layout — `{track_count}` track{'s' if track_count != 1 else ''}\n"
+            try:
+                track_count = len(json.loads(row[1]))
+            except Exception:
+                track_count = 0
+            description += f"`{index:02d}.` **{name.title()}** Folder — `{track_count}` track{'s' if track_count != 1 else ''}\n"
 
         embed.description = description
         embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
@@ -384,51 +318,39 @@ class CustomPlaylists(commands.Cog):
         name="delete", 
         description="❌ Delete a track or an entire personal playlist."
     )
-    @app_commands.describe(playlist_name="✨ The name of the Playlist.", song_num="🔢 Number of the song to remove (Leave empty to clear entire playlist).")
+    @app_commands.describe(playlist_name="✨ Target storage allocation folder block", song_num="🔢 Specific tracking number index row inside playlist (Blank clears entire list)")
     async def delete_playlist(self, ctx: commands.Context, playlist_name: str, song_num: Optional[int] = None):
         playlist_name = playlist_name.lower().strip()
         
         if song_num is None:
             deleted_count = await self.db.delete_entire_playlist(ctx.author.id, playlist_name)
             if deleted_count == 0:
-                return await ctx.reply(
-                    embed=discord.Embed(
-                        description=f"{Emojis.warning} No playlist found matching the name `{playlist_name}`!",
-                        color=discord.Color.yellow()
-                    ), delete_after=5
-                )
+                embed = discord.Embed(description=f"{Emojis.warning} No active folder system arrays were logged matching `{playlist_name}`!", color=discord.Color.yellow())
+                return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
             
             embed = discord.Embed(
-                description=f"{Emojis.success} Successfully deleted the entire playlist `{playlist_name}` (`{deleted_count}` tracks cleared).",
+                description=f"{Emojis.success} Dropped storage allocations for entire folder layout `{playlist_name}`! (`{deleted_count}` files scrubbed)",
                 color=discord.Color.blurple()
             )
-            return await ctx.reply(embed=embed, delete_after=10)
+            return await ctx.reply(embed=embed)
             
         tracks = await self.db.get_user_playlist(ctx.author.id, playlist_name)
         if not tracks:
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} No playlist found matching the name `{playlist_name}`!",
-                    color=discord.Color.yellow()
-                ), delete_after=5
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} Target library context configuration array mapping `{playlist_name}` returns empty records.", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
             
         if song_num < 1 or song_num > len(tracks):
-            return await ctx.reply(
-                embed=discord.Embed(
-                    description=f"{Emojis.warning} Invalid song number! Choose between 1 and {len(tracks)}.",
-                    color=discord.Color.yellow()
-                ), delete_after=5
-            )
+            embed = discord.Embed(description=f"{Emojis.warning} Out-of-bounds array input index string! Provide integers between 1 and {len(tracks)}.", color=discord.Color.yellow())
+            return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
             
         target_hash, target_title = tracks[song_num - 1]
         await self.db.delete_from_playlist(ctx.author.id, playlist_name, target_hash)
         
         embed = discord.Embed(
-            description=f"{Emojis.success} Removed **{target_title}** from your playlist `{playlist_name}`.",
+            description=f"{Emojis.success} Removed single item target **{target_title}** from your layout profile folder `{playlist_name}`.",
             color=discord.Color.blurple()
         )
-        await ctx.reply(embed=embed, delete_after=10)
+        await ctx.reply(embed=embed)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(CustomPlaylists(bot))
