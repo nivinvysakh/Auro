@@ -293,6 +293,7 @@ class Profile(commands.Cog):
         name="profile", description="🧔 View a user profile ", aliases=["pr"]
     )
     @app_commands.describe(user="✨ The user to view the profile of (optional)")
+    @commands.guild_only()
     async def profile(self, ctx: commands.Context, user: discord.User = None):
         target_user = user or ctx.author
         if target_user.bot:

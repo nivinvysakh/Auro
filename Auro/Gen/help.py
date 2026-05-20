@@ -44,6 +44,7 @@ class HelpLayoutView(ui.LayoutView):
                 f"{Emojis.dot} {Emojis.alien} **General Module**\n\n"
                 f"{Emojis.dot} {Emojis.music_help} **Music Module**\n\n"
                 f"{Emojis.dot} {Emojis.music} **Filters**\n\n"
+                f"{Emojis.dot} {Emojis.playlist} **Custom Playlists**\n\n"
                 f"{Emojis.dot} {Emojis.heart} **Contributors**\n\n"
             ))
             container.add_item(ui.Separator())
@@ -100,11 +101,22 @@ class HelpLayoutView(ui.LayoutView):
             ))
             container.add_item(ui.Separator())
             container.add_item(ui.TextDisplay(
-                f"## Custom Eq Setup {Emojis.heart} \n\n"
+                f"## Custom Eq Setup {Emojis.waves} \n\n"
                 f"{Emojis.dot} </seteq:1504378844516323371> — Manually tune the Auro Engine frequency bands.\n"
                 "\n"
                 "> Format: 'band:gain' (e.g., '0:0.25 1:0.15')\n\n"
                 f"{Emojis.dot} </eq_help:1504378844516323372> — Guide for the Auro Engine frequency bands.\n"
+            ))
+            container.add_item(ui.Separator())
+        elif page_name == "Custom Playlists":
+            container = self.create_base_container(discord.Color.dark_orange())
+            container.add_item(ui.TextDisplay(
+                f"## Custom Playlist {Emojis.playlist}\n"
+                "\n"
+                f"**{Emojis.dot} </myplaylist save:1506536337975676989>** — Save or add tracks to your personal database.\n"
+                f"**{Emojis.dot} </myplaylist load:1506536337975676989>** — Load a saved database playlist into the queue.\n"
+                f"**{Emojis.dot} </myplaylist delete:1506536337975676989>** — Permanently delete a saved database playlist.\n"
+                f"**{Emojis.dot} </myplaylist list:1506536337975676989>** — List all your saved database playlists."
             ))
             container.add_item(ui.Separator())
         elif page_name == "Contributors":
@@ -170,6 +182,7 @@ class ModuleSelector(ui.Select):
             discord.SelectOption(label="General", emoji=Emojis.alien, description="Utility and system commands"),
             discord.SelectOption(label="Music", emoji=Emojis.music_help, description="Audio engine and queue commands"),
             discord.SelectOption(label="Filters",emoji=Emojis.music,description="See the Filters."),
+            discord.SelectOption(label="Custom Playlists", emoji= Emojis.playlist, description="Personal database playlist management."),
             discord.SelectOption(label="Contributors",emoji=Emojis.heart, description="See the Contributors behind me")
         ]
         super().__init__(placeholder="Select a Cog to view info...", min_values=1, max_values=1, options=options)
