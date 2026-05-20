@@ -9,6 +9,26 @@ class Seek(commands.Cog):
     def __init__(self,bot: commands.Bot):
         self.bot = bot
     
+    def parse_time(self, time_str: str) -> int:
+        try:
+            if ":" in time_str:
+                parts = time_str.split(":")
+                if len(parts) == 2:
+                    minutes, seconds = map(int, parts)
+                    total_seconds = (minutes * 60) + seconds
+                elif len(parts) == 3:
+                    hours, minutes, seconds = map(int, parts)
+                    total_seconds = (hours * 3600) + (minutes * 60) + seconds
+            else:
+                total_seconds = int(time_str)
+            return total_seconds * 1000
+        except ValueError:
+            return -1
+    
+    def format_time(self, ms: int) -> str:
+        seconds = int((ms / 1000) % 60)
+        minutes = int((ms / (1000 * 60)) % 60)
+        return f"{minutes:02d}:{seconds:02d}"
     
     @commands.hybrid_command(
         name="seek", description="🌊 Jump to a specific time in the song"

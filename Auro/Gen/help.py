@@ -41,46 +41,70 @@ class HelpLayoutView(ui.LayoutView):
                 f"### Welcome to Auro {self.version}\n"
                 f"Crystal-clear audio, live synced lyrics, and cinematic filters.\n\n"
                 f"**Modules Available:**\n\n"
-                f"{Emojis.dot} {Emojis.alien} **General Module**\n"
-                f"{Emojis.dot} {Emojis.music_help} **Music Module**\n"
-                f"{Emojis.dot} {Emojis.heart} **Contributors**\n"
+                f"{Emojis.dot} {Emojis.alien} **General Module**\n\n"
+                f"{Emojis.dot} {Emojis.music_help} **Music Module**\n\n"
+                f"{Emojis.dot} {Emojis.music} **Filters**\n\n"
+                f"{Emojis.dot} {Emojis.heart} **Contributors**\n\n"
             ))
             container.add_item(ui.Separator())
 
         elif page_name == "General":
             container = self.create_base_container(discord.Color.purple())
             container.add_item(ui.TextDisplay(
-                f"## {Emojis.alien} General Module\n\n"
-                f"**{Emojis.dot} status** — View system latency\n"
-                f"**{Emojis.dot} profile** — User information card\n"
-                f"**{Emojis.dot} clearmsg** — Purge channel history\n"
-                f"**{Emojis.dot} contribute** — Support development\n"
-                f"**{Emojis.dot} pic** — Shows a user's profile picture.\n"
-                f"**{Emojis.dot} banner** — Shows a user's profile banner.\n"
-                f"**{Emojis.dot} clearbot** — Clean up all bot responses in the channel!\n"
-                f"**{Emojis.dot} help** — Show this menu"
+                f"## General Module {Emojis.alien}\n\n"
+                f"**{Emojis.dot} </stats:1496755644823502878>**  —  View system latency\n"
+                f"**{Emojis.dot} </profile:1504083683701952532>** — User information card\n"
+                f"**{Emojis.dot} </clearmsg:1489274898059890841>** — Purge channel history\n"
+                f"**{Emojis.dot} </contribute:1489268205171114186>** — Support development\n"
+                f"**{Emojis.dot} </pic:1505107143840366654>** — Shows a user's profile picture.\n"
+                f"**{Emojis.dot} </banner:1505107143840366655>** — Shows a user's profile banner.\n"
+                f"**{Emojis.dot} </clearbot:1489280571283607562>** — Clean up all bot responses in the channel!\n"
+                f"**{Emojis.dot} </help:1490758144677380168>** — Show this menu"
             ))
             container.add_item(ui.Separator())
 
         elif page_name == "Music":
             container = self.create_base_container(discord.Color.blurple())
             container.add_item(ui.TextDisplay(
-                f"## {Emojis.music_help} Music Module\n\n"
-                f"**{Emojis.dot} play** — Stream high-quality audio\n"
-                f"**{Emojis.dot} playfromstatus** — Play the music from your status or a friend's Spotify.\n"
-                f"**{Emojis.dot} lyrics** — Fetch real-time song text\n"
-                f"**{Emojis.dot} filters** — Audio enhancement toggles\n"
-                f"**{Emojis.dot} stop/skip** — Queue control\n"
-                f"**{Emojis.dot} loop/loopqueue** — Track/Queue repeat toggles\n"
-                f"**{Emojis.dot} Fix** — Hard-reset the Auro Engine\n"
-                f"**{Emojis.dot} Radio** — 24/7 high-quality streams\n"
-                f"**{Emojis.dot} track_details** — Get the details of currently playing song.\n"
-                f"**{Emojis.dot} queue_clr** — Wipe all tracks from the current Auro Engine queue.\n"
-                f"**{Emojis.dot} queue_pop** — Remove the last track added to the Auro Engine queue.\n"
-                f"**{Emojis.dot} queue_rmtrack** — Remove a specific track from the queue by its name.\n"
-                f"**{Emojis.dot} queue_move** — Move a track to a specific position in the queue.\n"
-                f"**{Emojis.dot} history** — View the last 10 tracks played in this session.\n"
-                f"**{Emojis.dot} save** — Sends the current song details to your DMs.\n"
+                f"## Music Module {Emojis.music_help} \n\n"
+                f"**{Emojis.dot} </play:1496755644823502881>** — Stream high-quality audio.\n"
+                f"**{Emojis.dot} </playfromstatus:1504089125098356736>** — Play the music from your status or a friend's Spotify.\n"
+                f"**{Emojis.dot} </lyrics:1502716663726866532>** — Fetch real-time song text.\n"
+                f"**{Emojis.dot} stop/skip** — Stops a song \\ Skips the currently playing song .\n"
+                f"**{Emojis.dot} loop/loopqueue** — Track/Queue repeat toggles.\n"
+                f"**{Emojis.dot} </fix:1498209884087521382>** — Hard-reset the Auro Engine.\n"
+                f"**{Emojis.dot} </radio:1499280588191043684>** — 24/7 high-quality streams.\n"
+                f"**{Emojis.dot} </track_details:1500544019070058506>** — Get the details of currently playing song.\n"
+                f"**{Emojis.dot} </queue_clr:1501553001641410672>** — Wipe all tracks from the current Auro Engine queue.\n"
+                f"**{Emojis.dot} </queue_pop:1501553001641410673>** — Remove the last track added to the Auro Engine queue.\n"
+                f"**{Emojis.dot} </queue_rmtrack:1501553001641410674>** — Remove a specific track from the queue by its name.\n"
+                f"**{Emojis.dot} </queue_move:1501553001641410676>** — Move a track to a specific position in the queue.\n"
+                f"**{Emojis.dot} </history:1503758516358217899>** — View the last 10 tracks played in this session.\n"
+                f"**{Emojis.dot} </save:1503758516358217900>** — Sends the current song details to your DMs.\n"
+            ))
+            container.add_item(ui.Separator())
+        elif page_name == "Filters":
+            container = self.create_base_container(discord.Color.dark_gold())
+            container.add_item(ui.TextDisplay(
+                f"## Filters {Emojis.music}\n"
+                "\n"
+                "> A list of Available Filters\n\n"
+                f"{Emojis.dot} </eq_bassboost:1504378844193230894> — Boost the bass frequencies.\n"
+                f"{Emojis.dot} </eq_dynamic:1497979624792260612> — Balanced punch and sparkle.\n"
+                f"{Emojis.dot} </eq_flat:1504378844193230895> — Flatten the equalizer settings.\n"
+                f"{Emojis.dot} </eq_metal:1504378844193230896> — Enhance the mid frequencies for a metal sound.\n"
+                f"{Emojis.dot} </eq_piano:1504378844193230897> — Enhance the high frequencies for a piano sound.\n"
+                f"{Emojis.dot} </eq_smooth:1497979624792260613> — Warm & relaxed: Reduces sharp treble for late-night vibes.\n"
+                f"{Emojis.dot} </eq_treble_boost:1504378844516323369> — Boost the high frequencies for extra sparkle.\n"
+                f"{Emojis.dot} </reset:1504378844516323370> — Clear all audio filters.\n"
+            ))
+            container.add_item(ui.Separator())
+            container.add_item(ui.TextDisplay(
+                f"## Custom Eq Setup {Emojis.heart} \n\n"
+                f"{Emojis.dot} </seteq:1504378844516323371> — Manually tune the Auro Engine frequency bands.\n"
+                "\n"
+                "> Format: 'band:gain' (e.g., '0:0.25 1:0.15')\n\n"
+                f"{Emojis.dot} </eq_help:1504378844516323372> — Guide for the Auro Engine frequency bands.\n"
             ))
             container.add_item(ui.Separator())
         elif page_name == "Contributors":
@@ -145,6 +169,7 @@ class ModuleSelector(ui.Select):
             discord.SelectOption(label="Home", emoji=ButtonEmojis.home, description="Go back to the overview"),
             discord.SelectOption(label="General", emoji=Emojis.alien, description="Utility and system commands"),
             discord.SelectOption(label="Music", emoji=Emojis.music_help, description="Audio engine and queue commands"),
+            discord.SelectOption(label="Filters",emoji=Emojis.music,description="See the Filters."),
             discord.SelectOption(label="Contributors",emoji=Emojis.heart, description="See the Contributors behind me")
         ]
         super().__init__(placeholder="Select a Cog to view info...", min_values=1, max_values=1, options=options)
