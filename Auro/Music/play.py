@@ -435,6 +435,7 @@ class Music(commands.Cog):
     @commands.hybrid_command(
         name="skip", description="⏭️ Skips the current song and plays the next one."
     )
+    @commands.guild_only()
     async def skip(self, ctx: commands.Context):
         player = cast(Player, ctx.voice_client)
         if not player or not player.is_playing:
@@ -473,6 +474,7 @@ class Music(commands.Cog):
     @commands.hybrid_command(
         name="stop", description=" ❌ Stops the music, clears the queue, and leaves."
     )
+    @commands.guild_only()
     async def stop(self, ctx:commands.Context):
         if not ctx.voice_client:
             return await ctx.reply(
@@ -513,6 +515,7 @@ class Music(commands.Cog):
     @commands.hybrid_command(
         name="queue", description="🎶 Shows the current song and upcoming tracks."
     )
+    @commands.guild_only()
     async def queue(self, ctx:commands.Context):
         player = cast(Player, ctx.voice_client)
         if not player:
@@ -547,7 +550,7 @@ class Music(commands.Cog):
                 )
             )
 
-        embed = discord.Embed(title=f"{Emojis.musicplaying} Current Queue", color=discord.Color.blue())
+        embed = discord.Embed(title=f"Current Queue {Emojis.musicplaying}", color=discord.Color.blue())
         if player.is_playing:
             embed.description = f"{Emojis.music_help} **Now Playing:** \n - {player.current.title}\n\n"
             if (player.current.title).startswith("Auro"):
@@ -559,7 +562,7 @@ class Music(commands.Cog):
         for i, t in enumerate(list(player.queue)[:10], 1):
             queue_text += f"{i}. {t.title}\n"
 
-        embed.add_field(name=f"{Emojis.asterisk} Up Next", value=queue_text or "No songs in queue.")
+        embed.add_field(name=f"{Emojis.asterisk} Up Next : ", value=queue_text or "No songs in queue.")
         await ctx.reply(embed=embed)
 
     @commands.hybrid_command(

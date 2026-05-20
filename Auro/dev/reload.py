@@ -47,7 +47,7 @@ class ReloadCog(commands.Cog):
             )
             embed.set_thumbnail(url=self.bot.user.avatar.url)
             embed.set_footer(text="Auro Core Infrastructure", icon_url=self.bot.user.avatar.url)
-            await ctx.reply(embed=embed,delete_after=10)
+            await ctx.reply(embed=embed,delete_after=3)
         except Exception as e:
             embed = discord.Embed(
                 title=f"{Emojis.error} Hot-Swap Failed",

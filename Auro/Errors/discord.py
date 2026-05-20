@@ -78,6 +78,14 @@ class ErrorHandler(commands.Cog):
                 color=discord.Color.red(),
             ).set_thumbnail(url=self.bot.user.display_avatar.url)
             await ctx.reply(embed=embed, delete_after=5)
+    
+        elif isinstance(error, commands.MissingPermissions):
+            embed = discord.Embed(
+                title=f"{Emojis.error} Missing Permissions",
+                description="You do not have the required permissions to run this command.",
+                color=discord.Color.red(),
+            ).set_thumbnail(url=self.bot.user.display_avatar.url)
+            await ctx.reply(embed=embed, delete_after=5)
 
         elif isinstance(error, (commands.CommandNotFound, commands.CheckFailure)):
             return
@@ -92,6 +100,7 @@ class ErrorHandler(commands.Cog):
             print(f"Text Error in command '{ctx.command}': {error}")
 
     # app_command Error Handel (app_command errors routes to on_app_command_error)
+    @commands.Cog.listener()
     async def on_app_command_error(
         self, interaction: discord.Interaction, error: app_commands.AppCommandError
     ):

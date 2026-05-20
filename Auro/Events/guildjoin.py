@@ -2,7 +2,6 @@ import discord
 from discord import ui
 from discord.ext import commands
 from util.emojis import Emojis, ButtonEmojis
-import asyncio
 
 class WelcomeLayout(ui.LayoutView):
     def __init__(self, bot:commands.Bot):
