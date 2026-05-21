@@ -1,9 +1,6 @@
 import discord
-import pomice
 from discord.ext import commands
 from util.emojis import Emojis
-from Auro.Music.play import Player
-from typing import cast
 
 class Stopvc(commands.Cog):
     def __init__(self,bot: commands.Bot):

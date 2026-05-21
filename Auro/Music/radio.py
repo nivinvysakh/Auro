@@ -15,10 +15,11 @@ class Radio(commands.Cog):
         }
 
     @app_commands.command(name="radio", description="📻 Tune into stable, 24/7 high-quality streams.")
+    @app_commands.guild_only()
     @app_commands.describe(genre="Pick your vibe")
     @app_commands.choices(genre=[
-        app_commands.Choice(name="🌙 Lofi Chills", value="lofi"),
-        app_commands.Choice(name="🚗 Synthwave Night", value="synthwave")
+        app_commands.Choice(name="Lofi Chills 🌙", value="lofi"),
+        app_commands.Choice(name="Synthwave Night 🚗", value="synthwave")
     ])
     async def radio(self, interaction: discord.Interaction, genre: app_commands.Choice[str]):
         lock = self.bot.get_cog("Stopvc")

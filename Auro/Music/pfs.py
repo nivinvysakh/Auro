@@ -16,6 +16,15 @@ class StatusPlay(commands.Cog):
     @discord.app_commands.describe(member="✨ The user whose Spotify you want to sync from")
     async def playfromstatus(self, ctx: commands.Context, member: Optional[discord.Member] = None):
         raw_target = member or ctx.author
+        if not ctx.author.voice or not ctx.author.voice.channel:
+            embed = discord.Embed(
+                description=(
+                    f"{Emojis.warning} "
+                    f"You must be connected to a voice channel!"
+                ),
+                color=discord.Color.yellow()
+            )
+            return await ctx.send(embed=embed , ephemeral=True , delete_after=5)
         
         if raw_target.bot:
             embed = discord.Embed(
@@ -49,7 +58,7 @@ class StatusPlay(commands.Cog):
                 description=f"{Emojis.error} Music Engine not found.",
                 color=discord.Color.red()
             )
-            await ctx.send(embed=embed, ephemeral=True)
+            await ctx.send(embed=embed, ephemeral=True , delete_after=10)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(StatusPlay(bot))

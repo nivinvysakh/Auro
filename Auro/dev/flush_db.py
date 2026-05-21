@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 from databases import MusicStorage, MusicCache
-
+from util.emojis import Emojis
 
 class Flush(commands.Cog):
     def __init__(self, bot:commands.Bot):
@@ -89,6 +89,49 @@ class Flush(commands.Cog):
                 color=discord.Color.orange(),
             )
             await ctx.send(embed=embed)
+
+    @commands.command(name="flushsong")
+    @commands.is_owner()
+    async def flush_song(self, ctx: commands.Context, *, song_name: str):
+        embed = discord.Embed(
+            title="🧹 Flush Target Song",
+            color=discord.Color.from_rgb(241, 196, 15)
+        )
+        embed.description = (
+            f"{Emojis.dot} **Target Query :** `{song_name}`\n\n"
+            f"*This will drop all database rows matching this track text name from storage.*\n"
+            f"Please type `confirm` within 15 seconds to proceed."
+        )
+        embed.set_footer(text="Auro Engine • Cache Manager", icon_url=self.bot.user.avatar.url)
+        await ctx.reply(embed=embed)
+
+        def check(m):
+            return m.author == ctx.author and m.content.lower() == "confirm" and m.channel == ctx.channel
+
+        try:
+            await self.bot.wait_for("message", check=check, timeout=15.0)
+            
+            storage_removed = await self.music_db.delete_by_title(song_name)
+
+            success_embed = discord.Embed(
+                title="⚡ Storage Eviction Complete",
+                color=discord.Color.from_rgb(46, 204, 113)
+            )
+            success_embed.description = (
+                f"{Emojis.dot} **Target Track :** `{song_name}`\n"
+                f"{Emojis.dot} **Storage Dropped :** `{storage_removed} rows`\n\n"
+                f"*The permanent database layer was re-indexed and optimized successfully.*"
+            )
+            success_embed.set_footer(text="Auro Engine • Cache Manager", icon_url=self.bot.user.avatar.url)
+            await ctx.reply(embed=success_embed)
+
+        except asyncio.TimeoutError:
+            timeout_embed = discord.Embed(
+                title="⏱️ Flush Timeout",
+                description=f"{Emojis.warning} Confirmation timed out. Operation canceled safely.",
+                color=discord.Color.orange()
+            )
+            await ctx.reply(timeout_embed)
 
     @commands.command(name="cachedump")
     @commands.is_owner()
