@@ -36,6 +36,7 @@ class Emojis:
     asterisk = "<:asterisk:1504357073096278047>"
     playlist = "<a:playlist:1506672591245545582>"
     waves = "<a:waves:1506676876368678962>"
+    refresh = "<:refresh:1507031219563663571>"
 
 
 class BadgesIcon:
