@@ -14,11 +14,12 @@ async def get_latest_version():
             return "v1.0.0"
 
 class HelpLayoutView(ui.LayoutView):
-    def __init__(self, bot: commands.Bot, author, version):
+    def __init__(self, bot: commands.Bot, author, version , prefix : str):
         super().__init__(timeout=300) 
         self.bot = bot
         self.author = author
         self.version = version
+        self.prefix = prefix
         self.bot_icon = bot.user.display_avatar.url
         self.message = None 
         self.show_page("Home")
@@ -26,7 +27,7 @@ class HelpLayoutView(ui.LayoutView):
     def create_base_container(self, color):
         container = ui.Container(accent_color=color)
         container.add_item(ui.Section(
-            ui.TextDisplay(f"# Auro 🌛 \n*A high-fidelity music engine for Discord.*\n > This menu Expires in 5 Minutes."),
+            ui.TextDisplay(f"# Auro 🌛 \n*A high-fidelity music engine for Discord.*\n > This menu Expires in 5 Minutes. • Server Prefix: `{self.prefix}`"),
             accessory=ui.Thumbnail(self.bot_icon)
         ))
         container.add_item(ui.Separator())
@@ -200,7 +201,10 @@ class Help(commands.Cog):
     @commands.guild_only()
     async def help(self, ctx: commands.Context):
         version = await get_latest_version()
-        view = HelpLayoutView(self.bot, ctx.author, version)
+        current_prefix = "a!"
+        if ctx.guild and hasattr(self.bot, "settings_db"):
+            current_prefix = self.bot.settings_db.get_prefix(ctx.guild.id)
+        view = HelpLayoutView(self.bot, ctx.author, version , current_prefix)
         view.message = await ctx.reply(content=None, view=view)
 
 async def setup(bot):

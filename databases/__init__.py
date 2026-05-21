@@ -1,11 +1,13 @@
 from .badges import BadgesDatabase
 from .music_cache import MusicCache
 from .music_storage import MusicStorage
-
+from .prefix import SettingsStorage
 badges = BadgesDatabase()
 music_cache = MusicCache()
 music_storage = MusicStorage()
+prefix = SettingsStorage()
 init_db_list = [
+    ("PrefixDb", prefix),
     ("badgesDB", badges),
     ("musicCacheDB", music_cache),
     ("Music_Bash_System", music_storage),
