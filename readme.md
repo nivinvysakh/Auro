@@ -1,3 +1,8 @@
+> [!NOTE]
+> **Documentation Branch**: This branch is dedicated strictly to documentation updates (`.md`, `.txt`, etc.).
+> 
+> For forking or contributing code, please switch to the `Main` branch.
+
 # Auro 🌙
 
 <img align="right" src="/img/auro.svg" width=200 alt="Auro Bot Icon"/>
