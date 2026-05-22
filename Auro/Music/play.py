@@ -194,6 +194,7 @@ class Music(commands.Cog):
             view = NowPlayingView(self.bot, player, track, self.format_time)
             msg = await player.controller.send(embed=embed,view=view)
             view.message = msg
+            player.current_view = view
             try:
                 await msg.add_reaction("💝")
             except discord.HTTPException:
@@ -201,6 +202,10 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_pomice_track_end(self, player: Player, track, reason):
+        if hasattr(player, "current_view") and player.current_view:
+            await player.current_view.disable_all_buttons()
+            player.current_view = None
+            
         if str(reason).upper() == "REPLACED":
             return
         if str(reason).upper() == "load_failed":
