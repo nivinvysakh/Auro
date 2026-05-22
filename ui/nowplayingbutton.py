@@ -1,53 +1,73 @@
 import discord
 import pomice
 import aiohttp
-from util.emojis import Emojis , PlayerEmojis
+from util.emojis import Emojis, PlayerEmojis
 
-class VolumeModel(discord.ui.Modal , title="Adjust Volume"):
+class VolumeModel(discord.ui.Modal, title="Adjust Volume"):
     volume_input = discord.ui.TextInput(
         label="Enter Volume Percentage (0-100)",
         placeholder="eg, 80",
         min_length=1,
-        max_length=100,
+        max_length=3,
         required=True
     )
-    def __init__(self,player : pomice.Player):
+    
+    def __init__(self, player: pomice.Player):
         super().__init__()
         self.player = player
     
-    async def on_submit(self, interaction : discord.Interaction):
+    async def on_submit(self, interaction: discord.Interaction):
         if not self.player.channel or not interaction.user.voice or interaction.user.voice.channel != self.player.channel:
-           return await interaction.response.send_message(
-               f"{Emojis.warning} You must be in my voice channel to adjust the volume.",
-               ephemeral=True
-           ) 
+            return await interaction.response.send_message(
+                f"{Emojis.warning} You must be in my voice channel to adjust the volume.",
+                ephemeral=True
+            ) 
+            
         value = self.volume_input.value.strip()
         if not value.isdigit():
             return await interaction.response.send_message(
                 f"{Emojis.warning} Please enter a valid number.",
                 ephemeral=True
             )
+            
         volume = int(value)
         if volume < 0 or volume > 100:
             return await interaction.response.send_message(
                 f"{Emojis.warning} Volume must be between 0 and 100",
                 ephemeral=True
             )
+            
         await self.player.set_volume(volume)
         await interaction.response.send_message(
-            f"{Emojis.success} Volume adjusted to **{volume}** by {interaction.user.mention}",
+            f"{Emojis.success} Volume adjusted to **{volume}%** by {interaction.user.mention}",
             delete_after=10
         )
 
+    async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
+        try:
+            await interaction.response.send_message(f"{Emojis.warning} An error occurred parsing that volume value.", ephemeral=True)
+        except:
+            pass
+
 
 class NowPlayingView(discord.ui.View):
-    def __init__(self, bot: discord.Client, player : pomice.Player, track: pomice.Track, format_time_func):
-        super().__init__(timeout=track.length / 1000) 
+    def __init__(self, bot: discord.Client, player: pomice.Player, track: pomice.Track, format_time_func):
+        super().__init__(timeout=None) 
         self.bot = bot
         self.player = player
         self.track = track
         self.format_time = format_time_func
         self.message = None
+
+    async def disable_all_buttons(self):
+        for item in self.children:
+            if isinstance(item, discord.ui.Button):
+                item.disabled = True
+        if self.message:
+            try:
+                await self.message.edit(view=self)
+            except (discord.HTTPException, aiohttp.ClientError):
+                pass
 
     async def check_voice_state(self, interaction: discord.Interaction, button: discord.ui.Button) -> bool:
         if not self.player.channel:
@@ -232,11 +252,4 @@ class NowPlayingView(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=self)
 
     async def on_timeout(self):
-        if self.message:
-            for item in self.children:
-                if isinstance(item, discord.ui.Button):
-                    item.disabled = True
-            try:
-                await self.message.edit(view=self)
-            except (discord.HTTPException, aiohttp.ClientError):
-                pass
+        await self.disable_all_buttons()
