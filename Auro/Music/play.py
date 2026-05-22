@@ -202,9 +202,10 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_pomice_track_end(self, player: Player, track, reason):
-        if hasattr(player, "current_view") and player.current_view:
-            await player.current_view.disable_all_buttons()
-            player.current_view = None
+        if not player.loop and  not player.loop_queue:
+            if hasattr(player, "current_view") and player.current_view:
+                await player.current_view.disable_all_buttons()
+                player.current_view = None
             
         if str(reason).upper() == "REPLACED":
             return

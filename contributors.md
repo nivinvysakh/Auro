@@ -16,7 +16,7 @@
 &nbsp;
 
 | Github Username | Discord User ID | Date of First Contribution | Type of Contribution|
-|-----------------|-----------------|----------------------------|---------------------|
+|:---|:---|:---|:---|
 | [Eclipse](https://github.com/thatsoeclipse)|`957196694393614367`| 26-3-2026| `Main`|
 | [Nivin](https://github.com/ilynivin)| *Null* | 26-3-2026| `Main`|
 
@@ -26,7 +26,7 @@
 &nbsp;
 
 | Discord Username | Date of First Bug Report | Type of Bug Reported|
-|------------------|--------------------------|---------------------|
+|:--- |:--- |:---|
 | *flying_at_mach2*| 21-4-2026| `Karoke_Bug` (Discontinued Feature.)|
 
 &nbsp;
@@ -37,7 +37,7 @@
 &nbsp;
 
 | Discord Username | Date of Joining Beta Testing |
-|------------------|-----------------------------|
+|:---|:---|
 | *flying_at_mach2*| `21-4-2026`|
 | *emi62958* | `18-4-2026`|
 | *theogalileo1* | `17-4-2026`|
