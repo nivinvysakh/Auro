@@ -151,7 +151,9 @@ class ErrorHandler(commands.Cog):
                 try :
                     if not interaction.response.is_done():
                         await interaction.response.send_message(embed=embed, ephemeral=True)
-                except discord.HTTPException:
+                    if interaction.message:
+                        await interaction.message.delete()
+                except (discord.HTTPException , discord.Forbidden):
                     pass
 
 

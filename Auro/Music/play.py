@@ -51,6 +51,7 @@ class Player(pomice.Player):
         self.controller = None
         self.loop = False
         self.loop_queue = False
+        self.loading = False
 
     async def do_next(self):
         if self.queue.is_empty:
@@ -321,6 +322,7 @@ class Music(commands.Cog):
             await player.reset_filters(fast_apply=True)
         else:
             player = cast(Player, ctx.voice_client)
+            
         if player.current and player.current.is_stream:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -346,99 +348,101 @@ class Music(commands.Cog):
                 try :
                     await player.channel.edit(
                         bitrate=max_bit,
-                        reason="Auro Audio Optimization"
-
+                        reason="Auro Optimization"
                     )
                 except Exception :
                     pass
+                    
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
         search = search.strip()
 
-        if "open.spotify.com" in search:
-            try:
-                request = sp.track(search)
-            except spotipy.exceptions.SpotifyException:
-                await ctx.reply(
-                    embed=discord.Embed(
-                        description=f"{Emojis.warning} Invalid Spotify track URL. Make sure it's a Track link, not a playlist or album.",
-                        color=discord.Color.yellow()
+        
+        player.loading = True
+
+        try:
+            if "open.spotify.com" in search:
+                try:
+                    request = sp.track(search)
+                except spotipy.exceptions.SpotifyException:
+                    await ctx.reply(
+                        embed=discord.Embed(
+                            description=f"{Emojis.warning} Invalid Spotify track URL. Make sure it's a Track link, not a playlist or album.",
+                            color=discord.Color.yellow()
+                        )
+                    )
+                    return
+                except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
+                    return await ctx.reply(
+                        embed=discord.Embed(
+                            title=f"{Emojis.warning} **Connection Error**",
+                            description="Spotify took too long to respond. Please try again in a moment!",
+                            color= discord.Color.yellow()
+                        ) , delete_after=15
+                    )
+                query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
+                results = await self.get_or_search_track(ctx, player, query, "spotify")
+
+            elif search.startswith(("http", "www")):
+                results = await self.get_or_search_track(ctx, player, search, "url")
+            else:
+                results = await self.get_or_search_track(ctx, player, search, "search")
+                
+            if isinstance(results, pomice.Playlist):
+                await player.destroy()
+                not_supported = discord.Embed(
+                    title=f"{Emojis.warning} Playlist Not Supported",
+                    color=discord.Color.orange()
+                )
+                not_supported.add_field(
+                    name="What happened?",
+                    value="Auro doesn't support playlists yet.",
+                    inline= False
+                )
+                not_supported.add_field(
+                    name="What you can do",
+                    value=(
+                        f"{Emojis.dot} Use a **single track link**\n"
+                        f"{Emojis.dot} Or search for a song name"
                     )
                 )
+                not_supported.set_footer(
+                        text="Auro Music • Single tracks only",
+                        icon_url=self.bot.user.display_avatar.url)
+                return await ctx.reply(embed=not_supported, delete_after=20)
+                
+            valid_track = None
+            for t in results:
+                if self.is_valid(t):
+                    valid_track = t
+                    break
+
+            if not valid_track:
                 return
-            except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
-                return await ctx.reply(
-                    embed=discord.Embed(
-                        title=f"{Emojis.warning} **Connection Error**",
-                        description="Spotify took too long to respond. Please try again in a moment!",
-                        color= discord.Color.yellow()
-                    ) , delete_after=15
-                )
-            query = f"{request['name']} {', '.join([a['name'] for a in request['artists']])}"
-            results = await self.get_or_search_track(ctx,player, query, "spotify")
 
-        elif search.startswith(("http", "www")):
-            results = await self.get_or_search_track(ctx,player, search, "url")
-        else:
-            results = await self.get_or_search_track(ctx,player, search, "search")
-        if isinstance(results, pomice.Playlist):
-            await player.destroy()
-            not_supported = discord.Embed(
-                title=f"{Emojis.warning} Playlist Not Supported",
-                color=discord.Color.orange()
-            )
-            not_supported.add_field(
-                name="What happened?",
-                value="Auro doesn't support playlists yet.",
-                inline= False
-            )
-            not_supported.add_field(
-                name="What you can do",
-                value=(
-                    f"{Emojis.dot} Use a **single track link**\n"
-                    f"{Emojis.dot} Or search for a song name"
-                )
-            )
-            not_supported.add_field(
-                name="Examples",
-                value=(
-                    "`a!play blinding lights`\n"
-                    "`a!play https://youtu.be/...`"
-                ),
-                inline=False
-            )
-            not_supported.set_footer(
-                    text="Auro Music • Single tracks only",
-                    icon_url=self.bot.user.display_avatar.url)
-            return await ctx.reply(
-                embed=not_supported,
-                delete_after=20
-            )
-        valid_track = None
-        for t in results:
-            if self.is_valid(t):
-                valid_track = t
-                break
+            valid_track.requester = ctx.author
+            
+            
+            if player.is_playing or player.queue.size > 0:
+                player.queue.put(valid_track)
+                await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**", delete_after=10)
+            else:
+                try:
+                    await player.channel.edit(status=None)
+                    await asyncio.sleep(0.5) 
+                except Exception :
+                    pass
+                    
+                await player.play(valid_track)
+                try:
+                    await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
+                except:
+                    pass
+                await ctx.send(f"{Emojis.success} Playing: **{valid_track.title}**", delete_after=5)
 
-        if not valid_track:
-            return
-        valid_track.requester = ctx.author
-        if player.is_playing:
-            player.queue.put(valid_track)
-            await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**",delete_after=10)
-        else:
-            try:
-                await player.channel.edit(status=None)
-                await asyncio.sleep(5)
-            except Exception :
-                pass
-            await player.play(valid_track)
-            try:
-                await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
-            except:
-                pass
-            await ctx.send(f"{Emojis.success} Playing: **{valid_track.title}**",delete_after=5)
+        finally: 
+            player.loading = False
 
     @commands.hybrid_command(
         name="skip", description="⏭️ Skips the current song and plays the next one."
