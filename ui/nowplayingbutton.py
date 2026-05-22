@@ -41,7 +41,7 @@ class VolumeModel(discord.ui.Modal , title="Adjust Volume"):
 
 
 class NowPlayingView(discord.ui.View):
-    def __init__(self, bot: discord.Client, player, track: pomice.Track, format_time_func):
+    def __init__(self, bot: discord.Client, player : pomice.Player, track: pomice.Track, format_time_func):
         super().__init__(timeout=track.length / 1000) 
         self.bot = bot
         self.player = player
