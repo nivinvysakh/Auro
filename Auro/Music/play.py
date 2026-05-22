@@ -25,6 +25,7 @@ from pathlib import Path
 from Auro.Errors.db_bash import TrackHealer
 from ui.selections import TrackSelectionView
 from collections import deque
+from ui.nowplayingbutton import NowPlayingView
 
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
@@ -190,8 +191,9 @@ class Music(commands.Cog):
                 embed.add_field(
                     name=f"{Emojis.star_animate} Requested by", value=f"\n{track.requester.mention}", inline=False
                 )
-
-            msg = await player.controller.send(embed=embed)
+            view = NowPlayingView(self.bot, player, track, self.format_time)
+            msg = await player.controller.send(embed=embed,view=view)
+            view.message = msg
             try:
                 await msg.add_reaction("💝")
             except discord.HTTPException:

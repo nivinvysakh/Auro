@@ -36,8 +36,14 @@ class Emojis:
     asterisk = "<:asterisk:1504357073096278047>"
     playlist = "<a:playlist:1506672591245545582>"
     waves = "<a:waves:1506676876368678962>"
-    refresh = "<:refresh:1507031219563663571>"
 
+class PlayerEmojis:
+    pause = "<:pause:1507069686729150616>"
+    play = "<:play:1507069763170336878>"
+    skip = "<:skip:1507070192818061352>"
+    stop = "<:stop:1507070302742646834>"
+    refresh = "<:refresh:1507070445776801993>"
+    volume = "<:volume:1507251008181637130>"
 
 class BadgesIcon:
     developer = "<:developer:1486698723852681317>"
