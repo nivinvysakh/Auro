@@ -156,7 +156,8 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_pomice_track_start(self, player: Player, track: pomice.Track):
-
+        if not player.loop or player.loop_queue:
+            player.history.append(track)
         if isinstance(player.channel, discord.StageChannel):
             try:
                 await asyncio.sleep(1)
@@ -170,7 +171,6 @@ class Music(commands.Cog):
             return
         source = track.info.get("sourceName", "Unknown").capitalize()
         if player.controller:
-            player.history.append(track.title)
             embed = (
                 discord.Embed(
                     title=f"**Now Playing** {Emojis.musicplaying}",

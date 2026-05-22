@@ -52,6 +52,16 @@ class SkipQueue(commands.Cog):
                 ),
                 delete_after=10
             )
+        if queue_size < 3 :
+            embed = discord.Embed(
+                description=f"{Emojis.warning} The queue is too short! Use `a!skip` instead for small queues.",
+                color= discord.Color.yellow()
+            )
+            return await ctx.reply(
+                embed=embed,
+                delete_after=15,
+                ephemeral=True
+            )
         
         tracks_to_remove = index - 1
 
