@@ -2,6 +2,7 @@ import discord
 import pomice
 import aiohttp
 from util.emojis import Emojis, PlayerEmojis
+from util.titlefilter import clean_track_title
 
 class VolumeModel(discord.ui.Modal, title="Adjust Volume"):
     volume_input = discord.ui.TextInput(
@@ -87,7 +88,15 @@ class NowPlayingView(discord.ui.View):
             )
             return False
 
+        
+        if self.player.loop or self.player.loop_queue:
+            return True
+
+        
         if not self.player.is_playing or not self.player.current or self.player.current != self.track:
+            if hasattr(self.player, "current_view") and self.player.current_view == self:
+                return True
+
             for child in self.children:
                 if isinstance(child, discord.ui.Button):
                     child.disabled = True
@@ -99,7 +108,7 @@ class NowPlayingView(discord.ui.View):
             
         return True
 
-    @discord.ui.button(emoji=PlayerEmojis.play, style=discord.ButtonStyle.secondary)
+    @discord.ui.button(emoji=PlayerEmojis.play, style=discord.ButtonStyle.secondary, row=0)
     async def resume_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await self.check_voice_state(interaction, button):
             return
@@ -120,7 +129,7 @@ class NowPlayingView(discord.ui.View):
             f"{Emojis.success} **Resumed** by {interaction.user.mention}", delete_after=5
         )
 
-    @discord.ui.button(emoji=PlayerEmojis.pause, style=discord.ButtonStyle.secondary)
+    @discord.ui.button(emoji=PlayerEmojis.pause, style=discord.ButtonStyle.secondary, row=0)
     async def pause_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await self.check_voice_state(interaction, button):
             return
@@ -136,7 +145,7 @@ class NowPlayingView(discord.ui.View):
             f"{Emojis.success} **Paused** by {interaction.user.mention}", delete_after=5
         )
 
-    @discord.ui.button(emoji=PlayerEmojis.skip, style=discord.ButtonStyle.secondary)
+    @discord.ui.button(emoji=PlayerEmojis.skip, style=discord.ButtonStyle.secondary, row=0)
     async def skip_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await self.check_voice_state(interaction, button):
             return
@@ -162,7 +171,7 @@ class NowPlayingView(discord.ui.View):
             f"{Emojis.success} **Skipped:** {current_title}", delete_after=5
         )
 
-    @discord.ui.button(emoji=PlayerEmojis.volume, style=discord.ButtonStyle.secondary)
+    @discord.ui.button(emoji=PlayerEmojis.volume, style=discord.ButtonStyle.secondary, row=0)
     async def volume_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not self.player.channel:
             button.disabled = True
@@ -181,7 +190,7 @@ class NowPlayingView(discord.ui.View):
 
         await interaction.response.send_modal(VolumeModel(self.player))
 
-    @discord.ui.button(emoji=PlayerEmojis.stop, style=discord.ButtonStyle.danger)
+    @discord.ui.button(emoji=PlayerEmojis.stop, style=discord.ButtonStyle.danger, row=0)
     async def stop_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not self.player.channel:
             button.disabled = True
@@ -192,7 +201,8 @@ class NowPlayingView(discord.ui.View):
             return await interaction.followup.send(
                 f"{Emojis.warning} I am not connected to any voice channel.", ephemeral=True
             )
-
+        await interaction.response.defer()
+        await self.disable_all_buttons()
         if not interaction.user.voice or interaction.user.voice.channel != self.player.channel:
             return await interaction.response.send_message(
                 f"{Emojis.warning} You must be in my voice channel to use this button.", ephemeral=True
@@ -217,19 +227,27 @@ class NowPlayingView(discord.ui.View):
             text="Auro Engine • Offline", icon_url=self.bot.user.display_avatar.url
         )
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-    @discord.ui.button(emoji=PlayerEmojis.refresh, style=discord.ButtonStyle.secondary)
+    @discord.ui.button(emoji=PlayerEmojis.refresh, style=discord.ButtonStyle.secondary, row=1)
     async def refresh_position(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await self.check_voice_state(interaction, button):
             return
        
-        source = self.track.info.get("sourceName", "Unknown").capitalize()
         
+        if self.player.loop or self.player.loop_queue:
+            
+            return await interaction.response.send_message(
+                f"{Emojis.warning} Tracking position updates is disabled while loops are active.",
+                ephemeral=True
+            )
+
+        source = self.track.info.get("sourceName", "Unknown").capitalize()
+        clean_title = clean_track_title(self.track.title)
         embed = discord.Embed(
             title=f"**Now Playing** {Emojis.musicplaying}",
             description=(
-                f"{Emojis.dot}  **Title** :  **{self.track.title}** \n"
+                f"{Emojis.dot}  **Title** :  **{clean_title}** \n"
                 f"{Emojis.dot}  **Author** : *{self.track.author}* \n"
                 f"{Emojis.dot}  **Position** : `{self.format_time(self.player.position)}` \\ `{self.format_time(self.track.length)}` \n"
                 f"{Emojis.dot}  **Link** : [Watch Video]({self.track.uri})\n"
@@ -237,7 +255,7 @@ class NowPlayingView(discord.ui.View):
             color=discord.Color.green(),
         )
         
-        embed.set_thumbnail(url=self.player.current.thumbnail)
+        embed.set_thumbnail(url=self.player.current.thumbnail if self.player.current else self.track.thumbnail)
         embed.set_footer(
             text=f"Auro Engine  |  {source}", icon_url=self.bot.user.avatar.url
         )
