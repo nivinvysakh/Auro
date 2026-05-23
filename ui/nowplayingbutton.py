@@ -2,6 +2,7 @@ import discord
 import pomice
 import aiohttp
 from util.emojis import Emojis, PlayerEmojis
+from util.titlefilter import clean_track_title
 
 class VolumeModel(discord.ui.Modal, title="Adjust Volume"):
     volume_input = discord.ui.TextInput(
@@ -200,7 +201,8 @@ class NowPlayingView(discord.ui.View):
             return await interaction.followup.send(
                 f"{Emojis.warning} I am not connected to any voice channel.", ephemeral=True
             )
-
+        await interaction.response.defer()
+        await self.disable_all_buttons()
         if not interaction.user.voice or interaction.user.voice.channel != self.player.channel:
             return await interaction.response.send_message(
                 f"{Emojis.warning} You must be in my voice channel to use this button.", ephemeral=True
@@ -225,7 +227,7 @@ class NowPlayingView(discord.ui.View):
             text="Auro Engine • Offline", icon_url=self.bot.user.display_avatar.url
         )
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
 
     @discord.ui.button(emoji=PlayerEmojis.refresh, style=discord.ButtonStyle.secondary, row=1)
     async def refresh_position(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -234,19 +236,18 @@ class NowPlayingView(discord.ui.View):
        
         
         if self.player.loop or self.player.loop_queue:
-            button.disabled = True
-            await interaction.response.edit_message(view=self)
-            return await interaction.followup.send(
+            
+            return await interaction.response.send_message(
                 f"{Emojis.warning} Tracking position updates is disabled while loops are active.",
                 ephemeral=True
             )
 
         source = self.track.info.get("sourceName", "Unknown").capitalize()
-        
+        clean_title = clean_track_title(self.track.title)
         embed = discord.Embed(
             title=f"**Now Playing** {Emojis.musicplaying}",
             description=(
-                f"{Emojis.dot}  **Title** :  **{self.track.title}** \n"
+                f"{Emojis.dot}  **Title** :  **{clean_title}** \n"
                 f"{Emojis.dot}  **Author** : *{self.track.author}* \n"
                 f"{Emojis.dot}  **Position** : `{self.format_time(self.player.position)}` \\ `{self.format_time(self.track.length)}` \n"
                 f"{Emojis.dot}  **Link** : [Watch Video]({self.track.uri})\n"

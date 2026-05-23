@@ -1,3 +1,6 @@
+class Roleids:
+    admin = 1495113086259167262
+
 class Emojis:
     color = 2829616
     auro = "<:botico:1489908738323120260>"

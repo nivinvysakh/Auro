@@ -1,10 +1,24 @@
 import discord
 from discord.ext import commands
-auth_users = [957196694393614367,1464578808202919998]
-def is_auth():
+from util.emojis import Roleids
+
+def is_owner_or_has_admin():
     async def predicate(ctx: commands.Context):
-        is_owner = await ctx.bot.is_owner(ctx.author)
-        return is_owner or ctx.author.id in auth_users
+        
+        
+        if await ctx.bot.is_owner(ctx.author):
+            return True
+        
+        
+        
+        if ctx.guild:
+            user_role_ids = [role.id for role in ctx.author.roles]
+            if Roleids.admin in user_role_ids:
+                return True
+                
+        
+        
+        raise commands.MissingAnyRole([Roleids.admin])
     return commands.check(predicate)
 class Rules_send(commands.Cog):
     def __init__(self,bot: commands.Bot):
@@ -13,7 +27,7 @@ class Rules_send(commands.Cog):
     @commands.command(
         name="send_rules"
     )
-    @is_auth()
+    @is_owner_or_has_admin()
     @commands.cooldown(2,40, commands.BucketType.guild)
     @commands.guild_only()
     async def send_rules(self,ctx:commands.Context):
@@ -127,7 +141,10 @@ class Rules_send(commands.Cog):
         embed.set_image(url=bot_user.banner.url)
         await ctx.send(embed=embed)
 
-
+    @send_rules.before_invoke
+    async def reset_cooldown_for_owner(self, ctx: commands.Context):
+        if await self.bot.is_owner(ctx.author):
+            ctx.command.reset_cooldown(ctx)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Rules_send(bot))

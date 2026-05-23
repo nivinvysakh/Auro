@@ -16,6 +16,7 @@ import spotipy
 import os
 import requests
 from util.emojis import Emojis
+from util.titlefilter import clean_track_title
 from discord import app_commands
 from typing import cast
 from spotipy import SpotifyClientCredentials
@@ -171,11 +172,12 @@ class Music(commands.Cog):
             return
         source = track.info.get("sourceName", "Unknown").capitalize()
         if player.controller:
+            clean_title = clean_track_title(track.title,max_chars=35)
             embed = (
                 discord.Embed(
                     title=f"**Now Playing** {Emojis.musicplaying}",
                     description=(
-                        f"{Emojis.dot}  **Title** :  **{track.title}** \n"
+                        f"{Emojis.dot}  **Title** :  **{clean_title}** \n"
                         f"{Emojis.dot}  **Author** : *{track.author}* \n"
                         f"{Emojis.dot}  **Position** : `{self.format_time(track.position)}` \\ `{self.format_time(track.length)}` \n"
                         f"{Emojis.dot}   **Link** : [Watch Video]({track.uri})\n"
