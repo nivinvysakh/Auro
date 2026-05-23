@@ -4,7 +4,7 @@ import os
 import discord
 from discord.ext import commands
 import pomice
-from util.emojis import Emojis
+from databases.prefix import SettingsStorage
 
 # --- Lavalink Core Node Configuration ---
 LAVALINK_HOST = "127.0.0.1"
@@ -13,14 +13,21 @@ LAVALINK_PASSWORD = "youshallnotpass"
 LAVALINK_SECURE = False
 LAVALINK_IDENTIFIER = "Auro"
 
+# --- Server Prefix async Function ---
+async def get_prefix(bot : commands.AutoShardedBot, message : discord.Message):
+    if not message.guild:
+        return "a!"
+    custom_prefix = bot.settings_db.get_prefix(message.guild.id)
+    return commands.when_mentioned_or(custom_prefix)(bot, message)
 
+# --- Bot Class Initialization --- 
 class Auro(commands.AutoShardedBot):
 
     def __init__(self):
         intents = discord.Intents.all()
-        self.black_list = []
+        self.settings_db: SettingsStorage = SettingsStorage()
         super().__init__(
-            command_prefix="a!",
+            command_prefix=get_prefix,
             intents=intents,
             help_command=None,
             chunk_guilds_at_startup=False,

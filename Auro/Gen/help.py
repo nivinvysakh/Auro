@@ -1,7 +1,7 @@
 import discord
 from discord import ui
 from discord.ext import commands
-from util.emojis import Emojis, ButtonEmojis , BadgesIcon
+from util.emojis import Emojis , ButtonEmojis
 import aiohttp
 
 async def get_latest_version():
@@ -14,11 +14,14 @@ async def get_latest_version():
             return "v1.0.0"
 
 class HelpLayoutView(ui.LayoutView):
-    def __init__(self, bot: commands.Bot, author, version):
+    def __init__(self, bot: commands.Bot, author, version , prefix : str , total_cmd : int , app_cmd : int):
         super().__init__(timeout=300) 
         self.bot = bot
         self.author = author
         self.version = version
+        self.prefix = prefix
+        self.tcmd = total_cmd
+        self.app_cmd = app_cmd
         self.bot_icon = bot.user.display_avatar.url
         self.message = None 
         self.show_page("Home")
@@ -26,7 +29,9 @@ class HelpLayoutView(ui.LayoutView):
     def create_base_container(self, color):
         container = ui.Container(accent_color=color)
         container.add_item(ui.Section(
-            ui.TextDisplay(f"# Auro 🌛 \n*A high-fidelity music engine for Discord.*\n > This menu Expires in 5 Minutes."),
+            ui.TextDisplay(f"# Auro 🌛 \n\n*The definitive audio experience for your server.*"),
+            ui.TextDisplay("> This menu Expires in 5 Minutes."),
+            ui.TextDisplay(f"> Server Prefix: `{self.prefix}` • Total Commands : **{self.tcmd}** • App Commands : **{self.app_cmd}**"),
             accessory=ui.Thumbnail(self.bot_icon)
         ))
         container.add_item(ui.Separator())
@@ -41,6 +46,7 @@ class HelpLayoutView(ui.LayoutView):
                 f"### Welcome to Auro {self.version}\n"
                 f"Crystal-clear audio, live synced lyrics, and cinematic filters.\n\n"
                 f"**Modules Available:**\n\n"
+                f"{Emojis.dot} ⚙️ **Prefix**\n\n"
                 f"{Emojis.dot} {Emojis.alien} **General Module**\n\n"
                 f"{Emojis.dot} {Emojis.music_help} **Music Module**\n\n"
                 f"{Emojis.dot} {Emojis.music} **Filters**\n\n"
@@ -48,7 +54,15 @@ class HelpLayoutView(ui.LayoutView):
                 f"{Emojis.dot} {Emojis.heart} **Contributors**\n\n"
             ))
             container.add_item(ui.Separator())
-
+        elif page_name == "Prefix":
+            container = self.create_base_container(discord.Color.green())
+            container.add_item(ui.TextDisplay(
+                f"## Prefix Commands ⚙️\n\n"
+                f"> These commands require `Manage_guild` permissions.\n\n"
+                f"**{Emojis.dot} </setprefix:1506897204302839828>** — Change Auro's command prefix for this server.\n"
+                f"**{Emojis.dot} </deleteprefix:1506897204302839829>** — Reset Auro's prefix back to default on this server."
+            ))
+            container.add_item(ui.Separator())
         elif page_name == "General":
             container = self.create_base_container(discord.Color.purple())
             container.add_item(ui.TextDisplay(
@@ -113,10 +127,10 @@ class HelpLayoutView(ui.LayoutView):
             container.add_item(ui.TextDisplay(
                 f"## Custom Playlist {Emojis.playlist}\n"
                 "\n"
-                f"**{Emojis.dot} </myplaylist save:1506536337975676989>** — Save or add tracks to your personal database.\n"
-                f"**{Emojis.dot} </myplaylist load:1506536337975676989>** — Load a saved database playlist into the queue.\n"
-                f"**{Emojis.dot} </myplaylist delete:1506536337975676989>** — Permanently delete a saved database playlist.\n"
-                f"**{Emojis.dot} </myplaylist list:1506536337975676989>** — List all your saved database playlists."
+                f"**{Emojis.dot} </myplaylist save:1506703235572830240>** — Save or add tracks to your personal database.\n"
+                f"**{Emojis.dot} </myplaylist load:1506703235572830240>** — Load a saved database playlist into the queue.\n"
+                f"**{Emojis.dot} </myplaylist delete:1506703235572830240>** — Permanently delete a saved database playlist.\n"
+                f"**{Emojis.dot} </myplaylist list:1506703235572830240>** — List all your saved database playlists."
             ))
             container.add_item(ui.Separator())
         elif page_name == "Contributors":
@@ -178,12 +192,13 @@ class HelpLayoutView(ui.LayoutView):
 class ModuleSelector(ui.Select):
     def __init__(self):
         options = [
-            discord.SelectOption(label="Home", emoji=ButtonEmojis.home, description="Go back to the overview"),
-            discord.SelectOption(label="General", emoji=Emojis.alien, description="Utility and system commands"),
-            discord.SelectOption(label="Music", emoji=Emojis.music_help, description="Audio engine and queue commands"),
+            discord.SelectOption(label="Home", emoji="🏡", description="Go back to the overview."),
+            discord.SelectOption(label="Prefix", emoji="⚙️", description="Change Auro's Prefix."),
+            discord.SelectOption(label="General", emoji=Emojis.alien, description="Utility and system commands."),
+            discord.SelectOption(label="Music", emoji=Emojis.music_help, description="Audio engine and queue commands."),
             discord.SelectOption(label="Filters",emoji=Emojis.music,description="See the Filters."),
             discord.SelectOption(label="Custom Playlists", emoji= Emojis.playlist, description="Personal database playlist management."),
-            discord.SelectOption(label="Contributors",emoji=Emojis.heart, description="See the Contributors behind me")
+            discord.SelectOption(label="Contributors",emoji=Emojis.heart, description="See the Contributors behind me.")
         ]
         super().__init__(placeholder="Select a Cog to view info...", min_values=1, max_values=1, options=options)
 
@@ -200,7 +215,12 @@ class Help(commands.Cog):
     @commands.guild_only()
     async def help(self, ctx: commands.Context):
         version = await get_latest_version()
-        view = HelpLayoutView(self.bot, ctx.author, version)
+        current_prefix = "a!"
+        total_cmd = len(self.bot.commands)
+        app_cmd = len(self.bot.tree.get_commands())
+        if ctx.guild and hasattr(self.bot, "settings_db"):
+            current_prefix = self.bot.settings_db.get_prefix(ctx.guild.id)
+        view = HelpLayoutView(self.bot, ctx.author, version , current_prefix , total_cmd, app_cmd)
         view.message = await ctx.reply(content=None, view=view)
 
 async def setup(bot):
