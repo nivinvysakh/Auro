@@ -55,11 +55,11 @@ class ChannelGroup(commands.Cog):
             embed = discord.Embed(
                 title="🔓 Channel Unlocked",
                 description="Auro commands can now be used in any text channel across the server.",
-                color=discord.Color.blurple()
+                color=discord.Color.red()
             )
         else:
             embed = discord.Embed(
-                description="❌ There was no channel restriction set for this server in the database.",
+                description=f"{Emojis.warning} There was no channel restriction set for this server in the database.",
                 color=discord.Color.red()
             )
             
@@ -71,15 +71,14 @@ class ChannelGroup(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.reply(
                 embed=discord.Embed(
-                    description="❌ You need the `Manage Server` permission to use these commands.",
+                    description=f"{Emojis.warning} You need the `Manage Server` permission to use these commands.",
                     color=discord.Color.red()
                 ),
                 delete_after=10
             )
 
 async def setup(bot: commands.Bot):
-    cog = ChannelGroup(bot)
-    await bot.add_cog(cog)
+    await bot.add_cog(ChannelGroup(bot))
 
     @bot.check
     async def global_channel_check(ctx: commands.Context):
@@ -107,7 +106,7 @@ async def setup(bot: commands.Bot):
                 if ctx.command and ctx.command.name not in ["help"]:
                     await ctx.reply(
                         embed=discord.Embed(
-                            description=f"⚠️ Auro commands are locked to {allowed_channel.mention}!",
+                            description=f"{Emojis.warning} Auro commands are locked to {allowed_channel.mention}!",
                             color=discord.Color.yellow()
                         ),
                         delete_after=10
