@@ -90,7 +90,7 @@ class Inactivity(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.author.bot:
+        if message.author.bot or not message.guild:
             return
 
         mentions = (f"<@!{self.bot.user.id}>", f"<@{self.bot.user.id}>")
@@ -101,12 +101,32 @@ class Inactivity(commands.Cog):
         if len(parts) < 2:
             return
 
+        trigger = parts[1].lower()
+        music_triggers = ["play", "p", "py", "pl", "stop", "stp", "dc", "leave", "getout"]
+
+        
+        if trigger in music_triggers:
+            # 🛡️ Staff Bypass Check
+            if not message.author.guild_permissions.manage_guild:
+                channel_cog = self.bot.get_cog("ChannelGroup")
+                if channel_cog:
+                    allowed_channel_id = channel_cog.storage.get_allowed_channel(message.guild.id)
+                    
+                    if allowed_channel_id and message.channel.id != allowed_channel_id:
+                        allowed_channel = message.guild.get_channel(allowed_channel_id)
+                        if allowed_channel:
+                            await message.reply(
+                                embed=discord.Embed(
+                                    description=f"{Emojis.warning} Auro music commands are locked to {allowed_channel.mention}!",
+                                    color=discord.Color.yellow()
+                                ), delete_after=10
+                            )
+                        return  
+
         ctx = await self.bot.get_context(message)
         music_cog = self.bot.get_cog("Music")
         if not music_cog:
             return
-
-        trigger = parts[1].lower()
 
         if trigger in ["play", "p", "py", "pl"]:
             if len(parts) >= 3:
@@ -119,5 +139,5 @@ class Inactivity(commands.Cog):
                 await music_cog.stop.callback(music_cog, ctx)
 
 
-async def setup(bot : commands.Bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Inactivity(bot))
