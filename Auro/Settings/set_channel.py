@@ -88,7 +88,7 @@ async def setup(bot: commands.Bot):
         
         if ctx.author.guild_permissions.manage_guild:
             if ctx.command and (
-                ctx.command.name in ["help", "prefix", "setprefix","clearbot","clearmsg"] or 
+                ctx.command.name in ["help", "prefix", "setprefix","deleteprefix","clearbot","clearmsg"] or 
                 ctx.command.root_parent and ctx.command.root_parent.name == "channel"
             ):
                 return True
