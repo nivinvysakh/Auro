@@ -16,7 +16,7 @@ class Track_details(commands.Cog):
         if getattr(player, "loop", False) and not getattr(track, "is_stream", False):
             status_flags.append("🔂 Looped")
             
-        status_subtitle = " • ".join(status_flags) if status_flags else f"{Emojis.musicplaying} *Playback Active*"
+        status_subtitle = " • ".join(status_flags) if status_flags else f"{Emojis.musicplaying} Playback Active"
 
         
         requester = getattr(track, "requester", "Unknown")
