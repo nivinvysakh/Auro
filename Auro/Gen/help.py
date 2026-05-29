@@ -46,7 +46,7 @@ class HelpLayoutView(ui.LayoutView):
                 f"### Welcome to Auro {self.version}\n"
                 f"Crystal-clear audio, live synced lyrics, and cinematic filters.\n\n"
                 f"**Modules Available:**\n\n"
-                f"{Emojis.dot} ⚙️ **Prefix**\n\n"
+                f"{Emojis.dot} ⚙️ **Settings**\n\n"
                 f"{Emojis.dot} {Emojis.alien} **General Module**\n\n"
                 f"{Emojis.dot} {Emojis.music_help} **Music Module**\n\n"
                 f"{Emojis.dot} {Emojis.music} **Filters**\n\n"
@@ -54,13 +54,21 @@ class HelpLayoutView(ui.LayoutView):
                 f"{Emojis.dot} {Emojis.heart} **Contributors**\n\n"
             ))
             container.add_item(ui.Separator())
-        elif page_name == "Prefix":
+        elif page_name == "Settings":
             container = self.create_base_container(discord.Color.green())
             container.add_item(ui.TextDisplay(
                 f"## Prefix Commands ⚙️\n\n"
                 f"> These commands require `Manage_guild` permissions.\n\n"
                 f"**{Emojis.dot} </setprefix:1506897204302839828>** — Change Auro's command prefix for this server.\n"
                 f"**{Emojis.dot} </deleteprefix:1506897204302839829>** — Reset Auro's prefix back to default on this server."
+            ))
+            container.add_item(ui.Separator())
+            container.add_item(ui.TextDisplay(
+                f"##  Channel Restrictions 🔒\n\n"
+                f"> These commands require `Manage_guild` permissions.\n\n"
+                f"**{Emojis.dot} </channel set:1509598635229450481>** — Locks all music playback and utility commands to a single text channel.\n"
+                f"**{Emojis.dot} </channel remove:1509598635229450481>** — Lifts the lock and allows Auro to be used anywhere in the server.\n"
+
             ))
             container.add_item(ui.Separator())
         elif page_name == "General":
@@ -196,7 +204,7 @@ class ModuleSelector(ui.Select):
     def __init__(self):
         options = [
             discord.SelectOption(label="Home", emoji="🏡", description="Go back to the overview."),
-            discord.SelectOption(label="Prefix", emoji="⚙️", description="Change Auro's Prefix."),
+            discord.SelectOption(label="Settings", emoji="⚙️", description="Change Auro's Settings ."),
             discord.SelectOption(label="General", emoji=Emojis.alien, description="Utility and system commands."),
             discord.SelectOption(label="Music", emoji=Emojis.music_help, description="Audio engine and queue commands."),
             discord.SelectOption(label="Filters",emoji=Emojis.music,description="See the Filters."),
