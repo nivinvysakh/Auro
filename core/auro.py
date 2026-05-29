@@ -44,8 +44,8 @@ class Auro(commands.AutoShardedBot):
 
         await asyncio.sleep(5)
 
-        
         feature_folders = [
+            "Auro/Settings",
             "Auro/Gen",
             "Auro/Music",
             "Auro/dev",
@@ -77,7 +77,6 @@ class Auro(commands.AutoShardedBot):
         await self.tree.sync()
         print(f"{self.get_time()} | SUCCESS   | Auro Slash Commands: Synced.")
 
-        
         async def pomice_setup():
             connected = False
             while not connected:
@@ -98,7 +97,7 @@ class Auro(commands.AutoShardedBot):
                     print(
                         f"{self.get_time()} | ERROR     | Pomice: Setup failed: {e}"
                     )
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(120)
 
         self.loop.create_task(pomice_setup())
 
@@ -115,9 +114,13 @@ class Auro(commands.AutoShardedBot):
         print(
             f"{self.get_time()} | WARNING   | Pomice: Node {node.identifier} disconnected! Reason: {reason} (Code: {code})"
         )        
+        
         reconnected = False
         while not reconnected:
-            await asyncio.sleep(5)
+            
+            print(f"{self.get_time()} | INFO      | Pomice: Waiting 2 minutes before reconnection attempt...")
+            await asyncio.sleep(120)
+            
             try:
                 print(
                     f"{self.get_time()} | INFO      | Pomice: Attempting to reconnect node {node.identifier}..."
@@ -137,7 +140,7 @@ class Auro(commands.AutoShardedBot):
                 reconnected = True
             except Exception as e:
                 print(
-                    f"{self.get_time()} | ERROR     | Pomice: Reconnection failed: {e}. Retrying in 5 seconds..."
+                    f"{self.get_time()} | ERROR     | Pomice: Reconnection failed: {e}. Retrying loop..."
                 )
 
     # --- Gateway Infrastructure Listeners ---

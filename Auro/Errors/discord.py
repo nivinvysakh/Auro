@@ -21,7 +21,7 @@ class ErrorHandler(commands.Cog):
         
         if isinstance(original_error, pomice.exceptions.NoNodesAvailable):
             embed = discord.Embed(
-                title=f"{Emojis.error} Audio Core Offline",
+                title=f"{Emojis.offline_lavalink} Audio Core Offline",
                 description=(
                         "I am currently unable to connect to our audio nodes. `(｡•́︿•̀｡)`\n\n"
                         "**Please try again in a few moments.**"),

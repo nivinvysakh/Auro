@@ -27,7 +27,7 @@ class PlaylistPagination(discord.ui.View):
         page_tracks = self.tracks[start:end]
 
         embed = discord.Embed(
-            title=f"📂 Playlist: {self.playlist_name.title()}",
+            title=f"{Emojis.playlist_ico} Playlist: {self.playlist_name.title()}",
             color=discord.Color.blurple()
         )
         
@@ -84,7 +84,7 @@ class CustomPlaylists(commands.Cog):
 
     @commands.hybrid_group(
         name="myplaylist", 
-        description="📂 Manage your personal saved playlists."
+        description=f"{Emojis.playlist_ico} Manage your personal saved playlists."
     )
     @commands.guild_only()
     async def myplaylist(self, ctx: commands.Context):
@@ -190,7 +190,7 @@ class CustomPlaylists(commands.Cog):
             return await ctx.interaction.followup.send(embed=embed)
 
         embed_loading = discord.Embed(
-            description=f"📂 Fetching `{len(tracks)}` tracks from your playlist `{playlist_name}`...",
+            description=f"{Emojis.playlist_ico} Fetching `{len(tracks)}` tracks from your playlist `{playlist_name}`...",
             color=discord.Color.blurple()
         )
         
@@ -211,7 +211,7 @@ class CustomPlaylists(commands.Cog):
 
         for track_hash, track_title in tracks:
             if player.queue.size >= 30:
-                embed_cap = discord.Embed(description="⚠️ *The queue hit its 30-track limit. Skipping the remaining songs.*", color=discord.Color.orange())
+                embed_cap = discord.Embed(description=f"{Emojis.warning} *The queue hit its 30-track limit. Skipping the remaining songs.*", color=discord.Color.orange())
                 await ctx.channel.send(embed=embed_cap, delete_after=10)
                 break
                 
@@ -294,7 +294,7 @@ class CustomPlaylists(commands.Cog):
             return await ctx.reply(embed=embed, ephemeral=True, delete_after=10)
 
         embed = discord.Embed(
-            title=f"📋 Your Playlists ({len(rows)}/5)",
+            title=f"{Emojis.playlist_ico} Your Playlists ({len(rows)}/5)",
             color=discord.Color.blurple()
         )
         
