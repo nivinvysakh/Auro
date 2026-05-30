@@ -46,6 +46,7 @@ class Auro(commands.AutoShardedBot):
 
         feature_folders = [
             "Auro/Settings",
+            "Auro/Context",
             "Auro/Gen",
             "Auro/Music",
             "Auro/dev",
