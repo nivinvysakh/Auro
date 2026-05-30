@@ -1,14 +1,17 @@
 import discord
 from discord.ext import commands
 import asyncio
+import time  
 from util.emojis import Emojis
 from typing import cast
 from Auro.Music.play import Player
+from databases.tracking import TrackingStorage  
 
 
 class Inactivity(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.storage = TrackingStorage()  
 
     @commands.Cog.listener()
     async def on_voice_state_update(
@@ -17,13 +20,44 @@ class Inactivity(commands.Cog):
         before: discord.VoiceState,
         after: discord.VoiceState,
     ):
+       
+        player = cast(Player, member.guild.voice_client)
 
+        # --- LIVE VOICE TRACKING MODULE ---
+        if player and player.channel:
+            
+            
+            if not member.bot:
+                
+                if after.channel and after.channel.id == player.channel.id:
+                    if not before.channel or before.channel.id != player.channel.id:
+                        self.storage.start_session(member.id, time.time())
+
+                
+                elif before.channel and before.channel.id == player.channel.id:
+                    if not after.channel or after.channel.id != player.channel.id:
+                        self.storage.end_session(member.id, time.time())
+
+            
+            elif member.id == self.bot.user.id and after.channel:
+        
+                for human in after.channel.members:
+                    if not human.bot:
+                        
+                        self.storage.start_session(human.id, time.time())
+
+        # --- AUDIO AUTO-STATE INTERCEPTORS  ---
         if member.id == self.bot.user.id:
-            player = cast(Player, member.guild.voice_client)
             if not player:
                 return
 
             if before.channel and not after.channel:
+                
+                if before.channel:
+                    
+                    for human in before.channel.members:
+                        if not human.bot:
+                            self.storage.end_session(human.id, time.time())
                 await player.destroy()
                 return
 
@@ -62,7 +96,7 @@ class Inactivity(commands.Cog):
                         )
                 return
 
-        player = cast(Player, member.guild.voice_client)
+        # --- INACTIVITY CLEANUP  ---
         if not player or not player.channel:
             return
 
@@ -81,10 +115,13 @@ class Inactivity(commands.Cog):
                             icon_url=self.bot.user.display_avatar.url,
                         )
                     )
+                
+                for human in player.channel.members:
+                    if not human.bot:
+                        self.storage.end_session(human.id, time.time())
                 await player.destroy()
 
         else:
-
             if player.is_paused and not player.manual_pause and not member.guild.me.voice.mute:
                 await player.set_pause(False)
 
@@ -104,9 +141,8 @@ class Inactivity(commands.Cog):
         trigger = parts[1].lower()
         music_triggers = ["play", "p", "py", "pl", "stop", "stp", "dc", "leave", "getout"]
 
-        
         if trigger in music_triggers:
-            # 🛡️ Staff Bypass Check
+            
             if not message.author.guild_permissions.manage_guild:
                 channel_cog = self.bot.get_cog("ChannelGroup")
                 if channel_cog:

@@ -41,6 +41,7 @@ class Emojis:
     waves = "<a:waves:1506676876368678962>"
     playlist_ico = "<:customplaylist:1509840141290835989>"
     offline_lavalink = "<:offline2:1509846834909155428>"
+    session = "<:session:1509957492027691171>"
 
 class PlayerEmojis:
     pause = "<:pause:1507069686729150616>"
