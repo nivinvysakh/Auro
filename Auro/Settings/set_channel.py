@@ -31,6 +31,7 @@ class ChannelGroup(commands.Cog):
         name="set",
         description="🔒 Restrict all music bot commands to a specific text channel."
     )
+    @commands.has_permissions(manage_guild=True)
     @app_commands.describe(target_channel="✨ The text channel you want to lock Auro commands to")
     async def channel_set(self, ctx: commands.Context, target_channel: discord.TextChannel):
         self.storage.set_allowed_channel(ctx.guild.id, target_channel.id)
@@ -47,6 +48,7 @@ class ChannelGroup(commands.Cog):
         name="remove",
         description="🔓 Remove the text channel restriction and allow commands everywhere."
     )
+    @commands.has_permissions(manage_guild=True)
     async def channel_remove(self, ctx: commands.Context):
         current_restriction = self.storage.get_allowed_channel(ctx.guild.id)
 

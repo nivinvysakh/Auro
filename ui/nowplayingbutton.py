@@ -201,15 +201,15 @@ class NowPlayingView(discord.ui.View):
                 if isinstance(child, discord.ui.Button):
                     child.disabled = True
             await interaction.response.edit_message(view=self)
-            return await interaction.followup.send(
+            return await interaction.response.send_message(
                 f"{Emojis.warning} I am not connected to any voice channel.", ephemeral=True
             )
-        await interaction.response.defer()
-        await self.disable_all_buttons()
         if not interaction.user.voice or interaction.user.voice.channel != self.player.channel:
             return await interaction.response.send_message(
                 f"{Emojis.warning} You must be in my voice channel to use this button.", ephemeral=True
             )
+        await interaction.response.defer()
+        await self.disable_all_buttons()
         for member in self.player.channel.members:
             if not member.bot:
                 self.tracking.end_session(member.id,time.time())
@@ -224,6 +224,7 @@ class NowPlayingView(discord.ui.View):
 
         self.player.queue.clear()
         await self.player.destroy()
+        
 
         embed = discord.Embed(
             title=f"{Emojis.success} Session Terminated",

@@ -288,8 +288,8 @@ class Music(commands.Cog):
                 description=f"Auro detected that **{track.title}** is stuck for over {threshold_ms}ms.\nSkipping to the next track.",
                 color=discord.Color.red(),
             )
-            await player.controller.send(embed=embed)
-            await asyncio.sleep(1)
+            await player.controller.send(embed=embed,delete_after=16)
+            await asyncio.sleep(1.6)
             await player.stop()
 
     #  --- Music Playback Commands ---
@@ -510,11 +510,20 @@ class Music(commands.Cog):
             )
 
         player = cast(Player, ctx.voice_client)
+        # Track Session Clean Up
         if player and player.channel:
             for  member in player.channel.members:
                 if not member.bot:
                     player.tracking.end_session(member.id,time.time())
-        
+                    
+        # Button Clean Up 
+        if player and hasattr(player, "current_view") and player.current_view:
+            try :
+                await player.current_view.disable_all_buttons()
+                player.current_view = None
+            except :
+                pass
+
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
 
