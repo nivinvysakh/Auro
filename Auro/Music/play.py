@@ -15,6 +15,7 @@ import asyncio
 import spotipy
 import os
 import requests
+import time
 from util.emojis import Emojis
 from util.titlefilter import clean_track_title
 from discord import app_commands
@@ -22,6 +23,7 @@ from typing import cast
 from spotipy import SpotifyClientCredentials
 from databases import MusicCache
 from databases import MusicStorage
+from databases import TrackingStorage
 from pathlib import Path
 from Auro.Errors.db_bash import TrackHealer
 from ui.selections import TrackSelectionView
@@ -48,6 +50,7 @@ class Player(pomice.Player):
         self.queue = pomice.Queue()
         self.music_cache = MusicCache()
         self.music_storage = MusicStorage()
+        self.tracking = TrackingStorage()
         self.manual_pause = False
         self.controller = None
         self.loop = False
@@ -285,8 +288,8 @@ class Music(commands.Cog):
                 description=f"Auro detected that **{track.title}** is stuck for over {threshold_ms}ms.\nSkipping to the next track.",
                 color=discord.Color.red(),
             )
-            await player.controller.send(embed=embed)
-            await asyncio.sleep(1)
+            await player.controller.send(embed=embed,delete_after=16)
+            await asyncio.sleep(1.6)
             await player.stop()
 
     #  --- Music Playback Commands ---
@@ -505,8 +508,22 @@ class Music(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
-        
+
         player = cast(Player, ctx.voice_client)
+        # Track Session Clean Up
+        if player and player.channel:
+            for  member in player.channel.members:
+                if not member.bot:
+                    player.tracking.end_session(member.id,time.time())
+                    
+        # Button Clean Up 
+        if player and hasattr(player, "current_view") and player.current_view:
+            try :
+                await player.current_view.disable_all_buttons()
+                player.current_view = None
+            except :
+                pass
+
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
 
@@ -516,7 +533,9 @@ class Music(commands.Cog):
                 pass
 
         player.queue.clear()
-        await player.destroy()
+        if player:
+            await player.destroy()
+        
         embed = discord.Embed(
                 title=f"{Emojis.success} Session Terminated",
                 description="The queue has been cleared and the player has disconnected.",

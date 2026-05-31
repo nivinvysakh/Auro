@@ -18,25 +18,23 @@ class ListeningSessionContext(commands.Cog):
         self.bot.tree.add_command(self.ctx_menu)
 
     async def cog_unload(self):
+        
         self.bot.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
 
-    @app_commands.allowed_installs(guilds=True,users=False)
-    @app_commands.allowed_contexts(guilds=True,dms=False,private_channels=False)
+    @app_commands.allowed_installs(guilds=True, users=False)
+    @app_commands.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def view_listening_hours_callback(self, interaction: discord.Interaction, user: discord.User):
-        
         if user.bot:
             return await interaction.response.send_message(
                 f"{emojis.error} Bots cannot listen to music sessions!", 
                 ephemeral=True
             )
 
-        
         await interaction.response.defer(ephemeral=False)
 
         
-        total_hours = self.storage.get_lifetime_hours(user.id)
+        raw_seconds = self.storage.get_lifetime_seconds(user.id)
 
-       
         embed = discord.Embed(
             title=f"{emojis.session} Voice Session Analytics",
             description=f"Tracking profile stats for {user.mention}",
@@ -44,10 +42,17 @@ class ListeningSessionContext(commands.Cog):
         )
         
         
-        if total_hours > 0:
+        if raw_seconds > 0.0:
+            if raw_seconds < 60:
+                duration_text = f"`{raw_seconds:.1f}` Seconds"
+            elif raw_seconds < 3600:
+                duration_text = f"`{raw_seconds / 60:.1f}` Minutes"
+            else:
+                duration_text = f"`{raw_seconds / 3600:.1f}` Hours"
+
             embed.add_field(
                 name=f"{ButtonEmojis.status} Time Listened",
-                value=f"> `{total_hours}` Hours spent in VC with Auro",
+                value=f"> {duration_text} spent in VC with Auro",
                 inline=False
             )
         else:
@@ -63,7 +68,6 @@ class ListeningSessionContext(commands.Cog):
             icon_url=self.bot.user.display_avatar.url
         )
 
-        
         await interaction.edit_original_response(embed=embed)
 
 

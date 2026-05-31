@@ -69,14 +69,13 @@ class TrackingStorage:
             
             return session_seconds
 
-    def get_lifetime_hours(self, user_id: int) -> float:
+    def get_lifetime_seconds(self, user_id: int) -> float:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT total_seconds FROM voice_lifetime WHERE user_id = ?", (user_id,))
             row = cursor.fetchone()
             if row:
-                calculated_hours = round(row[0] / 3600, 1)
-                return calculated_hours
+                return float(row[0])
             
             return 0.0
 
