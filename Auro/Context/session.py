@@ -32,7 +32,7 @@ class ListeningSessionContext(commands.Cog):
 
         await interaction.response.defer(ephemeral=False)
 
-        # 👑 CLEAN & CHAD LOOKUP: Trusting your storage layer completely
+        
         raw_seconds = self.storage.get_lifetime_seconds(user.id)
 
         embed = discord.Embed(
@@ -41,7 +41,7 @@ class ListeningSessionContext(commands.Cog):
             color=discord.Color.blurple()
         )
         
-        # ⏱️ Dynamic Display Engine
+        
         if raw_seconds > 0.0:
             if raw_seconds < 60:
                 duration_text = f"`{raw_seconds:.1f}` Seconds"
