@@ -1,6 +1,8 @@
 import discord
 import pomice
 import aiohttp
+import time
+from databases import TrackingStorage
 from util.emojis import Emojis, PlayerEmojis
 from util.titlefilter import clean_track_title
 
@@ -57,6 +59,7 @@ class NowPlayingView(discord.ui.View):
         self.bot = bot
         self.player = player
         self.track = track
+        self.tracking = TrackingStorage()
         self.format_time = format_time_func
         self.message = None
 
@@ -207,6 +210,9 @@ class NowPlayingView(discord.ui.View):
             return await interaction.response.send_message(
                 f"{Emojis.warning} You must be in my voice channel to use this button.", ephemeral=True
             )
+        for member in self.player.channel.members:
+            if not member.bot:
+                self.tracking.end_session(member.id,time.time())
 
         await self.player.music_cache.clear_guild_cache(interaction.guild.id)
         await self.player.music_cache.clear_loop_queue(interaction.guild.id)

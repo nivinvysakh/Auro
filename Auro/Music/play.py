@@ -15,6 +15,7 @@ import asyncio
 import spotipy
 import os
 import requests
+import time
 from util.emojis import Emojis
 from util.titlefilter import clean_track_title
 from discord import app_commands
@@ -22,6 +23,7 @@ from typing import cast
 from spotipy import SpotifyClientCredentials
 from databases import MusicCache
 from databases import MusicStorage
+from databases import TrackingStorage
 from pathlib import Path
 from Auro.Errors.db_bash import TrackHealer
 from ui.selections import TrackSelectionView
@@ -48,6 +50,7 @@ class Player(pomice.Player):
         self.queue = pomice.Queue()
         self.music_cache = MusicCache()
         self.music_storage = MusicStorage()
+        self.tracking = TrackingStorage()
         self.manual_pause = False
         self.controller = None
         self.loop = False
@@ -505,8 +508,13 @@ class Music(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
-        
+
         player = cast(Player, ctx.voice_client)
+        if player and player.channel:
+            for  member in player.channel.members:
+                if not member.bot:
+                    player.tracking.end_session(member.id,time.time())
+        
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
 
@@ -516,7 +524,9 @@ class Music(commands.Cog):
                 pass
 
         player.queue.clear()
-        await player.destroy()
+        if player:
+            await player.destroy()
+        
         embed = discord.Embed(
                 title=f"{Emojis.success} Session Terminated",
                 description="The queue has been cleared and the player has disconnected.",

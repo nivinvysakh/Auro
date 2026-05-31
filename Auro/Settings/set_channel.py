@@ -85,6 +85,9 @@ async def setup(bot: commands.Bot):
         if not ctx.guild:
             return True
 
+        if await bot.is_owner(ctx.author):
+            return True
+        
         
         if ctx.author.guild_permissions.manage_guild:
             if ctx.command and (
