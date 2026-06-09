@@ -26,6 +26,8 @@ class Inactivity(commands.Cog):
         # --- LIVE VOICE TRACKING MODULE ---
         if player and player.channel:
             
+            if isinstance(player.channel, discord.StageChannel):
+                return
             
             if not member.bot:
                 
