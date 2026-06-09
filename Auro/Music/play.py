@@ -301,6 +301,7 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @app_commands.describe(search="🌛 Search for a song or paste a link")
+    @commands.cooldown(3,3,commands.BucketType.user)
     async def play(self, ctx: commands.Context, *, search: str):
         lock = self.bot.get_cog("Stopvc")
         if lock and lock.maintenance_lock:
@@ -311,7 +312,15 @@ class Music(commands.Cog):
                 )
             )
         if not ctx.author.voice:
-            return await ctx.reply(f"{Emojis.warning} You must be in a VC!", delete_after=5)
+            embed = discord.Embed(
+                description=f"{Emojis.warning} **Voice Connection Required**\n> Please join a voice channel first so I know where to play music!",
+                color= discord.Color.from_str("#2B2D31")
+            )
+            return await ctx.reply(
+                embed=embed,
+                delete_after=5
+            )
+        
         if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
             return await ctx.reply(
                 embed=discord.Embed(
@@ -319,7 +328,13 @@ class Music(commands.Cog):
                     color=discord.Color.yellow()
                 )
             )
-        
+        if ctx.voice_client and getattr(ctx.voice_client, "loading", False):
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} Auro is already processing a search request, please wait!",
+                    color= discord.Color.yellow()
+                ), delete_after=5
+            )
         await ctx.defer()
 
         if not ctx.voice_client:
@@ -425,7 +440,23 @@ class Music(commands.Cog):
 
             if not valid_track:
                 return
-
+            if any(queued_track.uri == valid_track.uri for queued_track in player.queue):
+                return await ctx.send(
+                    embed=discord.Embed(
+                        description=f"{Emojis.warning} **Duplicate Track:** `{valid_track.title}` is already waiting in the queue list.",
+                        color=discord.Color.yellow()
+                    ),
+                    delete_after=10
+                )
+            if player.current and player.current.uri == valid_track.uri:
+                return await ctx.send(
+                    embed=discord.Embed(
+                        description=f"{Emojis.warning} **Already Playing:** `{valid_track.title}` is playing right now! Loop it instead.",
+                        color=discord.Color.yellow()
+                    ),
+                    delete_after=10
+                )
+            
             valid_track.requester = ctx.author
             
             
@@ -445,7 +476,6 @@ class Music(commands.Cog):
                 except:
                     pass
                 await ctx.send(f"{Emojis.success} Playing: **{valid_track.title}**", delete_after=5)
-
         finally: 
             player.loading = False
 

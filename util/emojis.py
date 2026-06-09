@@ -42,6 +42,7 @@ class Emojis:
     playlist_ico = "<:customplaylist:1509840141290835989>"
     offline_lavalink = "<:offline2:1509846834909155428>"
     session = "<:session:1509957492027691171>"
+    streaming_cat = "<:cat:1510692960092553466>"
 
 class PlayerEmojis:
     pause = "<:pause:1507069686729150616>"
