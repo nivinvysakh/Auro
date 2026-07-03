@@ -46,12 +46,15 @@ class MusicStorage:
                 result = await cursor.fetchone()
                 if result:
                     return result
-
+                
             async with db.execute(
                 "SELECT track_hash, track_title FROM global_cache WHERE search_query LIKE ? LIMIT 1",
-                (f"%{clean_query}%",)
+                (f"{clean_query}%",) 
             ) as cursor:
-                return await cursor.fetchone()
+                result = await cursor.fetchone()
+                if result:
+                    return result
+            return None
 
     async def get_by_track_hash(self, track_hash: str):
         async with aiosqlite.connect(self.path) as db:
