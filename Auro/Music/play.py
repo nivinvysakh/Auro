@@ -686,7 +686,7 @@ class Music(commands.Cog):
             color = discord.Color.red()
 
         embed = discord.Embed(
-            description=f"**Looping is now {status}** for: **{player.current.title}**",
+            description=f" {Emojis.success} **Looping is now {status}** for: **{player.current.title}**",
             color=color,
         )
         await ctx.reply(embed=embed)
