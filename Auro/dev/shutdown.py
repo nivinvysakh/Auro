@@ -1,5 +1,6 @@
 import discord
 import asyncio
+import pomice
 from discord.ext import commands
 
 class Shutdown(commands.Cog):
@@ -14,7 +15,7 @@ class Shutdown(commands.Cog):
     async def shutdown(self,ctx : commands.Context):
         embed = discord.Embed(
             title="🛑 Shutdown Started.",
-            description="eta 10 sec..",
+            description="Auro Bot will be shutting down in 10 Sec",
             color= discord.Color.red()
         )
         embed.set_footer(
@@ -25,8 +26,15 @@ class Shutdown(commands.Cog):
             embed=embed
         )
         await asyncio.sleep(10)
-        print("Connection Close Request from Discord Msg Trigger.")
-        await self.bot.close()
-    
+        try :
+            node_pools = pomice.NodePool()
+            for node in list(node_pools.nodes.values()):
+                await node.disconnect()
+                print("Pomice Node successfully disconnected.")
+        except Exception as e :
+            print(f"Failed to Disconnect due to following Error : {e}")
+        finally:
+            await self.bot.close()
+            print("Discord Connnection Closed.")    
 async def setup(bot: commands.AutoShardedBot):
     await bot.add_cog(Shutdown(bot))

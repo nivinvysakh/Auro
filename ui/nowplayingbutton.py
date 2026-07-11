@@ -258,8 +258,7 @@ class NowPlayingView(discord.ui.View):
                 f"{Emojis.dot}  **Author** : *{self.track.author}* \n"
                 f"{Emojis.dot}  **Position** : `{self.format_time(self.player.position)}` \\ `{self.format_time(self.track.length)}` \n"
                 f"{Emojis.dot}  **Link** : [Watch Video]({self.track.uri})\n"
-            ),
-            color=discord.Color.green(),
+            )
         )
         
         embed.set_thumbnail(url=self.player.current.thumbnail if self.player.current else self.track.thumbnail)

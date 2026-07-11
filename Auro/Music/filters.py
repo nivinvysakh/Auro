@@ -486,7 +486,7 @@ class Filters(commands.Cog):
             )
         await ctx.reply(
             embed= discord.Embed(
-                description=f"{Emojis.success} Treble Boost Enabled!",
+                description=f"{Emojis.success} **Treble Boost Enabled!**",
                 color= discord.Color.blurple()
             ).set_footer(
                 text="💝", icon_url=self.bot.user.avatar.url

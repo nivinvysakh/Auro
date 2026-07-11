@@ -17,7 +17,7 @@ import os
 import requests
 import time
 from util.emojis import Emojis
-from util.titlefilter import clean_track_title
+from util.titlefilter import clean_track_title , clean_track_artist
 from discord import app_commands
 from typing import cast
 from spotipy import SpotifyClientCredentials
@@ -175,21 +175,21 @@ class Music(commands.Cog):
             return
         source = track.info.get("sourceName", "Unknown").capitalize()
         if player.controller:
-            clean_title = clean_track_title(track.title,max_chars=35)
+            clean_title = clean_track_title(track.title,max_chars=40)
+            clean_artist = clean_track_artist(track.author,max_chars=20)
             embed = (
                 discord.Embed(
                     title=f"**Now Playing** {Emojis.musicplaying}",
                     description=(
                         f"{Emojis.dot}  **Title** :  **{clean_title}** \n"
-                        f"{Emojis.dot}  **Author** : *{track.author}* \n"
+                        f"{Emojis.dot}  **Author** : *{clean_artist}* \n"
                         f"{Emojis.dot}  **Position** : `{self.format_time(track.position)}` \\ `{self.format_time(track.length)}` \n"
                         f"{Emojis.dot}   **Link** : [Watch Video]({track.uri})\n"
-                    ),
-                    color=discord.Color.green(),
+                    )
                 )
                 .set_thumbnail(url=player.current.thumbnail)
                 .set_footer(
-                    text=f"Auro Engine  |  {source}", icon_url=self.bot.user.avatar.url
+                    text=f"Auro Engine  |  Source: {source}", icon_url=self.bot.user.avatar.url
                 )
             )
 
@@ -202,7 +202,7 @@ class Music(commands.Cog):
             view.message = msg
             player.current_view = view
             try:
-                await msg.add_reaction("💝")
+                await msg.add_reaction(Emojis.success)
             except discord.HTTPException:
                 pass
 
@@ -288,7 +288,7 @@ class Music(commands.Cog):
                 description=f"Auro detected that **{track.title}** is stuck for over {threshold_ms}ms.\nSkipping to the next track.",
                 color=discord.Color.red(),
             )
-            await player.controller.send(embed=embed,delete_after=16)
+            await player.controller.send(embed=embed,delete_after=20)
             await asyncio.sleep(1.6)
             await player.stop()
 
