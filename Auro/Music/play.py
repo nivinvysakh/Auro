@@ -664,6 +664,13 @@ class Music(commands.Cog):
                 )
             )
         player.loop = not player.loop
+        if player.loop_queue:
+            return await ctx.reply(
+                embed= discord.Embed(
+                    description=f"{Emojis.warning} Currently, `Loop Queue` is enabled. Disable it to enable `Loop Track`.",
+                    color= discord.Color.yellow(),
+                ) , delete_after = 30
+            )
 
         if player.loop:
             current_track = player.current
@@ -679,17 +686,18 @@ class Music(commands.Cog):
             )
 
             status = "Enabled"
-            color = discord.Color.blurple()
         else:
             await player.music_cache.clear_guild_cache(ctx.guild.id)
             status = "Disabled"
-            color = discord.Color.red()
 
-        embed = discord.Embed(
-            description=f" {Emojis.success} **Looping is now {status}** for: **{player.current.title}**",
-            color=color,
-        )
-        await ctx.reply(embed=embed)
+
+        clean_title = clean_track_title(player.current.title,max_chars=30)
+        loop_embed = discord.Embed(
+            title=f" Track : *{clean_title}*",
+            description=f"Looping is now **{status}** for the current track.",
+            color = discord.Color.blurple() if player.loop else discord.Color.red()
+        ).set_thumbnail(url=player.current.thumbnail).set_footer(text="Auro Engine • Loop System", icon_url=self.bot.user.display_avatar.url)
+        await ctx.reply(embed=loop_embed)
 
     @commands.hybrid_command(
         name="loopqueue",
@@ -726,6 +734,13 @@ class Music(commands.Cog):
                 color=discord.Color.yellow(),
             )
             return await ctx.reply(embed=embed, delete_after=11)
+        if player.loop:
+            return await ctx.reply(
+                embed = discord.Embed(
+                    description=f"{Emojis.warning} Currently, `Loop Track` is enabled. Disable it to enable `Loop Queue`.",
+                    color= discord.Color.yellow()
+                ), delete_after = 30
+            )
 
         player.loop_queue = not player.loop_queue
 
@@ -755,14 +770,16 @@ class Music(commands.Cog):
             await player.music_cache.clear_loop_queue(ctx.guild.id)
 
         status = "Enabled" if player.loop_queue else "Disabled"
-        emoji = Emojis.success if player.loop_queue else Emojis.error
-        embed = discord.Embed(
-            description=f"{emoji} **Queue Looping is now {status}** ",
+        loop_queue_embed = discord.Embed(
+            title=f"Loop Queue Status",
+            description=f"Looping for the entire queue is now **{status}**.",
             color=discord.Color.blurple() if player.loop_queue else discord.Color.red(),
         ).set_footer(
-            text="Auro Engine • Queue System", icon_url=self.bot.user.display_avatar.url
-        )
-        await ctx.reply(embed=embed)
+            text="Auro Engine • Loop System", icon_url=self.bot.user.display_avatar.url).set_thumbnail(
+            url = self.bot.user.avatar.url
+            )
+        
+        await ctx.reply(embed=loop_queue_embed)
 
     @commands.hybrid_command(name="pause", description="⏸️ Pauses the current track.")
     @commands.guild_only()
