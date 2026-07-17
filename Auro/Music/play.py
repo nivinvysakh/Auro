@@ -372,7 +372,29 @@ class Music(commands.Cog):
                     )
                 except Exception :
                     pass
-                    
+
+            await asyncio.sleep(0.5)
+        voice_state = ctx.guild.me.voice
+        if voice_state and (voice_state.mute or voice_state.self_mute):
+            
+            embed = discord.Embed(
+                title=f"{Emojis.warning} **Auro is Muted!**",
+                description=(
+                    "I am currently muted in this voice channel, so you won't hear any audio."
+                ),
+                color=discord.Color.yellow()
+            )
+            embed.add_field(
+                name=f"{Emojis.heart} Action Required",
+                value=f"{Emojis.dot} Please unmute me \n{Emojis.dot} Please reload the Song by using `/play` or `/pfs` command again to start playing."
+            )
+            
+            if ctx.interaction :
+                await ctx.interaction.followup.send(embed=embed)
+            elif not ctx.interaction:
+                await ctx.reply(embed=embed)
+            return
+            
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
@@ -462,7 +484,12 @@ class Music(commands.Cog):
             
             if player.is_playing or player.queue.size > 0:
                 player.queue.put(valid_track)
-                await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**", delete_after=10)
+                added_queue_embed = discord.Embed(
+                    title=f"{Emojis.success} Added to Queue",
+                    description=f"**{valid_track.title}** has been added to the queue.",
+                    color=discord.Color.green()
+                )
+                await ctx.reply(embed=added_queue_embed, delete_after=10)
             else:
                 try:
                     await player.channel.edit(status=None)
