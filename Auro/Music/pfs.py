@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from typing import Optional
 from util.emojis import Emojis
+from datetime import datetime , timezone
 
 class StatusPlay(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -15,6 +16,13 @@ class StatusPlay(commands.Cog):
     @commands.guild_only()
     @discord.app_commands.describe(member="✨ The user whose Spotify you want to sync from")
     async def playfromstatus(self, ctx: commands.Context, member: Optional[discord.Member] = None):
+        if ctx.guild.me.timed_out_until and ctx.guild.me.timed_out_until > datetime.now(timezone.utc):
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} **Auro is currently timed out in this server.**\n> Please wait until the timeout expires to use music commands.",
+                    color = discord.Color.yellow()
+                )
+            )
         raw_target = member or ctx.author
         if not ctx.author.voice or not ctx.author.voice.channel:
             embed = discord.Embed(

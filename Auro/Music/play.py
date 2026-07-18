@@ -29,7 +29,7 @@ from Auro.Errors.db_bash import TrackHealer
 from ui.selections import TrackSelectionView
 from collections import deque
 from ui.nowplayingbutton import NowPlayingView
-
+from datetime import datetime , timezone
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
 MIN_DURATION = 10 * 1000
@@ -319,6 +319,13 @@ class Music(commands.Cog):
             return await ctx.reply(
                 embed=embed,
                 delete_after=5
+            )
+        if ctx.guild.me.timed_out_until and ctx.guild.me.timed_out_until > datetime.now(timezone.utc):
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} **Auro is currently timed out in this server.**\n> Please wait until the timeout expires to use music commands.",
+                    color = discord.Color.yellow()
+                )
             )
         
         if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:

@@ -9,6 +9,7 @@ import re
 from util.emojis import Emojis
 from Auro.Music.play import Player
 from databases import MusicStorage
+from datetime import datetime , timezone
 
 class PlaylistPagination(discord.ui.View):
     def __init__(self, author: discord.User, playlist_name: str, tracks: list):
@@ -167,6 +168,13 @@ class CustomPlaylists(commands.Cog):
     )
     @app_commands.describe(playlist_name="✨ Enter the name of the playlist to load")
     async def load_playlist(self, ctx: commands.Context, playlist_name: str):
+        if ctx.guild.me.timed_out_until and ctx.guild.me.timed_out_until > datetime.now(timezone.utc):
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} **Auro is currently timed out in this server.**\n> Please wait until the timeout expires to use music commands.",
+                    color = discord.Color.yellow()
+                ), ephemeral=True
+            )
         if not ctx.author.voice:
             embed = discord.Embed(description=f"{Emojis.warning} You must be in a voice channel to load a playlist!", color=discord.Color.yellow())
             return await ctx.reply(embed=embed, ephemeral=True, delete_after=5)
