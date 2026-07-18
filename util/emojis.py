@@ -43,6 +43,7 @@ class Emojis:
     offline_lavalink = "<:offline2:1509846834909155428>"
     session = "<:session:1509957492027691171>"
     streaming_cat = "<:cat:1510692960092553466>"
+    books = "<:mc_book:1528032751427518534>"
 
 class PlayerEmojis:
     pause = "<:pause:1507069686729150616>"

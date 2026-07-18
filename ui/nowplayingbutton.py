@@ -84,7 +84,21 @@ class NowPlayingView(discord.ui.View):
                 f"{Emojis.warning} I am not connected to any voice channel.", ephemeral=True
             )
             return False
-
+        if hasattr(self.player, "controller") and self.player.controller:
+            if interaction.channel_id != self.player.controller.id:
+                # 1. Loop through all children and explicitly gray them out
+                for child in self.children:
+                    if isinstance(child, discord.ui.Button):
+                        child.disabled = True
+                
+                
+                await interaction.response.edit_message(view=self)
+                
+                
+                await interaction.followup.send(
+                    f"{Emojis.warning} This control panel has been disabled because it is not in the active player channel ({self.player.controller.mention}).",
+                )
+                return False
         if not interaction.user.voice or interaction.user.voice.channel != self.player.channel:
             await interaction.response.send_message(
                 f"{Emojis.warning} You must be in my voice channel to use this button.", ephemeral=True

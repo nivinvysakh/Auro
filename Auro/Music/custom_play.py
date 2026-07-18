@@ -4,6 +4,7 @@ from discord import app_commands
 from util.emojis import Emojis
 from Auro.Music.play import Player
 from typing import cast
+from datetime import datetime, timezone
 
 class CustomPlay(commands.Cog):
     def __init__(self,bot : commands.Bot):
@@ -19,6 +20,14 @@ class CustomPlay(commands.Cog):
     )
     @commands.cooldown(1,30,commands.BucketType.guild)
     async def custom(self,interaction : discord.Interaction , file : discord.Attachment ):
+        if interaction.guild.me.timed_out_until and interaction.guild.me.timed_out_until > datetime.now(timezone.utc):
+            return await interaction.response.send_message(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} **Auro is currently timed out in this server.**\n> Please wait until the timeout expires to use music commands.",
+                    color = discord.Color.yellow()
+                ), ephemeral=True
+            )
+        
         await interaction.response.defer()
         ALLOWED_EXTENSIONS = ('mp3', 'wav', 'flac', 'ogg', 'm4a', 'aac')
         if not any(file.filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS):

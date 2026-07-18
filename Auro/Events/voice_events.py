@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from datetime import datetime, timezone
-from Music.play import Player
+from Auro.Music.play import Player
 
 class VoiceEvents(commands.Cog):
     def __init__(self, bot):
@@ -25,13 +25,7 @@ class VoiceEvents(commands.Cog):
             if player and isinstance(player, Player):
                 try:
                     
-                    player.queue.clear()
-                    
-                    if hasattr(player, "music_cache"):
-                        await player.music_cache.clear_guild_cache(after.guild.id)
-                        await player.music_cache.clear_loop_queue(after.guild.id)
-                    
-                    
+                    player.queue.clear()                    
                     if player.current:
                         await player.stop()
                         

@@ -116,7 +116,12 @@ class Music(commands.Cog):
             return []
         if len(results) > 1 :
             view = TrackSelectionView(results[:5])
-            msg = await ctx.send(content=f"🔎 {ctx.author.mention}, multiple results found. Select the correct version:", view=view )
+            multiple_embed = discord.Embed(
+                title=f"{Emojis.books} {ctx.author.display_name}",
+                description="Multiple results found , select the correct version",
+                color= discord.Color.orange()
+            )
+            msg = await ctx.send(content=f"{ctx.author.mention}",embed=multiple_embed,view=view )
             await view.wait()
             try :
                 await msg.delete()
