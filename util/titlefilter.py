@@ -25,3 +25,29 @@ def clean_track_title(title: str, max_chars: int = 40) -> str:
         return cleaned[:max_chars - 3].strip() + "..."
         
     return cleaned if cleaned else title
+
+def clean_track_artist(artist: str, max_chars : int = 30) -> str:
+    if not artist:
+        return "Unknown Artist"
+
+    junk_patterns = [
+        r'\s*[\[\(](official|music|video|audio|lyric|hd|4k|hq)[\]\)]\s*',
+        r'\s*[\[\(]video\s*clip[\]\)]\s*',
+        r'\s*\|\s*official\s*(music\s*)?(video|audio)\s*',
+        r'\s*-\s*official\s*(music\s*)?(video|audio)\s*',
+        r'\s*[\[\(](f|feat|featuring|ft)\.?\s+[^\]\)]+[\]\)]\s*',
+        r'\s*[\[\(][^\]\)]*(remix|mix|edit|version)[\]\)]\s*',
+        r'\s*~\s*.*',
+    ]
+    
+    cleaned = artist
+    for pattern in junk_patterns:
+        cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE)
+        
+    cleaned = re.sub(re.compile(r'\s+'), ' ', cleaned)
+    cleaned = cleaned.strip().strip('-').strip('|').strip()
+
+    if len(cleaned) > max_chars:
+        return cleaned[:max_chars - 3].strip() + "..."
+        
+    return cleaned if cleaned else artist

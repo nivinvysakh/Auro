@@ -5,6 +5,7 @@ import asyncio
 from typing import cast
 from Auro.Music.play import Player
 from util.emojis import Emojis
+from datetime import datetime , timezone
 
 class Radio(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -22,6 +23,14 @@ class Radio(commands.Cog):
         app_commands.Choice(name="Synthwave Night 🚗", value="synthwave")
     ])
     async def radio(self, interaction: discord.Interaction, genre: app_commands.Choice[str]):
+       
+        if interaction.guild.me.timed_out_until and interaction.guild.me.timed_out_until > datetime.now(timezone.utc):
+            return await interaction.response.send_message(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} **Auro is currently timed out in this server.**\n> Please wait until the timeout expires to use music commands.",
+                    color = discord.Color.yellow()
+                ), ephemeral=True
+            )
         lock = self.bot.get_cog("Stopvc")
         if lock and lock.maintenance_lock:
             return await interaction.response.send_message(

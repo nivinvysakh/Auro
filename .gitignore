@@ -1,5 +1,6 @@
 .env
 DB/
+*badge.db
 *__pycache__/
 .cache
 firebase_key.json
