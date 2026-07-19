@@ -32,4 +32,12 @@ class TrackSelectionView(discord.ui.View):
     async def callback(self, interaction: discord.Interaction):
         self.selected_track = self.tracks[int(self.select.values[0])]
         self.stop()
-        await interaction.response.send_message(f"{Emojis.success} Selected: **{self.selected_track.title}**", ephemeral=True)
+        succes_embed = discord.Embed(
+            title=f"{Emojis.success} Track Loaded.",
+            description=f"> Selected: **{self.selected_track.title}**",
+            color= discord.Color.green()
+        )
+        await interaction.response.send_message(
+            embed=succes_embed,
+            ephemeral=True
+        )

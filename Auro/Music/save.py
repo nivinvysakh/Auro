@@ -42,7 +42,8 @@ class Save(commands.Cog):
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text="Auro Engine • Save", icon_url=self.bot.user.avatar.url)
         try :
-            await ctx.author.send(embed=embed)
+            msg = await ctx.author.send(embed=embed)
+            await msg.add_reaction("❤️‍🩹")
             await ctx.reply(
                 embed=discord.Embed(
                     description=f"{Emojis.success} I've sent the details to your DMs, {ctx.author.mention}!",

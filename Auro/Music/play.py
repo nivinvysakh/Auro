@@ -17,7 +17,7 @@ import os
 import requests
 import time
 from util.emojis import Emojis
-from util.titlefilter import clean_track_title
+from util.titlefilter import clean_track_title , clean_track_artist
 from discord import app_commands
 from typing import cast
 from spotipy import SpotifyClientCredentials
@@ -29,7 +29,7 @@ from Auro.Errors.db_bash import TrackHealer
 from ui.selections import TrackSelectionView
 from collections import deque
 from ui.nowplayingbutton import NowPlayingView
-
+from datetime import datetime , timezone
 # Constants for filtering junk
 MAX_DURATION = 20 * 60 * 1000
 MIN_DURATION = 10 * 1000
@@ -116,7 +116,12 @@ class Music(commands.Cog):
             return []
         if len(results) > 1 :
             view = TrackSelectionView(results[:5])
-            msg = await ctx.send(content=f"🔎 {ctx.author.mention}, multiple results found. Select the correct version:", view=view )
+            multiple_embed = discord.Embed(
+                title=f"{Emojis.books} {ctx.author.display_name}",
+                description="Multiple results found , select the correct version",
+                color= discord.Color.orange()
+            )
+            msg = await ctx.send(content=f"{ctx.author.mention}",embed=multiple_embed,view=view )
             await view.wait()
             try :
                 await msg.delete()
@@ -175,21 +180,21 @@ class Music(commands.Cog):
             return
         source = track.info.get("sourceName", "Unknown").capitalize()
         if player.controller:
-            clean_title = clean_track_title(track.title,max_chars=35)
+            clean_title = clean_track_title(track.title,max_chars=40)
+            clean_artist = clean_track_artist(track.author,max_chars=20)
             embed = (
                 discord.Embed(
                     title=f"**Now Playing** {Emojis.musicplaying}",
                     description=(
                         f"{Emojis.dot}  **Title** :  **{clean_title}** \n"
-                        f"{Emojis.dot}  **Author** : *{track.author}* \n"
+                        f"{Emojis.dot}  **Author** : *{clean_artist}* \n"
                         f"{Emojis.dot}  **Position** : `{self.format_time(track.position)}` \\ `{self.format_time(track.length)}` \n"
                         f"{Emojis.dot}   **Link** : [Watch Video]({track.uri})\n"
-                    ),
-                    color=discord.Color.green(),
+                    )
                 )
                 .set_thumbnail(url=player.current.thumbnail)
                 .set_footer(
-                    text=f"Auro Engine  |  {source}", icon_url=self.bot.user.avatar.url
+                    text=f"Auro Engine  |  Source: {source}", icon_url=self.bot.user.avatar.url
                 )
             )
 
@@ -202,7 +207,7 @@ class Music(commands.Cog):
             view.message = msg
             player.current_view = view
             try:
-                await msg.add_reaction("💝")
+                await msg.add_reaction(Emojis.success)
             except discord.HTTPException:
                 pass
 
@@ -288,7 +293,7 @@ class Music(commands.Cog):
                 description=f"Auro detected that **{track.title}** is stuck for over {threshold_ms}ms.\nSkipping to the next track.",
                 color=discord.Color.red(),
             )
-            await player.controller.send(embed=embed,delete_after=16)
+            await player.controller.send(embed=embed,delete_after=20)
             await asyncio.sleep(1.6)
             await player.stop()
 
@@ -319,6 +324,13 @@ class Music(commands.Cog):
             return await ctx.reply(
                 embed=embed,
                 delete_after=5
+            )
+        if ctx.guild.me.timed_out_until and ctx.guild.me.timed_out_until > datetime.now(timezone.utc):
+            return await ctx.reply(
+                embed=discord.Embed(
+                    description=f"{Emojis.warning} **Auro is currently timed out in this server.**\n> Please wait until the timeout expires to use music commands.",
+                    color = discord.Color.yellow()
+                )
             )
         
         if ctx.voice_client and ctx.author.voice.channel != ctx.voice_client.channel:
@@ -372,7 +384,29 @@ class Music(commands.Cog):
                     )
                 except Exception :
                     pass
-                    
+
+            await asyncio.sleep(0.5)
+        voice_state = ctx.guild.me.voice
+        if voice_state and (voice_state.mute or voice_state.self_mute):
+            
+            embed = discord.Embed(
+                title=f"{Emojis.warning} **Auro is Muted!**",
+                description=(
+                    "I am currently muted in this voice channel, so you won't hear any audio."
+                ),
+                color=discord.Color.yellow()
+            )
+            embed.add_field(
+                name=f"{Emojis.heart} Action Required",
+                value=f"{Emojis.dot} Please unmute me \n{Emojis.dot} Please reload the Song by using `/play` or `/pfs` command again to start playing."
+            )
+            
+            if ctx.interaction :
+                await ctx.interaction.followup.send(embed=embed)
+            elif not ctx.interaction:
+                await ctx.reply(embed=embed)
+            return
+            
         await player.music_cache.clear_guild_cache(ctx.guild.id)
         await player.music_cache.clear_loop_queue(ctx.guild.id)
         player.controller = ctx.channel
@@ -462,7 +496,12 @@ class Music(commands.Cog):
             
             if player.is_playing or player.queue.size > 0:
                 player.queue.put(valid_track)
-                await ctx.send(f"{Emojis.success} Added to queue: **{valid_track.title}**", delete_after=10)
+                added_queue_embed = discord.Embed(
+                    title=f"{Emojis.success} Added to Queue",
+                    description=f"**{valid_track.title}** has been added to the queue.",
+                    color=discord.Color.green()
+                )
+                await ctx.reply(embed=added_queue_embed, delete_after=10)
             else:
                 try:
                     await player.channel.edit(status=None)
@@ -664,6 +703,13 @@ class Music(commands.Cog):
                 )
             )
         player.loop = not player.loop
+        if player.loop_queue:
+            return await ctx.reply(
+                embed= discord.Embed(
+                    description=f"{Emojis.warning} Currently, `Loop Queue` is enabled. Disable it to enable `Loop Track`.",
+                    color= discord.Color.yellow(),
+                ) , delete_after = 30
+            )
 
         if player.loop:
             current_track = player.current
@@ -679,17 +725,18 @@ class Music(commands.Cog):
             )
 
             status = "Enabled"
-            color = discord.Color.blurple()
         else:
             await player.music_cache.clear_guild_cache(ctx.guild.id)
             status = "Disabled"
-            color = discord.Color.red()
 
-        embed = discord.Embed(
-            description=f"**Looping is now {status}** for: **{player.current.title}**",
-            color=color,
-        )
-        await ctx.reply(embed=embed)
+
+        clean_title = clean_track_title(player.current.title,max_chars=30)
+        loop_embed = discord.Embed(
+            title=f" Track : *{clean_title}*",
+            description=f"Looping is now **{status}** for the current track.",
+            color = discord.Color.blurple() if player.loop else discord.Color.red()
+        ).set_thumbnail(url=player.current.thumbnail).set_footer(text="Auro Engine • Loop System", icon_url=self.bot.user.display_avatar.url)
+        await ctx.reply(embed=loop_embed)
 
     @commands.hybrid_command(
         name="loopqueue",
@@ -726,6 +773,13 @@ class Music(commands.Cog):
                 color=discord.Color.yellow(),
             )
             return await ctx.reply(embed=embed, delete_after=11)
+        if player.loop:
+            return await ctx.reply(
+                embed = discord.Embed(
+                    description=f"{Emojis.warning} Currently, `Loop Track` is enabled. Disable it to enable `Loop Queue`.",
+                    color= discord.Color.yellow()
+                ), delete_after = 30
+            )
 
         player.loop_queue = not player.loop_queue
 
@@ -755,14 +809,16 @@ class Music(commands.Cog):
             await player.music_cache.clear_loop_queue(ctx.guild.id)
 
         status = "Enabled" if player.loop_queue else "Disabled"
-        emoji = Emojis.success if player.loop_queue else Emojis.error
-        embed = discord.Embed(
-            description=f"{emoji} **Queue Looping is now {status}** ",
+        loop_queue_embed = discord.Embed(
+            title=f"Loop Queue Status",
+            description=f"Looping for the entire queue is now **{status}**.",
             color=discord.Color.blurple() if player.loop_queue else discord.Color.red(),
         ).set_footer(
-            text="Auro Engine • Queue System", icon_url=self.bot.user.display_avatar.url
-        )
-        await ctx.reply(embed=embed)
+            text="Auro Engine • Loop System", icon_url=self.bot.user.display_avatar.url).set_thumbnail(
+            url = self.bot.user.avatar.url
+            )
+        
+        await ctx.reply(embed=loop_queue_embed)
 
     @commands.hybrid_command(name="pause", description="⏸️ Pauses the current track.")
     @commands.guild_only()
