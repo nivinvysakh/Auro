@@ -64,7 +64,13 @@ class Radio(commands.Cog):
             results = await player.node.get_tracks(self.stations[genre.value])
 
             if not results:
-                return await interaction.followup.send(f"{Emojis.error} Station currently unreachable.")
+                station_offline_embed = discord.Embed(
+                    description=f"Station currently unreachable. {Emojis.error}",
+                    color= discord.Color.red()
+                )
+                return await interaction.followup.send(
+                    embed= station_offline_embed
+                )
 
             track = results[0]
             track.title = f"Auro Radio: {genre.name}"

@@ -21,7 +21,7 @@ class TrackSelectionView(discord.ui.View):
                 label=display_label,
                 description=f"By {track.author} | {track.length // 60000}m",
                 value=str(i),
-                emoji=Emojis.star_animate
+                emoji=Emojis.selection_dot
             ))
 
         self.select = discord.ui.Select(placeholder="Choose the version...", options=options)
@@ -33,7 +33,7 @@ class TrackSelectionView(discord.ui.View):
         self.selected_track = self.tracks[int(self.select.values[0])]
         self.stop()
         succes_embed = discord.Embed(
-            title=f"{Emojis.success} Track Loaded.",
+            title=f"Track Loaded {Emojis.success}",
             description=f"> Selected: **{self.selected_track.title}**",
             color= discord.Color.green()
         )

@@ -136,7 +136,14 @@ class Music(commands.Cog):
                     source=source
                 )
                 return [view.selected_track]
-            await ctx.reply(f"{ctx.author.mention} No Choice is selected.",delete_after=5)
+            no_result = discord.Embed(
+                description=f"{ctx.author.mention} No choice is selected.",
+                color= discord.Color.purple()
+            )
+            await ctx.send(
+                embed=no_result,
+                delete_after=5
+            )
             return []
         if results:
             track_hash = getattr(results[0], "track_id", None) or results[0].info.get(
@@ -497,7 +504,7 @@ class Music(commands.Cog):
             if player.is_playing or player.queue.size > 0:
                 player.queue.put(valid_track)
                 added_queue_embed = discord.Embed(
-                    title=f"{Emojis.success} Added to Queue",
+                    title=f"Added to Queue {Emojis.success} ",
                     description=f"**{valid_track.title}** has been added to the queue.",
                     color=discord.Color.green()
                 )
@@ -514,7 +521,15 @@ class Music(commands.Cog):
                     await player.channel.edit(status=f"{Emojis.auro} Auro Music !")
                 except:
                     pass
-                await ctx.send(f"{Emojis.success} Playing: **{valid_track.title}**", delete_after=5)
+                playing_embed = discord.Embed(
+                    description=f"Playing : *{valid_track.title}*",
+                    color= discord.Color.orange()
+                )
+                await asyncio.sleep(2)
+                await ctx.send(
+                    embed=playing_embed,
+                    delete_after=5
+                )
         finally: 
             player.loading = False
 

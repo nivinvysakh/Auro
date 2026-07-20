@@ -44,6 +44,7 @@ class Emojis:
     session = "<:session:1509957492027691171>"
     streaming_cat = "<:cat:1510692960092553466>"
     books = "<:mc_book:1528032751427518534>"
+    selection_dot = "<a:dot1:1528705800275623956>"
 
 class PlayerEmojis:
     pause = "<:pause:1507069686729150616>"
