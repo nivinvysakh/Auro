@@ -48,6 +48,6 @@ def clean_track_artist(artist: str, max_chars : int = 30) -> str:
     cleaned = cleaned.strip().strip('-').strip('|').strip()
 
     if len(cleaned) > max_chars:
-        return cleaned[:max_chars - 3].strip() + "..."
+        return cleaned[:max_chars - 3].strip() + "& others..."
         
     return cleaned if cleaned else artist

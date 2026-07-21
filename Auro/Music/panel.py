@@ -35,6 +35,12 @@ class Controls(commands.Cog):
         
         music_cog = self.bot.get_cog("Music")
         if music_cog and hasattr(music_cog, "on_pomice_track_start"):
+            await ctx.reply(
+                embed=discord.Embed(
+                    description=f"Pannel has been sent to {ctx.channel.mention}",
+                ) , delete_after=10
+            )
+            await asyncio.sleep(1)
             await music_cog.on_pomice_track_start(player, player.current)
 
 async def setup(bot: commands.Bot):
