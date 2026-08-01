@@ -53,8 +53,7 @@ class Auro(commands.AutoShardedBot):
             "Auro/Errors",
             "Auro/Server",
             "Auro/Events",
-            "Auro/Website",
-            "Auro/status",
+            "Auro/Website"
         ]
 
         for folder in feature_folders:

@@ -20,7 +20,7 @@ class invite(commands.Cog):
         )
         embed.add_field(
             name="🔗 Direct Link",
-            value="[Click Here to Invite](https://aurobot.netlify.app/)",
+            value="[Click Here to Invite](https://auroweb.netlify.app)",
             inline= False
         )
         avatar_url = self.bot.user.avatar.url if self.bot.user.avatar else self.bot.user.default_avatar.url
@@ -29,7 +29,7 @@ class invite(commands.Cog):
         
         button = Button(
             label="Invite Auro",
-            url="https://aurobot.netlify.app/",
+            url="https://auroweb.netlify.app",
             emoji= "🔗"
         )
         view = View()

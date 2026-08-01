@@ -25,7 +25,6 @@ from databases import MusicCache
 from databases import MusicStorage
 from databases import TrackingStorage
 from pathlib import Path
-from Auro.Errors.db_bash import TrackHealer
 from ui.selections import TrackSelectionView
 from collections import deque
 from ui.nowplayingbutton import NowPlayingView
@@ -34,7 +33,6 @@ from datetime import datetime , timezone
 MAX_DURATION = 20 * 60 * 1000
 MIN_DURATION = 10 * 1000
 env_path = Path(".") / ".env"
-track_healer = TrackHealer()
 
 sp = spotipy.Spotify(
     client_credentials_manager=SpotifyClientCredentials(
@@ -91,6 +89,9 @@ class Music(commands.Cog):
     async def get_or_search_track(
         self, ctx: commands.Context, player: Player, query: str, search_type: str = "query" 
     ) -> list:
+        """
+        A Helper Function used for Track Searching and Saving in DB and Sets a Looping DB Hash
+        """
         use_loop_cache = player.loop or player.loop_queue
         cached = await player.music_storage.get_cached_track(query)
         if cached:
@@ -247,48 +248,18 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_pomice_track_exception(
-        self, player: Player, track: pomice.Track, exception
-    ):
-        print(f"⚠️ Track Exception: {track.title}. Initializing Healer...")
-
-        track_healer = TrackHealer()
-        new_hash = await track_healer.repair(track.title)
-
-        if new_hash:
-            healed_track = await player.build_track(new_hash)
-            if healed_track:
-                healed_track.requester = getattr(track, "requester", None)
-
-                if not player.is_playing:
-                    await player.play(healed_track)
-                else:
-
-                    player.queue.put_at_front(healed_track)
-                    await player.stop()
-
-                if player.controller:
-                    await player.controller.send(
-                        embed=discord.Embed(
-                            title=f"{Emojis.success} Track Healed",
-                            description=f"Successfully healed **{track.title}**. Resuming playback.",
-                            color=discord.Color.green(),
-                        )
-                    )
-                return
+        self, player: Player, track: pomice.Track, exception):
 
         if player.controller:
             embed = discord.Embed(
-                title=f"{Emojis.warning} Playback Error",
-                description=f"Auro failed to heal **{track.title}**.\nSkipping...",
-                color=discord.Color.red(),
-            ).set_footer(
-                text="Auro Engine • AutoHeal",
-                icon_url=self.bot.user.display_avatar.url,
+                title=f"{Emojis.error} Playback Error",
+                description=f"Auro detected that **{track.title}** has crashed in server . \n Skipping to next track.",
+                color= discord.Color.orange()
             )
-
-            await player.controller.send(embed=embed, delete_after=15)
-
-        await player.stop()
+            await player.controller.send(embed=embed , delete_after=20)
+            print(f"An Error has Occured in  pomice_track_exception : {exception}")
+            await asyncio.sleep(1.6)
+            await player.stop()
 
     @commands.Cog.listener()
     async def on_pomice_track_stuck(
