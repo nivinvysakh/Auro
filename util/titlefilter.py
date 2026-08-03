@@ -1,6 +1,9 @@
 import re
 
 def clean_track_title(title: str, max_chars: int = 40) -> str:
+    """
+    Cleans the track title by removing common junk patterns such as "official", "music video", "feat.", etc. It also trims whitespace and limits the length of the title to a specified maximum number of characters.
+    """
     if not title:
         return "Unknown Track"
 

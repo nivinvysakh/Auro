@@ -34,6 +34,9 @@ class MusicCache:
                 return row[0] if row else None
 
     async def set_cached_hash(self, query: str, track_hash: str, title: str):
+        """
+        Set a cached hash for a given query.
+        """
 
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")
@@ -44,6 +47,8 @@ class MusicCache:
             await db.commit()
 
     async def clear_all(self):
+        """
+        Clear all cached hashes."""
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")
             await db.execute("DELETE FROM music_cache")
@@ -51,6 +56,8 @@ class MusicCache:
             await db.execute("VACUUM")
 
     async def clear_guild_cache(self, guild_id: int):
+        """
+        Clear all cached hashes for a specific guild."""
 
         async with aiosqlite.connect(self.path) as db:
             await db.execute("PRAGMA synchronous=NORMAL;")

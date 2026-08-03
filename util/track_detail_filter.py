@@ -2,6 +2,9 @@ import re
 from typing import Tuple
 
 def split_track_title(title: str) -> Tuple[str, str]:
+    """
+    A function that splits a track title into the main title and any extra details (like featuring artists, remix info, etc.). It uses regex to identify common patterns in track titles and separates them accordingly. If no patterns are found, it returns the original title and an empty string for extra details. If the title is longer than 40 characters, it will split at the last space before the 40th character.
+    """
 
     if not title:
         return "Unknown Track", ""

@@ -1,7 +1,13 @@
 class Roleids:
+    """
+    A Class containing Role IDs so that A authorized user can use Admin Commands in Auro Support Server.
+    """
     admin = 1495113086259167262
 
 class Emojis:
+    """
+    A class containing various emoji representations used throughout the bot. Each attribute corresponds to a specific emoji, which can be used in messages, embeds, and other interactions within Discord.
+    """
     color = 2829616
     auro = "<:botico:1489908738323120260>"
     error = "<:error:1486697352109756636>"

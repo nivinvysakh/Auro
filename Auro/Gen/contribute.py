@@ -5,6 +5,9 @@ import aiohttp
 
 
 async def get_latest_version():
+    """
+    Fetches the latest release version of the Auro bot from the Github API. If the request is successful, it returns the tag name of the latest release. If the request fails, it returns a default version string "v1.0.0". 
+    """
     url = "https://api.github.com/repos/ilynivin/Auro/releases/latest"
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
