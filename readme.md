@@ -5,9 +5,8 @@
 > **Auro** is no longer actively maintained due to persistent upstream platform blocks, IP rate limits, and audio stream extraction restrictions.
 >
 > This repository is archived and remains public strictly as a code archive and architectural reference (demonstrating asynchronous audio streaming, custom Discord UI pagination, transliteration pipelines, and full-stack integration). Feel free to fork or adapt any utility modules for your own projects.
-> This project took me around 2~3 years in planing, designing and developing.
-> Since Auro was in privet repo for long time and was desided to be released to public at september 2026 i am ending as a Bot Developer and will not be making any more bots in future. I will be focusing on Web and Cloud Development. I am happy that i have shown a constant dedication to this project with over 100+ commits in Main , Beta Branchs etc ..
-> Thank you 🙏💖
+>
+> This project took me around 2–3 years in planning, designing, and developing. Since Auro was in a private repository for a long time and was originally scheduled to be released publicly in September 2026, I am concluding my journey as a bot developer and will not be making more bots in the future. Moving forward, I will be focusing on Web and Cloud Development. I am proud to have shown constant dedication to this project with 270+ commits across branches. Thank you! 🙏💖
 
 # Auro 🌙
 
@@ -72,8 +71,8 @@ A minimalist, high-performance music engine for Discord.
 1. **Run the bot**:
    <br><br>
    `bash
- python main.py or py main.py
- `
+python main.py or py main.py
+`
    > [!important]
    > Make sure your Lavalink server is running before starting the bot.
    > &nbsp;
