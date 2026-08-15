@@ -6,11 +6,6 @@
 >
 > This repository is archived and remains public strictly as a code archive and architectural reference (demonstrating asynchronous audio streaming, custom Discord UI pagination, transliteration pipelines, and full-stack integration). Feel free to fork or adapt any utility modules for your own projects.
 
-> [!NOTE]
-> **Documentation Branch**: This branch is dedicated strictly to documentation updates (`.md`, `.txt`, etc.).
->
-> For forking or contributing code, please switch to the `Main` branch.
-
 ---
 
 # Auro 🌙
@@ -76,8 +71,8 @@ A minimalist, high-performance music engine for Discord.
 1. **Run the bot**:
    <br><br>
    `bash
-    python main.py or py main.py
-    `
+ python main.py or py main.py
+ `
    > [!important]
    > Make sure your Lavalink server is running before starting the bot.
    > &nbsp;
